@@ -1,8 +1,8 @@
 ---
 name: Feature Template
 about: Suggest an idea for this project
-title: ''
-labels: ''
+title: 'feat: '
+labels: '👏 enhancement'
 assignees: ''
 
 ---
