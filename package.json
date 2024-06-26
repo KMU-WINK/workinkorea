@@ -5,8 +5,8 @@
     "husky": "^9.0.11"
   },
   "scripts": {
-    "lint": "cd web && yarn lint",
-    "format": "cd web && yarn format",
+    "lint": "cd frontend && yarn lint",
+    "format": "cd frontend && yarn format",
     "prepare": "husky install"
   },
   "husky": {
