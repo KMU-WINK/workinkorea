@@ -16,6 +16,7 @@
 ## 디렉토리 구조 : File-Type Structure
 
 - example
+  ```
   .
   ├── app # Contains the main application files.
   │ ├── **init**.py # this file makes "app" a "Python package"
@@ -53,6 +54,7 @@
   ├── requirements.txt
   ├── .gitignore
   └── README.md
+  ```
 - app/: Contains the main application files.
 - main.py: Initializes the FastAPI application.
 - dependencies.py: Defines dependencies used by the routers.
