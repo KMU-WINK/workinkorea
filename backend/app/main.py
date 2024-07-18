@@ -1,10 +1,13 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
+from .routers import spots, stays
 
-from .routers import items
+load_dotenv()
 
 app = FastAPI()
 
-app.include_router(items.router)
+app.include_router(spots.router)
+app.include_router(stays.router)
 
 
 @app.get("/")

@@ -62,7 +62,7 @@
 - crud/: Contains CRUD (Create, Read, Update, Delete) operation modules.
 - schemas/: Contains Pydantic schema modules.
 - models/: Contains database model modules.
-- external_services/: Contains modules for interacting with external services.
+- external_services/: Contains modules for interacting with external services. **(API is here)**
 - utils/: Contains utility modules.
 - tests/: Contains test modules.
 
@@ -89,3 +89,31 @@
 ## API 문서
 
 API의 상세한 사용 방법은 `/docs` 경로에서 Swagger를 참고하세요.
+
+## 사용하는 Open API
+
+- **일반 인증키는 decoding된 값을 사용한다.**
+- 한국관광공사 국문 관광정보 서비스 GW
+  - endpoint : http://apis.data.go.kr/B551011/KorService1
+  - 사용하는 세부 서비스마다 endpoint가 달라집니다. 위 url에 추가하여 사용해야합니다.
+    - /areaCode1 : 지역코드조회
+    - /categoryCode1 : 서비스분류코드조회
+    - /areaBasedList1 : 지역기반관광정보조회
+    - /locationBasedList1 : 위치기반관광정보조회
+    - /searchKeyword1 : 키워드검색조회
+    - /searchFestival1 : 행사정보조회
+    - /searchStay1 : 숙박정보조회
+    - /detailCommon1 : 공통정보조회 (상세정보1)
+    - /detailIntro1 : 소개정보조회 (상세정보2)
+    - /detailInfo1 : 반복정보조회 (상세정보3)
+    - /detailImage1 : 이미지정보조회 (상세정보4)
+    - /areaBasedSyncList1 : 국문관광정보 동기화목록조회
+  - 관광 타입을 넣어주어야 하는 경우도 있다. **(ContentTypeId)**
+    - 관광지: 12
+    - 문화시설: 14
+    - 행사/공연/축제: 15
+    - 여행코스: 25
+    - 레포츠: 28
+    - 숙박: 32
+    - 쇼핑: 38
+    - 음식점: 39
