@@ -30,6 +30,10 @@
   │ │ ├── **init**.py
   │ │ ├── item.py # Defines CRUD operations for items.
   │ │ └── user.py # Defines CRUD operations for users.
+  │ ├── db
+  │ │ ├── **init**.py
+  │ │ ├── connection.py # Connect to DB server.
+  │ │ └── session.py    # Session management file.
   │ ├── schemas
   │ │ ├── **init**.py
   │ │ ├── item.py # Defines schemas for items.
