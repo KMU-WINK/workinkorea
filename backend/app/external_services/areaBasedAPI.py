@@ -34,10 +34,10 @@ AREA_CODE = {
 def get_spots(area="서울", pageNo=1):
     params = {
         "serviceKey": API_KEY,  # **required**
-        "numOfRows": "10",
-        "pageNo": pageNo,
         "MobileOS": "ETC",  # **required**
         "MobileApp": "AppTest",  # **required**
+        "numOfRows": "10",
+        "pageNo": pageNo,
         "_type": "json",  # type은 json으로 고정
         "contentTypeId": "12",  # **관광타입 = 관광지**
         "listYN": "Y",  # 목록구분(Y=목록, N=개수) -> ?뭔솔
@@ -57,10 +57,10 @@ def get_spots(area="서울", pageNo=1):
 def get_stays(area="서울", pageNo=1):
     params = {
         "serviceKey": API_KEY,  # **required**
-        "numOfRows": "10",
-        "pageNo": pageNo,
         "MobileOS": "ETC",  # **required**
         "MobileApp": "AppTest",  # **required**
+        "numOfRows": "10",
+        "pageNo": pageNo,
         "_type": "json",  # type은 json으로 고정
         "contentTypeId": "32",  # **관광타입 = 숙박**
         "listYN": "Y",  # 목록구분(Y=목록, N=개수) -> ?뭔솔
