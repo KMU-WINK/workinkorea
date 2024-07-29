@@ -16,20 +16,22 @@ const config: Config = {
       xl: '1.25rem',
     },
     colors: {
-      main: '#33C4A8',
-      secondary: '#EAF9F6',
-      unavailable: '#C1DBD7',
       wish: '#FF96A3',
       kakao: '#FEE502',
       naver: '#04C759',
-      gray: {
-        '1': '#F5F5F5',
-        '2': '#D9D9D9',
-        '3': '#A9A9A9',
-        '4': '#5A5A5A',
-      },
     },
     extend: {
+      colors: {
+        main: '#33C4A8',
+        secondary: '#EAF9F6',
+        unavailable: '#C1DBD7',
+        gray: {
+          '1': '#F5F5F5',
+          '2': '#D9D9D9',
+          '3': '#A9A9A9',
+          '4': '#5A5A5A',
+        },
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
