@@ -16,16 +16,6 @@ export default function Home() {
     setIsModalOpen(false);
   };
 
-  // @media screen and (max-width: 480px) {
-  //   .modal-content{
-  //       max-width: 100vw;
-  //       width: 100vw;
-  //       height: 100vh;
-  //       border-radius: 0;
-  //       justify-content: center;
-  //     }
-  //   }
-
   return (
     <main className="min-h-screen" style={{ padding: '24px' }}>
       <button
