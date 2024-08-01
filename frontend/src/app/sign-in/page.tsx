@@ -27,18 +27,6 @@ export default function Home() {
         Open Modal
       </button>
       <Modal isOpen={isModalOpen} onClose={closeModal}>
-        {/*        <div*/}
-        {/*          className="flex flex-col p-[52px_24px_36px_24px] relative bg-white rounded-[20px] gap-[100px] max-w-[392px] min-w-[392px]*/}
-        {/*xs:max-w-screen xs:w-screen xs:h-screen xs:rounded-none xs:justify-center"*/}
-        {/*          style={{*/}
-        {/*            backgroundColor: '#ffffff',*/}
-        {/*            borderRadius: '20px',*/}
-        {/*            gap: '100px',*/}
-        {/*            maxWidth: '392px',*/}
-        {/*            minWidth: '392px',*/}
-        {/*            padding: '52px 24px 36px 24px',*/}
-        {/*          }}*/}
-        {/*        >*/}
         <div className="modal-content">
           <div
             className="absolute top-4 right-4 cursor-pointer"
@@ -48,7 +36,7 @@ export default function Home() {
             x
           </div>
           <div className="flex flex-col" style={{ gap: '24px' }}>
-            <div className="flex flex-col " style={{ gap: '6px' }}>
+            <div className="flex flex-col" style={{ gap: '6px' }}>
               <div
                 className="text-xl font-semibold text-[#33C4A8]"
                 style={{ color: '#33C4A8' }}
