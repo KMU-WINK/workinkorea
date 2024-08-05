@@ -33,8 +33,8 @@ export default function Banner({ type, title, description }: BannerProps) {
   return (
     <div className={`${commonStyle} ${typeStyle}`}>
       {/* 24px -> xxl 로 수정 예정 */}
-      <div className="text-[24px] font-semibold">{title}</div>
-      <div>{description}</div>
+      <p className="text-[24px] font-semibold">{title}</p>
+      <p>{description}</p>
     </div>
   );
 }
