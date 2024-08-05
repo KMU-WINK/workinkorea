@@ -15,16 +15,16 @@ export default function Banner({ type, title, description }: BannerProps) {
 
   switch (type) {
     case 'white-filter-on':
-      typeStyle = 'bg-[#ffffff1a] text-[#ffffff]';
+      typeStyle = 'bg-[#ffffff1a] text-white';
       break;
     case 'white-filter-off':
       typeStyle = 'text-white';
       break;
     case 'black-filter-on':
-      typeStyle = 'bg-[#0000001a] text-[#000000]';
+      typeStyle = 'bg-[#0000001a] text-black';
       break;
     case 'black-filter-off':
-      typeStyle = 'text-[#000000]';
+      typeStyle = 'text-black';
       break;
     default:
       break;
