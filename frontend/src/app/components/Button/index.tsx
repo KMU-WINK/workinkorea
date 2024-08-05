@@ -17,9 +17,7 @@ export default function Button({
       type="button"
       className={`flex w-full justify-center self-center pt-5 pb-10 px-11 ${isSelect ? 'bg-main' : 'bg-unavailable'}`}
     >
-      <p className="flex align-center justify-center w-[303px] text-white">
-        {text}
-      </p>
+      <p className="flex align-center justify-center w-72 text-white">{text}</p>
     </button>
   );
 }
