@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import Modal from './_components/Modal';
+import Close from '../../../public/svgs/close.svg';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,8 +16,14 @@ export default function Home() {
     setIsModalOpen(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      closeModal();
+    }
+  };
+
   return (
-    <main className="min-h-screen text-[#000000] p-6">
+    <main className="min-h-screen text-[#000000] p-6" onKeyDown={handleKeyDown}>
       <button
         className="flex flex-col items-center justify-center text-white w-full bg-main p-3"
         type="button"
@@ -24,31 +31,33 @@ export default function Home() {
       >
         Open Modal
       </button>
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        handleKeyDown={handleKeyDown}
+      >
         <div
           className="flex flex-col justify-center pt-14 px-6
           pb-20 relative bg-[#ffffff]
           gap-24 min-w-[100vw] min-h-screen rounded-none
           sm:rounded-[20px] sm:min-w-[392px] sm:min-h-[392px]"
         >
-          <div
+          <Close
             className="absolute top-4 right-4 cursor-pointer"
             onClick={closeModal}
-          >
-            x
-          </div>
+          />
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1.5">
-              <div className="text-xl font-semibold text-main">
+              <span className="text-xl font-semibold text-main">
                 워크인코리아
-              </div>
-              <div className="text-lg font-medium">
+              </span>
+              <span className="text-lg font-medium">
                 원하는 곳에서 머무르며 일하다
-              </div>
+              </span>
             </div>
-            <div className="text-sm">
+            <span className="text-sm">
               나에게 꼭 맞는 장소에서의 워케이션을 계획하세요
-            </div>
+            </span>
           </div>
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2.5">
@@ -71,7 +80,7 @@ export default function Home() {
                 Google로 시작하기
               </button>
             </div>
-            <div className="text-[14px] font-medium">
+            <span className="text-[14px] font-medium">
               계속 진행하시면 워크인코리아의{' '}
               <Link className="underline" href="/">
                 서비스 약관
@@ -81,7 +90,7 @@ export default function Home() {
                 개인정보처리방침
               </Link>
               에 동의하시는 것으로 간주됩니다.
-            </div>
+            </span>
           </div>
         </div>
       </Modal>
