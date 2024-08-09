@@ -3,22 +3,9 @@
 import Image from 'next/image';
 import priceToString from '@/utils/priceToString';
 import styled from 'styled-components';
+import { CardProps, CardType, ServiceType } from '@/types/type';
 import Heart from '../../../public/svgs/heart.svg';
 import FullHeart from '../../../public/svgs/heart-fill.svg';
-
-type CardType = 'default' | 'map';
-type ServiceType = 'default' | 'work';
-
-export interface CardProps {
-  cardType: CardType;
-  serviceType: ServiceType;
-  title: string;
-  location: string;
-  image: string;
-  price: number;
-  inWishlist?: boolean;
-  company?: string;
-}
 
 const Container = styled.div<{ cardType: CardType }>`
   display: flex;
