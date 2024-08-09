@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const PrivateAxiosInstance = axios.create({
-  baseURL: process.env.NEXT_BULIC_API_BASE_URI,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URI,
   timeout: 1000,
   headers: { 'Content-Type': 'application/json' },
 });
