@@ -39,7 +39,7 @@ const Content = styled.div<{ cardType: CardType }>`
   flex: ${props => (props.cardType === 'map' ? '1' : '')};
   justify-content: ${props =>
     props.cardType === 'map' ? 'space-between' : 'flex-start'};
-  gap: ${props => (props.cardType === 'map' ? '0' : '12px')};
+  gap: ${props => (props.cardType === 'map' ? '0' : '0.75rem')};
 `;
 
 const DetailContainer = styled.div`
