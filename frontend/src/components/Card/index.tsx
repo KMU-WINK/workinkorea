@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import priceToString from '@/utils/priceToString';
 import styled from 'styled-components';
-import Example from '../../../public/images/company-example.png';
-import Wish from '../../../public/svgs/heart.svg';
+import Heart from '../../../public/svgs/heart.svg';
+import FullHeart from '../../../public/svgs/heart-fill.svg';
 
 type CardType = 'default' | 'map';
 type ServiceType = 'default' | 'work';
@@ -112,14 +112,14 @@ export default function Card({
   location,
   image,
   price,
-  inWishlist,
-  company,
+  inWishlist = false,
+  company = '',
 }: CardProps) {
   return (
     <Container cardType={cardType}>
       <ImageSection cardType={cardType}>
         <Image
-          src={Example}
+          src={image}
           alt="example"
           fill={serviceType === 'default'}
           style={
@@ -138,9 +138,7 @@ export default function Card({
             <Title cardType={cardType}>{title}</Title>
           </Detail>
           {cardType === 'default' && (
-            <div>
-              <Wish />
-            </div>
+            <div>{inWishlist ? <FullHeart /> : <Heart />}</div>
           )}
         </DetailContainer>
         <InfoContainer cardType={cardType} serviceType={serviceType}>
@@ -152,9 +150,7 @@ export default function Card({
               <Price cardType={cardType}>{priceToString(price)}원~</Price>
             )}
             {cardType === 'map' && (
-              <div>
-                <Wish />
-              </div>
+              <div>{inWishlist ? <FullHeart /> : <Heart />}</div>
             )}
           </BottomContainer>
           <Location cardType={cardType}>{location}</Location>
