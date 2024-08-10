@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
+import KakaoScriptLoader from '@/components/KakaoScriptLoader';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={myFont.className}>
         <StyledJsxRegistry>{children}</StyledJsxRegistry>
+        <KakaoScriptLoader />
       </body>
     </html>
   );
