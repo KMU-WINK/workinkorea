@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 import requests
+import os
 
 router = APIRouter(
     prefix="/auth",
@@ -16,3 +17,15 @@ async def kakaoAuth(client_id: str, redirect_url: str, code: str):
     _res = requests.post(_url)
     _result = _res.json()
     return {"code": _result}
+
+
+@router.get('/naver')
+async def naverAuth(state: str, code: str):
+    client_id = os.getenv("NAVER_CLIENT_ID")
+    client_secret = os.getenv("NAVER_CLIENT_SECRET")
+    redirect_uri = os.getenv("NAVER_REDIRECT_URI")
+    
+    _url = f'https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&code={code}&state={state}'
+    _res = requests.post(_url, headers={'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret': client_secret})
+    _result = _res.json()
+    return _result
