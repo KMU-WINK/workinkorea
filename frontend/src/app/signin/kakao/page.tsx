@@ -1,10 +1,10 @@
 'use client';
 
-import { authorizeWithKakao } from '@/services/auth/kakao';
+import authorizeWithKakao from '@/services/auth/kakao';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
-const KakaoCallbackPage = () => {
+function KakaoCallbackPage() {
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   /**
@@ -18,7 +18,7 @@ const KakaoCallbackPage = () => {
       const response = authorizeWithKakao({
         clientId: process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '',
         redirectUrl: `${window.location.protocol}//${window.location.host}/signin/kakao`,
-        code: code,
+        code,
       });
 
       // 인가 코드(code)를 통하여 액세스 토큰 요청을 완료하였으므로 isGranted.current를 갱신합니다.
@@ -30,6 +30,6 @@ const KakaoCallbackPage = () => {
   }, []);
 
   return <>콜백 페이지</>;
-};
+}
 
 export default KakaoCallbackPage;
