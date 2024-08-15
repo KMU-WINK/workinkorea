@@ -7,7 +7,12 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-async def read_items():
+@router.get("")
+async def read_spots():
     data = get_spots()
     return data
+
+
+@router.get("/:id")
+async def read_spot(id: int):
+    return "spot_detail"
