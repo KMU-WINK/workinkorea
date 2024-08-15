@@ -1,11 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Heart from '../../../../public/svgs/heart.svg';
+import HeartColor from '../../../../public/svgs/heart-color.svg';
 import Location from '../../../../public/svgs/location.svg';
 import GoSmall from '../../../../public/svgs/go-small.svg';
-import { useEffect, useState } from 'react';
-import HeartColor from '../../../../public/svgs/heart-color.svg';
+import BackWhite from '../../../../public/svgs/back-white.svg';
 
 interface JobInfo {
   title: string;
@@ -71,13 +72,17 @@ export default function Job() {
         className="flex flex-col justify-start items-center
         bg-white w-full sm:max-w-sm"
       >
-        <Image
-          src="/svgs/job-test.svg"
-          alt="Job"
-          layout="responsive"
-          width="0"
-          height="0"
-        />
+        <div className="relative w-full">
+          <Image
+            src="/svgs/job-test.svg"
+            alt="Job"
+            layout="responsive"
+            width="0"
+            height="0"
+          />
+          <BackWhite className="absolute top-4 left-4 z-10" />
+          <div className="absolute inset-0 h-1/2 bg-gradient-to-b from-gray-3 to-transparent"></div>
+        </div>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1">
           <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white">
             <div className="w-full flex justify-between items-center">

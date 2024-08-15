@@ -6,6 +6,7 @@ import Heart from '../../../../public/svgs/heart.svg';
 import HeartColor from '../../../../public/svgs/heart-color.svg';
 import Location from '../../../../public/svgs/location.svg';
 import GoSmall from '../../../../public/svgs/go-small.svg';
+import BackWhite from '../../../../public/svgs/back-white.svg';
 
 interface TourInfo {
   name: string;
@@ -57,13 +58,18 @@ export default function Tour() {
         className="flex flex-col justify-start items-center gap-3 w-full
         bg-white sm:max-w-sm"
       >
-        <Image
-          src="/svgs/tour-test.png"
-          alt="Stay"
-          layout="responsive"
-          width="0"
-          height="0"
-        />
+        <div className="relative w-full">
+          <Image
+            src="/svgs/tour-test.png"
+            alt="Tour"
+            layout="responsive"
+            width="0"
+            height="0"
+          />
+          <BackWhite className="absolute top-4 left-4 z-10" />
+
+          <div className="absolute inset-0 h-1/4 bg-gradient-to-b from-[#00000080] to-transparent"></div>
+        </div>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
           <div className="w-full flex flex-col gap-5 px-4 py-2 bg-white">
             <div className="w-full flex justify-between items-center">
