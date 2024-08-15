@@ -35,8 +35,6 @@ class User(Base):
     nickname = Column(String, index=True, unique=True)
     birth = Column(String)
     gender = Column(String)
-    id = Column(String, unique=True)
-    login = Column(String)
 
     # on Boarding
     regions = relationship("Region", secondary=User_Region, back_populates="users")
