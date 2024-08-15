@@ -13,7 +13,7 @@ declare global {
 function SignInPage() {
   const loginWithKaKao = () => {
     window.Kakao.Auth.authorize({
-      redirectUri: `${window.location.protocol}//${window.location.host}/signin/kakao`,
+      redirectUri: `${process.env.NEXT_PUBLIC_API_BASE_URI}/auth/kakao`,
     });
   };
 

@@ -13,15 +13,18 @@ router = APIRouter(
 )
 
 @router.get("/kakao")
-async def kakaoAuth(client_id: str, redirect_url: str, code: str):
-    # grant_type    <String>: authorization_code로 고정
-    # client_id     <String>: 앱 REST API 키
-    # redirect_uri  <String>: 인가 코드가 리다이렉트된 URI
-    # code          <String>: 인가 코드 받기 요청으로 얻은 인가 코드
-    _url = f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&code={code}&redirect_uri={redirect_url}"
-    _res = requests.post(_url)
-    _result = _res.json()
+async def kakaoAuth(code: str):
+    client_id = os.getenv('KAKAO_REST_API_KEY') 
+    redirect_uri = 'http://127.0.0.1:8000/auth/kakao'
 
+    _url = f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
+    _headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
+    _res = requests.post(_url, headers=_headers)
+    _result = _res.json()
+    
     access_token = _result["access_token"]
     return login(access_token=access_token, provider="KAKAO")
 
@@ -35,9 +38,6 @@ async def naverAuth(state: str, code: str):
     _url = f'https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&code={code}&state={state}'
     _res = requests.post(_url, headers={'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret': client_secret})
     _result = _res.json()
-
-    if "access_token" not in _result:
-        raise HTTPException(status_code=400, detail="Failed to get Naver access token")
 
     access_token = _result["access_token"]
     return login(access_token=access_token, provider="NAVER")
@@ -70,10 +70,12 @@ def login(access_token: str, provider: str):
     
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
     # 회원가입 시, 필요한 소셜 id와 provider를 search param에 포함 
+    client_url = os.getenv("WINK_CLIENT_URI")
+    
     if not user:
-        return RedirectResponse(url=f"{os.getenv("WINK_CLIENT_URI")}/signup?id={id}&provider={provider}")
+        return RedirectResponse(url=f"{client_url}/signup?id={id}&provider={provider}")
     
     access_token = Authorize.create_access_token(subject=user.nickname)
-    response = RedirectResponse(url="http://localhost:8000/")
+    response = RedirectResponse(url=f"{client_url}")
     response.set_cookie(key="access_token", value=access_token, httponly=True, samesite="Strict")
     return response
