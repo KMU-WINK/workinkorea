@@ -11,4 +11,4 @@ class Job(Base):
     content_id = Column(String)
 
     # User와의 일대일 관계 설정
-    user = relationship("User", back_populates="job")
+    user = relationship("User", back_populates="jobs")
