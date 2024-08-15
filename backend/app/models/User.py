@@ -30,7 +30,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    login = Column(String, nullable=False)
+    social_id = Column(String, nullable=False)
+    social = Column(String, nullable=False)
 
     nickname = Column(String, index=True, unique=True)
     birth = Column(String)

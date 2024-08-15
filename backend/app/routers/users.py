@@ -23,14 +23,14 @@ async def read_user(id: int, db: Session = Depends(get_db)):
 
 @router.post("")
 async def create_user(params: UserCreate, db: Session = Depends(get_db)):
-
     new_user = user.create(db, user=params)
     return new_user
 
 
-@router.patch("/:id")
-async def update_user(id: int, User: UserUpdate):
-    return "update_user"
+@router.patch("")
+async def update_user(user: UserUpdate, db: Session = Depends(get_db)):
+    result = user.update(db, user=user)
+    return result
 
 
 @router.delete("/:id")
