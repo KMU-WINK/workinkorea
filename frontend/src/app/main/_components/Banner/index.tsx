@@ -6,10 +6,17 @@ interface BannerProps {
     | 'black-filter-off';
   title: string;
   description: string;
+  backgroundImage: React.ReactNode;
 }
 
-export default function Banner({ type, title, description }: BannerProps) {
-  const commonStyle = 'flex flex-col gap-5 rounded-xl px-6 py-8 min-h-[360px]';
+export default function Banner({
+  type,
+  title,
+  description,
+  backgroundImage,
+}: BannerProps) {
+  const commonStyle =
+    'flex flex-col gap-5 rounded-xl px-6 py-8 min-h-[360px] relative overflow-hidden';
 
   let typeStyle = '';
 
@@ -32,9 +39,14 @@ export default function Banner({ type, title, description }: BannerProps) {
 
   return (
     <div className={`${commonStyle} ${typeStyle}`}>
-      {/* 24px -> xxl 로 수정 예정 */}
-      <p className="text-[24px] font-semibold">{title}</p>
-      <p>{description}</p>
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">{backgroundImage}</div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        <p className="text-[24px] font-semibold">{title}</p>
+        <p>{description}</p>
+      </div>
     </div>
   );
 }
