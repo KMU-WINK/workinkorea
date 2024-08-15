@@ -1,5 +1,4 @@
 # app/db/session.py
-from sqlalchemy.orm import Session
 from .connection import SessionLocal
 
 

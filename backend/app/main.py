@@ -2,12 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .db.connection import Base, engine
-from .routers import spots, stays, jobs, users
+from .models import User, Region, Interest, Work, Stay, Spot, Job  # 모든 모델을 import
+from .routers import initial, spots, stays, jobs, users
 
 load_dotenv()
 
 app = FastAPI()
 
+# Database Initialization
+Base.metadata.create_all(bind=engine)
 
 WHITE_LIST = [
     "http://localhost",
@@ -23,13 +26,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(initial.router)
 app.include_router(spots.router)
 app.include_router(stays.router)
 app.include_router(jobs.router)
 app.include_router(users.router)
-
-# Database Initialization
-Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
