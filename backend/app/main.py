@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .db.connection import Base, engine
-from .routers import spots, stays, tests, auth
+from .routers import spots, stays, jobs, users, auth
 
 load_dotenv()
 
@@ -26,7 +26,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(spots.router)
 app.include_router(stays.router)
-app.include_router(tests.router)
+app.include_router(jobs.router)
+app.include_router(users.router)
 
 # Database Initialization
 Base.metadata.create_all(bind=engine)
