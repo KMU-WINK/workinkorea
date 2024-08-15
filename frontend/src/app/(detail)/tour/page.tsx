@@ -60,7 +60,7 @@ export default function Tour() {
       >
         <div className="relative w-full">
           <Image
-            src="/svgs/tour-test.png"
+            src="/pngs/tour-test.png"
             alt="Tour"
             layout="responsive"
             width="0"

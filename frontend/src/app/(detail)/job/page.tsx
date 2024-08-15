@@ -70,7 +70,7 @@ export default function Job() {
     <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
       <div
         className="flex flex-col justify-start items-center
-        bg-white w-full sm:max-w-sm"
+        bg-white w-full sm:max-w-sm pb-20"
       >
         <div className="relative w-full">
           <Image

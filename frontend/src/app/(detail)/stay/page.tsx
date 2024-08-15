@@ -20,7 +20,7 @@ export default function Stay() {
         bg-white sm:max-w-sm"
       >
         <Image
-          src="/svgs/stay-test.png"
+          src="/pngs/stay-test.png"
           alt="Stay"
           layout="responsive"
           width="0"
