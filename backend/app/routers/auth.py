@@ -57,8 +57,8 @@ async def naverAuth(state: str, code: str):
     return login(access_token=access_token, provider="naver")
 
 
-def get_user(id: str, provider: str, db: Session = Depends(get_db)):
-    return db.query(User).filter(User.id == id and User.login == provider).first()
+def get_user(social_id: str, provider: str, db: Session = Depends(get_db)):
+    return db.query(User).filter(User.social_id == social_id and User.login == provider).first()
 
 def login(access_token: str, provider: str):
     db = next(get_db())
@@ -68,25 +68,24 @@ def login(access_token: str, provider: str):
             "https://kapi.kakao.com/v2/user/me",
             headers={"Authorization": f"Bearer {access_token}"}
         ).json()
-        id = str(user_info.get("id"))
+        social_id = str(user_info.get("id"))
         
     if provider == 'naver':
         user_info = requests.get(
             "https://openapi.naver.com/v1/nid/me",
             headers={"Authorization": f"Bearer {access_token}"}
         ).json()
-        id = user_info.get("response", {}).get("id")
-
+        social_id = user_info.get("response", {}).get("id")
     
     # 해당 id, provider를 통하여 db에 사용자 유무 판별
-    user = get_user(id=id, provider=provider, db=db)
+    user = get_user(social_id=social_id, provider=provider, db=db)
     
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
     # 회원가입 시, 필요한 소셜 id와 provider를 search param에 포함 
     client_url = os.getenv("WINK_CLIENT_URI")
     
     if not user:
-        return RedirectResponse(url=f"{client_url}/signup?id={id}&provider={provider}")
+        return RedirectResponse(url=f"{client_url}/signup?social_id={social_id}&provider={provider}")
     
     access_token = create_jwt_token(user.nickname)
     response = RedirectResponse(url=f"{client_url}")
