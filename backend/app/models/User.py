@@ -39,7 +39,7 @@ class User(Base):
 class UserRegion(Base):
     __tablename__ = "user_regions"
 
-    user_id = Column(String, ForeignKey("User.id"), primary_key=True)
+    user_id = Column(String, ForeignKey("user.id"), primary_key=True)
     id = Column(String, ForeignKey("region.id"), primary_key=True)
 
     user = relationship("User", back_populates="regions")

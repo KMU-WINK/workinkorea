@@ -1,11 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..models.User import User
 from ..db.session import get_db
-from fastapi_jwt_auth import AuthJWT
 from fastapi.responses import RedirectResponse
 import requests
 import os
+import jwt
+from datetime import datetime, timedelta
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+def create_jwt_token(user_nickname: str):
+    # JWT 토큰 생성
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode = {"sub": user_nickname, "exp": expire}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
 
 router = APIRouter(
     prefix="/auth",
@@ -26,7 +40,7 @@ async def kakaoAuth(code: str):
     _result = _res.json()
     
     access_token = _result["access_token"]
-    return login(access_token=access_token, provider="KAKAO")
+    return login(access_token=access_token, provider="kakao")
 
 
 @router.get('/naver')
@@ -40,24 +54,23 @@ async def naverAuth(state: str, code: str):
     _result = _res.json()
 
     access_token = _result["access_token"]
-    return login(access_token=access_token, provider="NAVER")
+    return login(access_token=access_token, provider="naver")
 
 
 def get_user(id: str, provider: str, db: Session = Depends(get_db)):
-    return db.query(User).filter(User.id == id and User.provider == provider).first()
+    return db.query(User).filter(User.id == id and User.login == provider).first()
 
 def login(access_token: str, provider: str):
     db = next(get_db())
-    Authorize = AuthJWT()
     # Access Token을 이용하여 각 소셜 서비스의 고유 id 값 조회
-    if provider == 'KAKAO':
+    if provider == 'kakao':
         user_info = requests.get(
             "https://kapi.kakao.com/v2/user/me",
             headers={"Authorization": f"Bearer {access_token}"}
         ).json()
         id = str(user_info.get("id"))
         
-    if provider == 'NAVER':
+    if provider == 'naver':
         user_info = requests.get(
             "https://openapi.naver.com/v1/nid/me",
             headers={"Authorization": f"Bearer {access_token}"}
@@ -75,7 +88,8 @@ def login(access_token: str, provider: str):
     if not user:
         return RedirectResponse(url=f"{client_url}/signup?id={id}&provider={provider}")
     
-    access_token = Authorize.create_access_token(subject=user.nickname)
+    access_token = create_jwt_token(user.nickname)
     response = RedirectResponse(url=f"{client_url}")
     response.set_cookie(key="access_token", value=access_token, httponly=True, samesite="Strict")
     return response
+
