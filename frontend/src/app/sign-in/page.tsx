@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 import Modal from './_components/Modal';
 import Close from '../../../public/svgs/close.svg';
+import Kakao from '../../../public/svgs/kakao.svg';
+import Naver from '../../../public/svgs/naver.svg';
+import Google from '../../../public/svgs/google.svg';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,7 +41,7 @@ export default function Home() {
       >
         <div
           className="flex flex-col justify-center pt-14 px-6
-          pb-20 relative bg-[#ffffff]
+          pb-20 relative bg-white
           gap-24 min-w-[100vw] min-h-screen rounded-none
           sm:rounded-[20px] sm:min-w-[392px] sm:min-h-[392px]"
         >
@@ -61,24 +64,18 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2.5">
-              <button
-                className="w-full p-[18px] border-none rounded-xl bg-kakao"
-                type="button"
-              >
+              <div className="w-full p-[18px] border border-gray-2 rounded-xl bg-kakao relative text-center">
+                <Kakao className="absolute top-1/2 -translate-y-1/2" />
                 카카오로 시작하기
-              </button>
-              <button
-                className="w-full p-[18px] border-none rounded-xl bg-naver text-[#ffffff]"
-                type="button"
-              >
+              </div>
+              <div className="w-full p-[18px] border border-gray-2 rounded-xl bg-naver text-white relative text-center">
+                <Naver className="absolute top-1/2 -translate-y-1/2" />
                 네이버로 시작하기
-              </button>
-              <button
-                className="w-full p-[18px] border-gray-2 rounded-xl bg-[#ffffff] border"
-                type="button"
-              >
+              </div>
+              <div className="w-full p-[18px] border border-gray-2 rounded-xl relative text-center">
+                <Google className="absolute top-1/2 -translate-y-1/2" />
                 Google로 시작하기
-              </button>
+              </div>
             </div>
             <span className="text-[14px] font-medium">
               계속 진행하시면 워크인코리아의{' '}
