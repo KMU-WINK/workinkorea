@@ -15,7 +15,7 @@ function NaverCallbackPage() {
       const response = authorizeWithNaver({
         clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '',
         clientSecret: process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET || '',
-        redirectUri: `${window.location.protocol}//${window.location.host}/signin/naver`,
+        redirectUri: `${process.env.NEXT_PUBLIC_API_BASE_URI}/auth/naver`,
         code,
         state: state || '',
       });
