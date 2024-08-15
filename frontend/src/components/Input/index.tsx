@@ -19,7 +19,7 @@ export default function Input({
 }: InputProps) {
   return (
     <div
-      className={`flex gap-2.5 w-full bg-white border border-gray-2 rounded-[10px] px-3.5 py-[18px] ${disabled && 'bg-gray-2'}`}
+      className={`flex gap-2.5 w-full border border-gray-2 rounded-[10px] px-3.5 py-[18px] ${disabled ? 'bg-gray-2' : 'bg-white'}`}
       onClick={disabled ? onClick : undefined}
       onKeyDown={disabled ? onClick : undefined}
       role="button"
@@ -27,8 +27,9 @@ export default function Input({
     >
       {leftIcon}
       <input
-        className="bg-transparent outline-none flex-1"
+        className="bg-transparent outline-none flex-1 placeholder-gray-4"
         type="text"
+        readOnly={disabled}
         placeholder={placeholder}
         onChange={e => onChange && onChange(e.target.value)}
       />
