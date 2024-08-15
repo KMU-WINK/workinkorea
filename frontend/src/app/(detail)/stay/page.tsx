@@ -3,9 +3,16 @@
 import Image from 'next/image';
 import Heart from '../../../../public/svgs/heart.svg';
 import Location from '../../../../public/svgs/location.svg';
-import GoColor from '../../../../public/svgs/go-color.svg';
+import GoSmall from '../../../../public/svgs/go-small.svg';
+import { useState } from 'react';
+import HeartColor from '../../../../public/svgs/heart-color.svg';
 
 export default function Stay() {
+  const [selected, setSelected] = useState<boolean>(false);
+  const clickHeart = () => {
+    setSelected(!selected);
+    console.log('selected', selected);
+  };
   return (
     <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
       <div
@@ -26,7 +33,11 @@ export default function Stay() {
                 <span className="text-xl font-medium">
                   태안 하얀고래 풀빌라
                 </span>
-                <Heart />
+                {selected ? (
+                  <HeartColor onClick={clickHeart} />
+                ) : (
+                  <Heart onClick={clickHeart} />
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <div className="w-full flex items-center">
@@ -34,7 +45,7 @@ export default function Stay() {
                   <span className="text-sm">
                     충청남도 태안군 고남면 대야로 202
                   </span>
-                  <GoColor />
+                  <GoSmall />
                 </div>
               </div>
             </div>
