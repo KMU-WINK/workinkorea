@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import Input from '@/components/Input';
 import Banner from './_components/Banner';
 
@@ -11,6 +12,7 @@ import Search from '../../../public/svgs/search.svg';
 import JobIcon from '../../../public/svgs/job-icon.svg';
 import StayIcon from '../../../public/svgs/stay-icon.svg';
 import TourIcon from '../../../public/svgs/tour-icon.svg';
+import Go from '../../../public/svgs/go.svg';
 
 interface BannerInfo {
   type:
@@ -26,12 +28,20 @@ interface UserInfo {
   name: string;
   profile: string;
 }
+interface AdInfo {
+  title: string;
+  link: string;
+}
 
 export default function MainPage() {
   const [bannerInfo, setBannerInfo] = useState<BannerInfo[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: '',
     profile: '',
+  });
+  const [adInfo, setAdInfo] = useState<AdInfo>({
+    title: '',
+    link: '/',
   });
 
   useEffect(() => {
@@ -53,6 +63,10 @@ export default function MainPage() {
       name: '여섯글자이름',
       profile: '/pngs/profile-test.png',
     });
+    setAdInfo({
+      title: '내용',
+      link: '/',
+    });
   }, []);
 
   const gun = () => {
@@ -60,7 +74,7 @@ export default function MainPage() {
   };
 
   return (
-    <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start">
+    <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
       <div
         className="flex flex-col justify-start items-center
         gap-9
@@ -78,7 +92,7 @@ export default function MainPage() {
                 height={20}
                 className="rounded-3xl "
               />
-              <span className="text-sm text-black font-medium">
+              <span className="text-sm font-medium">
                 {userInfo.name ? userInfo.name : '사용자'}
               </span>
             </div>
@@ -109,11 +123,17 @@ export default function MainPage() {
               </div>
             </div>
             <div className="w-full bg-gray-2 h-[1px]" />
-            <div className=" p-6 w-full flex flex-col gap-7 justify-center items-center h-16" />
+            <Link
+              href={adInfo.link ? adInfo.link : '/main'}
+              className="p-6 w-full flex gap-7 justify-between items-center border border-red-500"
+            >
+              <span>{adInfo.title ? adInfo.title : '광고'}</span>
+              <Go />
+            </Link>
           </div>
         </div>
         <div className="flex flex-col gap-5 w-full">
-          <span className="text-xl font-medium text-black">
+          <span className="text-xl font-medium">
             {userInfo.name ? userInfo.name : '사용자'}님을 위한 추천
           </span>
           {bannerInfo.map(info => (
