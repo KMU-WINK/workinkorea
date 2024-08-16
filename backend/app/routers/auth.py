@@ -56,9 +56,31 @@ async def naverAuth(state: str, code: str):
     access_token = _result["access_token"]
     return login(access_token=access_token, provider="naver")
 
+@router.get("/google")
+async def googleAuth(state: str, code: str):
+    client_id = os.getenv('GOOGLE_CLIENT_ID')
+    client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+    redirect_uri = os.getenv('GOOGLE_REDIRECT_URI')
+
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "code": code,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uri": redirect_uri,
+        "grant_type": "authorization_code",
+        "state": state
+    }
+
+    _result = requests.post(token_url, data=token_data).json()
+
+    access_token = _result["access_token"]
+    
+    return login(access_token=access_token, provider="google")
+
 
 def get_user(social_id: str, provider: str, db: Session = Depends(get_db)):
-    return db.query(User).filter(User.social_id == social_id and User.login == provider).first()
+    return db.query(User).filter(User.social_id == social_id, User.social == provider).first()
 
 def login(access_token: str, provider: str):
     db = next(get_db())
@@ -77,6 +99,10 @@ def login(access_token: str, provider: str):
         ).json()
         social_id = user_info.get("response", {}).get("id")
     
+    if provider == 'google':
+        user_info = requests.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access_token}"}).json()
+        social_id = user_info["id"]
+    
     # 해당 id, provider를 통하여 db에 사용자 유무 판별
     user = get_user(social_id=social_id, provider=provider, db=db)
     
@@ -91,4 +117,3 @@ def login(access_token: str, provider: str):
     response = RedirectResponse(url=f"{client_url}")
     response.set_cookie(key="access_token", value=access_token, httponly=True, samesite="Strict")
     return response
-
