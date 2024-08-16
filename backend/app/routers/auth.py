@@ -29,7 +29,7 @@ router = APIRouter(
 @router.get("/kakao")
 async def kakaoAuth(code: str):
     client_id = os.getenv('KAKAO_REST_API_KEY') 
-    redirect_uri = 'http://127.0.0.1:8000/auth/kakao'
+    redirect_uri = os.getenv('KAKAO_REDIRECT_URI')
 
     _url = f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
     _headers = {
