@@ -113,6 +113,8 @@ export default function Card({
               ? { objectFit: 'cover' }
               : { width: 80, height: 80 }
           }
+          width={serviceType === 'default' ? 0 : 80}
+          height={serviceType === 'default' ? 0 : 80}
         />
       </ImageSection>
       <Content $cardType={cardType}>
