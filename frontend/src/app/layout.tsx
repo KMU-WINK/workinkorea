@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
+import Script from 'next/script';
 import StyledJsxRegistry from './registry';
 
 export const metadata: Metadata = {
@@ -12,6 +13,8 @@ const myFont = localFont({
   src: '../../public/fonts/PretendardVariable.woff2',
 });
 
+const API = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_API}&autoload=false`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={myFont.className}>
+        <Script src={API} strategy="beforeInteractive" />
         <StyledJsxRegistry>{children}</StyledJsxRegistry>
       </body>
     </html>
