@@ -57,7 +57,7 @@ export default function Wish() {
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
-      <div className="max-w-sm w-full h-full flex flex-col items-center gap-2">
+      <div className="max-w-sm w-full h-full flex flex-col items-center gap-2 py-4">
         <div className="w-full relative text-center py-3">
           <Back className="absolute top-3 left-6 cursor-pointer" />
           <span>위시리스트</span>
