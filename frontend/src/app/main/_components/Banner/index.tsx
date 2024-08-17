@@ -1,13 +1,4 @@
-interface BannerProps {
-  type:
-    | 'white-filter-on'
-    | 'white-filter-off'
-    | 'black-filter-on'
-    | 'black-filter-off';
-  title: string;
-  description: string;
-  backgroundImage: React.ReactNode;
-}
+import { BannerProps } from '@/types/type';
 
 export default function Banner({
   type,
