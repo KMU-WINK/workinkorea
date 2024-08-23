@@ -7,7 +7,12 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-async def read_items():
+@router.get("")
+async def read_stays():
     data = get_stays()
     return data
+
+
+@router.get("/:id")
+async def read_stay(id: int):
+    return "stay_detail"
