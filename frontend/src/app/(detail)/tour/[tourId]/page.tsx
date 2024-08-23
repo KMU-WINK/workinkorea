@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Heart from '../../../../public/svgs/heart.svg';
-import HeartColor from '../../../../public/svgs/heart-color.svg';
-import Location from '../../../../public/svgs/location.svg';
-import GoSmall from '../../../../public/svgs/go-small.svg';
-import BackWhite from '../../../../public/svgs/back-white.svg';
+import Heart from '../../../../../public/svgs/heart.svg';
+import HeartColor from '../../../../../public/svgs/heart-color.svg';
+import Location from '../../../../../public/svgs/location.svg';
+import GoSmall from '../../../../../public/svgs/go-small.svg';
+import BackWhite from '../../../../../public/svgs/back-white.svg';
 
 interface TourInfo {
   name: string;
@@ -60,32 +60,29 @@ export default function Tour() {
       >
         <div className="relative w-full">
           <Image
-            src="/pngs/tour-test.png"
+            src="/images/tour-test.png"
             alt="Tour"
             layout="responsive"
             width="0"
             height="0"
           />
-          <BackWhite className="absolute top-4 left-4 z-10" />
-
+          <BackWhite className="absolute top-4 left-4 z-10 cursor-pointer" />
           <div className="absolute inset-0 h-1/4 bg-gradient-to-b from-[#00000080] to-transparent"></div>
         </div>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
-          <div className="w-full flex flex-col gap-5 px-4 py-2 bg-white">
+          <div className="w-full flex flex-col gap-4 px-4 py-2 bg-white">
             <div className="w-full flex justify-between items-center">
               <span className="text-xl font-medium">{tourInfo.name}</span>
               {selected ? (
-                <HeartColor onClick={clickHeart} />
+                <HeartColor className="cursor-pointer" onClick={clickHeart} />
               ) : (
-                <Heart onClick={clickHeart} />
+                <Heart className="cursor-pointer" onClick={clickHeart} />
               )}
             </div>
-            <div className="w-full flex flex-col gap-2">
-              <div className="w-full flex items-center">
-                <Location />
-                <span className="text-sm">{tourInfo.location}</span>
-                <GoSmall />
-              </div>
+            <div className="w-fit flex items-center cursor-pointer">
+              <Location />
+              <span className="text-sm">{tourInfo.location}</span>
+              <GoSmall />
             </div>
             <div className="w-full flex gap-4 text-xs">
               <div className="flex flex-col font-bold gap-2">

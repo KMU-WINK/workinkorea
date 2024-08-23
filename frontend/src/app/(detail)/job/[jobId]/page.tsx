@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Heart from '../../../../public/svgs/heart.svg';
-import HeartColor from '../../../../public/svgs/heart-color.svg';
-import Location from '../../../../public/svgs/location.svg';
-import GoSmall from '../../../../public/svgs/go-small.svg';
-import BackWhite from '../../../../public/svgs/back-white.svg';
+import Heart from '../../../../../public/svgs/heart.svg';
+import HeartColor from '../../../../../public/svgs/heart-color.svg';
+import Location from '../../../../../public/svgs/location.svg';
+import GoSmall from '../../../../../public/svgs/go-small.svg';
+import BackWhite from '../../../../../public/svgs/back-white.svg';
 
 interface JobInfo {
   title: string;
@@ -80,7 +80,7 @@ export default function Job() {
             width="0"
             height="0"
           />
-          <BackWhite className="absolute top-4 left-4 z-10" />
+          <BackWhite className="absolute top-4 left-4 z-10 cursor-pointer" />
           <div className="absolute inset-0 h-1/2 bg-gradient-to-b from-gray-3 to-transparent"></div>
         </div>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1">
@@ -88,12 +88,12 @@ export default function Job() {
             <div className="w-full flex justify-between items-center">
               <span className="text-xl font-medium">{jobInfo.title}</span>
               {selected ? (
-                <HeartColor onClick={clickHeart} />
+                <HeartColor className="cursor-pointer" onClick={clickHeart} />
               ) : (
-                <Heart onClick={clickHeart} />
+                <Heart className="cursor-pointer" onClick={clickHeart} />
               )}
             </div>
-            <div className="w-full flex items-center">
+            <div className="w-fit flex items-center cursor-pointer">
               <Location />
               <span className="text-sm">{jobInfo.location}</span>
               <GoSmall />

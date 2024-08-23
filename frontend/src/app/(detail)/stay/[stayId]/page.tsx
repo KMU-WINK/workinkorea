@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import Heart from '../../../../public/svgs/heart.svg';
-import Location from '../../../../public/svgs/location.svg';
-import GoSmall from '../../../../public/svgs/go-small.svg';
+import Heart from '../../../../../public/svgs/heart.svg';
+import Location from '../../../../../public/svgs/location.svg';
+import GoSmall from '../../../../../public/svgs/go-small.svg';
 import { useState } from 'react';
-import HeartColor from '../../../../public/svgs/heart-color.svg';
+import HeartColor from '../../../../../public/svgs/heart-color.svg';
+import BackWhite from '../../../../../public/svgs/back-white.svg';
 
 export default function Stay() {
   const [selected, setSelected] = useState<boolean>(false);
@@ -19,13 +20,17 @@ export default function Stay() {
         className="flex flex-col justify-start items-center gap-3 w-full
         bg-white sm:max-w-sm"
       >
-        <Image
-          src="/pngs/stay-test.png"
-          alt="Stay"
-          layout="responsive"
-          width="0"
-          height="0"
-        />
+        <div className="relative w-full">
+          <Image
+            src="/images/stay-test.png"
+            alt="Job"
+            layout="responsive"
+            width="0"
+            height="0"
+          />
+          <BackWhite className="absolute top-4 left-4 z-10 cursor-pointer" />
+          <div className="absolute inset-0 h-1/4 bg-gradient-to-b from-[#00000080] to-transparent"></div>
+        </div>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
           <div className="w-full flex flex-col gap-6 px-4 py-2 bg-white">
             <div className="w-full flex flex-col gap-1">
@@ -34,13 +39,13 @@ export default function Stay() {
                   태안 하얀고래 풀빌라
                 </span>
                 {selected ? (
-                  <HeartColor onClick={clickHeart} />
+                  <HeartColor className="cursor-pointer" onClick={clickHeart} />
                 ) : (
-                  <Heart onClick={clickHeart} />
+                  <Heart className="cursor-pointer" onClick={clickHeart} />
                 )}
               </div>
               <div className="w-full flex flex-col gap-2">
-                <div className="w-full flex items-center">
+                <div className="w-fit flex items-center cursor-pointer">
                   <Location />
                   <span className="text-sm">
                     충청남도 태안군 고남면 대야로 202
