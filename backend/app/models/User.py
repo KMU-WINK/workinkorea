@@ -25,6 +25,13 @@ User_Interest = Table(
     Column("interest_id", Integer, ForeignKey("interests.id"), primary_key=True),
 )
 
+User_Work = Table(
+    "user_work",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("work_id", Integer, ForeignKey("works.id"), primary_key=True),
+)
+
 
 class User(Base):
     __tablename__ = "users"
@@ -42,7 +49,7 @@ class User(Base):
     interests = relationship(
         "Interest", secondary=User_Interest, back_populates="users"
     )
-    work = relationship("Work", back_populates="user", uselist=False)
+    works = relationship("Work", secondary=User_Work, back_populates="users")
 
     # wishlist
     stays = relationship("Stay", back_populates="user")
@@ -60,6 +67,15 @@ class User(Base):
     @validates("birth")
     def validate_birth(self, key, value):
         # 정규 표현식을 사용해 "YYYY-MM-DD" 형식인지 확인
-        if re.match(r"^\d{4}-\d{2}-\d{2}$", value):
-            return value
-        raise ValueError("birth must be in 'YYYY-MM-DD' format")
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", value):
+            raise ValueError(
+                f"birth must be in 'YYYY-MM-DD' format, your input : {value}"
+            )
+        return value
+
+    @validates("gender")
+    def validate_gender(self, key, value):
+        genders = ["남성", "여성"]
+        if value not in genders:
+            raise ValueError(f"{value} is not in valid gender :{genders}")
+        return value
