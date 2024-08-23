@@ -50,18 +50,18 @@ export default function MainPage() {
         type: 'white-filter-on',
         title: '완전한 휴식이 필요할 때',
         description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요', // 여기에 콤마 추가
-        backgroundImage: '/jpgs/banner-test.jpg',
+        backgroundImage: '/images/banner-test.jpg',
       },
       {
         type: 'white-filter-on',
         title: '완전한 휴식이 필요할 때',
         description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요', // 여기에 콤마 추가
-        backgroundImage: '/jpgs/banner-test.jpg',
+        backgroundImage: '/images/banner-test.jpg',
       },
     ]);
     setUserInfo({
       name: '여섯글자이름',
-      profile: '/pngs/profile-test.png',
+      profile: '/images/profile-test.png',
     });
     setAdInfo({
       title: '내용',
@@ -102,19 +102,19 @@ export default function MainPage() {
             <div className="p-6 w-full flex flex-col gap-7 justify-center items-center">
               <Input leftIcon={<Search />} disabled onClick={gun} />
               <div className="flex justify-center items-center gap-5 text-gray-4 text-xs">
-                <div className="flex flex-col justify-center items-center gap-2">
+                <div className="flex flex-col justify-center items-center gap-2 cursor-pointer">
                   <div className="border border-gray-2 rounded-full flex justify-center items-center p-3">
                     <JobIcon />
                   </div>
                   <span>채용</span>
                 </div>
-                <div className="flex flex-col justify-center items-center gap-2">
+                <div className="flex flex-col justify-center items-center gap-2 cursor-pointer">
                   <div className="border border-gray-2 rounded-full flex justify-center items-center p-3">
                     <StayIcon />
                   </div>
                   <span>숙소</span>
                 </div>
-                <div className="flex flex-col justify-center items-center gap-2">
+                <div className="flex flex-col justify-center items-center gap-2 cursor-pointer">
                   <div className="border border-gray-2 rounded-full flex justify-center items-center p-3">
                     <TourIcon />
                   </div>
@@ -125,7 +125,7 @@ export default function MainPage() {
             <div className="w-full bg-gray-2 h-[1px]" />
             <Link
               href={adInfo.link ? adInfo.link : '/main'}
-              className="p-6 w-full flex gap-7 justify-between items-center border border-red-500"
+              className="p-6 w-full flex gap-7 justify-between items-center"
             >
               <span>{adInfo.title ? adInfo.title : '광고'}</span>
               <Go />
