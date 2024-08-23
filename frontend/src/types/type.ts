@@ -11,3 +11,14 @@ export interface CardProps {
   inWishlist?: boolean;
   company?: string;
 }
+
+export interface BannerProps {
+  type:
+    | 'white-filter-on'
+    | 'white-filter-off'
+    | 'black-filter-on'
+    | 'black-filter-off';
+  title: string;
+  description: string;
+  backgroundImage: React.ReactNode;
+}

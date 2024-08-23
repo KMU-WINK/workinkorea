@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .db.connection import Base, engine
-from .models import User, Region, Interest, Work, Stay, Spot, Job  # 모든 모델을 import
+from .models import *  # 모든 모델을 import
 from .routers import initial, spots, stays, jobs, users, auth
+
 
 load_dotenv()
 
