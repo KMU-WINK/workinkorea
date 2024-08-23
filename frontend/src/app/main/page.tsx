@@ -82,7 +82,7 @@ export default function MainPage() {
       >
         <div className="flex flex-col gap-3.5 w-full">
           <div className="flex justify-between">
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-1 items-center cursor-pointer">
               <Image
                 src={
                   userInfo.profile ? userInfo.profile : '/pngs/profile-test.png'
