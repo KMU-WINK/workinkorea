@@ -98,8 +98,8 @@ export default function MainPage() {
               </span>
             </div>
             <div className="flex gap-2">
-              <HeartColor />
-              <SettingColor />
+              <HeartColor className="cursor-pointer" />
+              <SettingColor className="cursor-pointer" />
             </div>
           </div>
           <div className="border border-gray-2 rounded-lg flex flex-col items-center">
