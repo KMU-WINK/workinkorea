@@ -13,6 +13,7 @@ import JobIcon from '../../../public/svgs/job-icon.svg';
 import StayIcon from '../../../public/svgs/stay-icon.svg';
 import TourIcon from '../../../public/svgs/tour-icon.svg';
 import Go from '../../../public/svgs/go.svg';
+import SettingColor from '../../../public/svgs/setting-color.svg';
 
 interface BannerInfo {
   type:
@@ -96,7 +97,10 @@ export default function MainPage() {
                 {userInfo.name ? userInfo.name : '사용자'}
               </span>
             </div>
-            <HeartColor />
+            <div className="flex gap-2">
+              <HeartColor />
+              <SettingColor />
+            </div>
           </div>
           <div className="border border-gray-2 rounded-lg flex flex-col items-center">
             <div className="p-6 w-full flex flex-col gap-7 justify-center items-center">
