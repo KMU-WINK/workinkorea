@@ -166,8 +166,9 @@ export default function WishDetail() {
             <span>{wishItem.location}</span>
           </div>
           <div className="w-full flex flex-col px-6 items-center gap-2">
-            {feedList.map(item => (
+            {feedList.map((item, index) => (
               <Card
+                key={`card-${index}`}
                 cardType={item.cardType}
                 serviceType={item.serviceType}
                 title={item.title}
