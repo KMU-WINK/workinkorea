@@ -13,6 +13,7 @@ const Container = styled.div<{ $cardType: CardType }>`
   border: 1px solid #d9d9d9;
   border-radius: 10px;
   cursor: pointer;
+  width: 100%;
   height: ${props => (props.$cardType === 'map' ? '145px' : '237px')};
   overflow: hidden;
 `;
