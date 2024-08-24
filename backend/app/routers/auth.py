@@ -111,7 +111,7 @@ def login(access_token: str, provider: str):
     client_url = os.getenv("WINK_CLIENT_URI")
     
     if not user:
-        return RedirectResponse(url=f"{client_url}/signup?social_id={social_id}&provider={provider}")
+        return RedirectResponse(url=f"{client_url}/onboarding?social_id={social_id}&provider={provider}")
     
     access_token = create_jwt_token(user.nickname)
     response = RedirectResponse(url=f"{client_url}")
