@@ -25,3 +25,15 @@ export interface BannerProps {
   description: string;
   backgroundImage: React.ReactNode;
 }
+
+export interface FeedProps {
+  id?: number;
+  cardType: CardType;
+  serviceType: ServiceType;
+  title: string;
+  location: string;
+  image: string;
+  price: number;
+  company: string;
+  inWishlist: boolean;
+}
