@@ -1,8 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import Card from '@/components/Card';
 import { CardProps } from '@/types/type';
+import styled from 'styled-components';
 
 declare global {
   interface Window {
@@ -35,13 +39,63 @@ const testData: CardProps[] = [
     image: '/',
     price: 5000,
   },
+  {
+    cardType: 'map',
+    serviceType: 'default',
+    title: '홍대점',
+    location: '연희동',
+    image: '/',
+    price: 5000,
+  },
+  {
+    cardType: 'map',
+    serviceType: 'default',
+    title: '홍대점',
+    location: '연희동',
+    image: '/',
+    price: 5000,
+  },
+  {
+    cardType: 'map',
+    serviceType: 'default',
+    title: '홍대점',
+    location: '연희동',
+    image: '/',
+    price: 5000,
+  },
 ];
+
+const SliderContainer = styled.div`
+  position: relative;
+  bottom: 184px;
+  z-index: 10;
+  padding: 20px;
+  .slick-slide {
+    padding-right: 10px;
+  }
+`;
 
 export default function Map() {
   const mapRef = useRef<HTMLDivElement>(null);
   const markerImageSrc = '/svgs/ping.svg';
   const activeMarkerImageSrc = '/svgs/ping-active.svg';
   const activeMarkerRef = useRef<any>(null);
+
+  const onSlideChange = (index: number) => {
+    console.log(index);
+  };
+
+  const sliderSettings = {
+    dots: false,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1.05,
+    slidesToScroll: 1,
+    arrows: false,
+    afterChange: (index: number) => {
+      onSlideChange(index);
+    },
+  };
 
   useEffect(() => {
     window.kakao.maps.load(() => {
@@ -107,19 +161,23 @@ export default function Map() {
   }, []);
 
   return (
-    <div>
-      <div ref={mapRef} className="w-screen h-screen" />
-      <div className="fixed bottom-10 left-6 z-10 flex gap-2.5">
-        {testData.map(list => (
-          <Card
-            cardType={list.cardType}
-            serviceType={list.serviceType}
-            title={list.title}
-            location={list.location}
-            image={list.image}
-            price={list.price}
-          />
-        ))}
+    <div className="h-screen flex justify-center items-center">
+      <div className="max-w-sm h-full overflow-hidden relative">
+        <div ref={mapRef} className="w-screen h-full" />
+        <SliderContainer>
+          <Slider {...sliderSettings}>
+            {testData.map(list => (
+              <Card
+                cardType={list.cardType}
+                serviceType={list.serviceType}
+                title={list.title}
+                location={list.location}
+                image={list.image}
+                price={list.price}
+              />
+            ))}
+          </Slider>
+        </SliderContainer>
       </div>
     </div>
   );
