@@ -7,7 +7,7 @@ export default function Banner({
   backgroundImage,
 }: BannerProps) {
   const commonStyle =
-    'flex flex-col gap-5 rounded-xl px-6 py-8 min-h-[360px] relative overflow-hidden';
+    'flex flex-col gap-5 rounded-xl px-6 py-8 min-h-[360px] relative overflow-hidden cursor-pointer';
 
   let typeStyle = '';
 

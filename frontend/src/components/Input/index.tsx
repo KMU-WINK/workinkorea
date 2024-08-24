@@ -19,7 +19,7 @@ export default function Input({
 }: InputProps) {
   return (
     <div
-      className={`flex gap-2.5 w-full border border-gray-2 rounded-[10px] px-3.5 py-[18px] ${disabled ? 'bg-gray-2' : 'bg-white'}`}
+      className={`flex gap-2.5 w-full border border-gray-2 rounded-[10px] px-3.5 py-[18px] ${disabled ? 'bg-[#F5F5F5]' : 'bg-white'}`}
       onClick={disabled ? onClick : undefined}
       onKeyDown={disabled ? onClick : undefined}
       role="button"
