@@ -27,13 +27,13 @@ export interface BannerProps {
 }
 
 export interface FeedProps {
-  id?: number;
+  contentid: number;
   cardType: CardType;
   serviceType: ServiceType;
   title: string;
+  addr1: string;
+  addr2: string;
   location: string;
   image: string;
-  price: number;
-  company: string;
   inWishlist: boolean;
 }
