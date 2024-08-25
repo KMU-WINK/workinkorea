@@ -125,6 +125,7 @@ export default function Card({
           }
           width={serviceType === 'default' ? 0 : 80}
           height={serviceType === 'default' ? 0 : 80}
+          unoptimized
         />
       </ImageSection>
       <Content $cardType={cardType}>
