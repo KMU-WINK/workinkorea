@@ -23,7 +23,6 @@ export default function Tour() {
 
     try {
       const response = await PublicAxiosInstance.get(`/spots?page=${page}`);
-      console.log('response', response.data.data);
       const data = response.data.data.map((item: FeedProps) => ({
         contentid: item.contentid,
         cardType: 'default',
@@ -73,10 +72,6 @@ export default function Tour() {
   const wishClick = () => {
     console.log('wishClick');
   };
-
-  useEffect(() => {
-    console.log('feedList : ', feedList);
-  }, [feedList]);
 
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black">
