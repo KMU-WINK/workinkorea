@@ -79,6 +79,7 @@ export default function Tour() {
         {feedList.map((item: FeedProps) => (
           <Card
             id={item.contentId}
+            key={item.contentId}
             cardType={item.cardType}
             serviceType={item.serviceType}
             title={item.title}
