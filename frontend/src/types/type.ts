@@ -27,7 +27,7 @@ export interface BannerProps {
 }
 
 export interface FeedProps {
-  contentId: number;
+  contentid: number;
   cardType: CardType;
   serviceType: ServiceType;
   title: string;
