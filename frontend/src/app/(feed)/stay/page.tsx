@@ -23,8 +23,9 @@ export default function Stay() {
 
     try {
       const response = await PublicAxiosInstance.get(`/stays?page=${page}`);
+      console.log('response', response.data.data);
       const data = response.data.data.map((item: FeedProps) => ({
-        contentId: item.contentId,
+        contentid: item.contentid,
         cardType: 'default',
         serviceType: 'default',
         title: item.title,
@@ -73,20 +74,24 @@ export default function Stay() {
     console.log('wishClick');
   };
 
+  useEffect(() => {
+    console.log('feedList : ', feedList);
+  }, [feedList]);
+
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black">
       <div className="flex flex-col gap-1 items-center w-full">
         {feedList.map((item: FeedProps) => (
           <Card
-            id={item.contentId}
-            key={item.contentId}
+            id={item.contentid}
+            key={item.contentid}
             cardType={item.cardType}
             serviceType={item.serviceType}
             title={item.title}
             location={`${item.addr1} ${item.addr2}`}
             image={item.image}
             inWishlist={item.inWishlist}
-            onCardClick={() => cardClick(item.contentId)}
+            onCardClick={() => cardClick(item.contentid)}
             onWishListClick={wishClick}
           />
         ))}
