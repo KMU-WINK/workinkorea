@@ -26,7 +26,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between">
+    <div className="bg-white min-h-screen flex flex-col justify-between overflow-scroll">
       <div className="px-6">
         <div className="py-3 min-h-14">
           {currentPage > 1 ? (
