@@ -8,7 +8,7 @@ export interface CardProps {
   title: string;
   location: string;
   image: string;
-  price: number;
+  price?: number;
   onCardClick: React.MouseEventHandler<HTMLDivElement>;
   onWishListClick: (id: number) => void;
   inWishlist?: boolean;
@@ -27,13 +27,16 @@ export interface BannerProps {
 }
 
 export interface FeedProps {
-  contentid: number;
+  contentId: number;
   cardType: CardType;
   serviceType: ServiceType;
   title: string;
+  firstimage: string;
+  firstimage2: string;
   addr1: string;
   addr2: string;
-  location: string;
   image: string;
   inWishlist: boolean;
+  location: string;
 }
+// job 같은 경우에는 아직 안나와서 추후에 추가 예정

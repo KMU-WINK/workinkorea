@@ -94,7 +94,7 @@ export default function Job() {
 
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black">
-      <div className="flex flex-col gap-1 items-center">
+      <div className="flex flex-col gap-1 items-center w-full">
         {feedList.map(item => (
           <Card
             cardType={item.cardType}
