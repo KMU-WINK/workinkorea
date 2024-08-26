@@ -9,7 +9,7 @@ import { FeedProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
-export default function Stay() {
+export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -18,11 +18,11 @@ export default function Stay() {
   const router = useRouter();
 
   const fetchData = async () => {
-    if (loading || !hasMore) return; // 이미 데이터를 불러오고 있거나 더 이상 데이터가 없으면 종료
+    if (loading || !hasMore) return;
     setLoading(true);
 
     try {
-      const response = await PublicAxiosInstance.get(`/stays?page=${page}`);
+      const response = await PublicAxiosInstance.get(`/spots?page=${page}`);
       const data = response.data.data.map((item: FeedProps) => ({
         contentId: item.contentId,
         cardType: 'default',
