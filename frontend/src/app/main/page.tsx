@@ -140,8 +140,9 @@ export default function MainPage() {
           <span className="text-xl font-medium">
             {userInfo.name ? userInfo.name : '사용자'}님을 위한 추천
           </span>
-          {bannerInfo.map(info => (
+          {bannerInfo.map((info, index) => (
             <Banner
+              key={`info-${index}`}
               type={info.type}
               title={info.title}
               description={info.description}
