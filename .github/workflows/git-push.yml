@@ -7,24 +7,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: pandoc/latex
     steps:
       - uses: actions/checkout@v2
-      - name: Install mustache (to update the date)
-        run: apk add ruby && gem install mustache
-      - name: creates output
-        run: sh ./build.sh
-      - name: Pushes to another repository
+      - name: Build Next.js project
+        run: sh ./frontend/build.sh # frontend 디렉토리 아래의 build.sh 스크립트를 실행
+      - name: Push built files to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.JIWON_GITHUB_KEY }}
         with:
-          source-directory: 'output'
+          source-directory: "output/.next" # 빌드된 .next 디렉토리를 소스 디렉토리로 지정
           destination-github-username: Choi-Jiwon-38
           destination-repository-name: workinkorea
           user-email: ${{ secrets.JIWON_ACCOUNT_EMAIL }}
-          commit-message: ${{ github.event.commits[0].message }}
+          commit-message: "Deploying Next.js build"
           target-branch: main
-      - name: Test get variable exported by push-to-another-repository
-        run: echo $DESTINATION_CLONED_DIRECTORY
