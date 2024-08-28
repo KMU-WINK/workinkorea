@@ -152,12 +152,12 @@ export default function Card({
           <BottomContainer>
             {serviceType === 'work' && company && (
               <Price $cardType={cardType}>
-                시급 {price.toLocaleString('ko-KR')}원
+                시급 {price?.toLocaleString('ko-KR')}원
               </Price>
             )}
             {serviceType === 'default' && cardType === 'map' && (
               <Price $cardType={cardType}>
-                {price.toLocaleString('ko-KR')}원~
+                {price?.toLocaleString('ko-KR')}원~
               </Price>
             )}
             {cardType === 'map' && (
