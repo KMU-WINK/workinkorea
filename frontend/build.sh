@@ -1,5 +1,4 @@
 #!/bin/sh
-cd ../frontend  # frontend 디렉토리로 이동
 
 # 의존성 설치 및 빌드
 npm install
