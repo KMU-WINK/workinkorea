@@ -38,5 +38,7 @@ export interface FeedProps {
   image: string;
   inWishlist: boolean;
   location: string;
+  mapx?: number;
+  mapy?: number;
 }
 // job 같은 경우에는 아직 안나와서 추후에 추가 예정
