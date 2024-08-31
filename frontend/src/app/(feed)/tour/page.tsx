@@ -9,7 +9,7 @@ import { FeedProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
-export default function Stay() {
+export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function Stay() {
     setLoading(true);
 
     try {
-      const response = await PublicAxiosInstance.get(`/stays?page=${page}`);
+      const response = await PublicAxiosInstance.get(`/spots?page=${page}`);
       const data = response.data.data.map((item: FeedProps) => ({
         contentid: item.contentid,
         cardType: 'default',
@@ -66,7 +66,7 @@ export default function Stay() {
   }, [page, loading, hasMore]);
 
   const cardClick = (id: number) => {
-    router.push(`/stay/${id}`);
+    router.push(`/tour/${id}`);
   };
 
   const wishClick = () => {
