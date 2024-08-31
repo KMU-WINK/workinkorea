@@ -41,7 +41,7 @@ export default function Input({
         placeholder={placeholder}
         ref={inputRef}
         value={value}
-        className={`bg-transparent outline-none flex-1 placeholder-gray-4 ${disabled && 'cursor-pointer'}`}
+        className={`text-black bg-transparent outline-none flex-1 placeholder-gray-4 ${disabled && 'cursor-pointer'}`}
         readOnly={disabled || readOnly}
         onChange={onChange}
       />
