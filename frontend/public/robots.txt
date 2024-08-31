@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /sign-in
+Disallow: /onboarding/**
+
+# Host
+Host: https://workinkorea.vercel.app
+
+# Sitemaps
+Sitemap: https://workinkorea.vercel.app/sitemap.xml
