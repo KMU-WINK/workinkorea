@@ -13,6 +13,7 @@ const Container = styled.div<{ $cardType: CardType }>`
   border: 1px solid #d9d9d9;
   border-radius: 10px;
   cursor: pointer;
+  width: 100%;
   height: ${props => (props.$cardType === 'map' ? '145px' : '237px')};
   overflow: hidden;
 `;
@@ -91,18 +92,27 @@ const Location = styled.p<{ $cardType: CardType }>`
   font-size: ${props => (props.$cardType === 'map' ? '0.625rem' : '0.75rem')};
 `;
 
+const WishButton = styled.button`
+  display: flex;
+  align-items: flex-start;
+  z-index: 10;
+`;
+
 export default function Card({
+  id,
   cardType,
   serviceType,
   title,
   location,
   image,
   price,
+  onCardClick,
+  onWishListClick,
   inWishlist = false,
   company = '',
 }: CardProps) {
   return (
-    <Container $cardType={cardType}>
+    <Container $cardType={cardType} onClick={onCardClick}>
       <ImageSection $cardType={cardType}>
         <Image
           src={image}
@@ -115,6 +125,7 @@ export default function Card({
           }
           width={serviceType === 'default' ? 0 : 80}
           height={serviceType === 'default' ? 0 : 80}
+          unoptimized
         />
       </ImageSection>
       <Content $cardType={cardType}>
@@ -126,23 +137,39 @@ export default function Card({
             <Title $cardType={cardType}>{title}</Title>
           </Detail>
           {cardType === 'default' && (
-            <div>{inWishlist ? <ColorHeart /> : <Heart />}</div>
+            <WishButton
+              type="button"
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation(); // 이벤트 버블링 현상을 방지
+                onWishListClick(id);
+              }}
+            >
+              {inWishlist ? <ColorHeart /> : <Heart />}
+            </WishButton>
           )}
         </DetailContainer>
         <InfoContainer $cardType={cardType} $serviceType={serviceType}>
           <BottomContainer>
             {serviceType === 'work' && company && (
               <Price $cardType={cardType}>
-                시급 {price.toLocaleString('ko-KR')}원
+                시급 {price?.toLocaleString('ko-KR')}원
               </Price>
             )}
             {serviceType === 'default' && cardType === 'map' && (
               <Price $cardType={cardType}>
-                {price.toLocaleString('ko-KR')}원~
+                {price?.toLocaleString('ko-KR')}원~
               </Price>
             )}
             {cardType === 'map' && (
-              <div>{inWishlist ? <ColorHeart /> : <Heart />}</div>
+              <WishButton
+                type="button"
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.stopPropagation(); // 이벤트 버블링 현상을 방지
+                  onWishListClick(id);
+                }}
+              >
+                {inWishlist ? <ColorHeart /> : <Heart />}
+              </WishButton>
             )}
           </BottomContainer>
           <Location $cardType={cardType}>{location}</Location>

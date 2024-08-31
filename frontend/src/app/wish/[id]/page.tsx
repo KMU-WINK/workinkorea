@@ -64,6 +64,9 @@ export default function WishDetail() {
   useEffect(() => {
     setFeedList([
       {
+        id: 1,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -74,6 +77,9 @@ export default function WishDetail() {
         inWishlist: false,
       },
       {
+        id: 2,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -84,6 +90,9 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
+        id: 3,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -94,6 +103,9 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
+        id: 4,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -104,6 +116,9 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
+        id: 5,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -114,6 +129,9 @@ export default function WishDetail() {
         inWishlist: false,
       },
       {
+        id: 6,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -124,6 +142,9 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
+        id: 7,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -134,6 +155,9 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
+        id: 8,
+        onCardClick: () => {},
+        onWishListClick: () => {},
         cardType: 'default',
         serviceType: 'work',
         title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
@@ -166,9 +190,10 @@ export default function WishDetail() {
             <span>{wishItem.location}</span>
           </div>
           <div className="w-full flex flex-col px-6 items-center gap-2">
-            {feedList.map((item, index) => (
+            {feedList.map(item => (
               <Card
-                key={`card-${index}`}
+                id={item.id}
+                key={item.id}
                 cardType={item.cardType}
                 serviceType={item.serviceType}
                 title={item.title}
@@ -177,6 +202,8 @@ export default function WishDetail() {
                 price={item.price}
                 company={item.company}
                 inWishlist={item.inWishlist}
+                onCardClick={item.onCardClick}
+                onWishListClick={item.onWishListClick}
               />
             ))}
           </div>

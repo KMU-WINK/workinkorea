@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 
 import Input from '@/components/Input';
@@ -13,19 +14,35 @@ interface Props {
 }
 
 export default function FeedLayout({ children }: Props) {
+  const pathname = usePathname();
+  const [mapClick, setMapClick] = useState<() => void>(() => () => {});
+
   const leftClick = () => {
     console.log('leftClick');
   };
   const rightClick = () => {
     console.log('rightClick');
   };
-  const mapClick = () => {
-    console.log('mapClick');
-  };
+  // pathname에 따라 mapClick 함수 다르게 설정
+  useEffect(() => {
+    if (pathname === '/stay') {
+      setMapClick(() => () => {
+        console.log('mapClick : stay');
+      });
+    } else if (pathname === '/tour') {
+      setMapClick(() => () => {
+        console.log('mapClick : tour');
+      });
+    } else {
+      setMapClick(() => () => {
+        console.log('mapClick : job');
+      });
+    }
+  }, [pathname]);
 
   return (
     <div className="flex flex-col justify-start items-center h-full bg-white relative">
-      <div className="w-full flex flex-col justify-center items-center fixed top-0 z-10 max-w-sm">
+      <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 max-w-sm">
         <div className="w-full px-6 py-3.5 flex justify-center items-center bg-main">
           <Input
             leftIcon={<Back onClick={leftClick} />}
