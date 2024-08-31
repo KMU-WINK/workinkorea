@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Slider from 'react-slick';
+import Slider, { Settings } from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Card from '@/components/Card';
@@ -106,7 +106,7 @@ export default function Map() {
   const activeMarkerImageSrc = '/svgs/ping-active.svg';
   const activeMarkerRef = useRef<any>(null);
   const mapObjectRef = useRef<any>(null);
-  const sliderRef = useRef<any>(null);
+  const sliderRef = useRef<Slider | null>(null);
   const [markers, setMarkers] = useState<MarkersType>({});
 
   // 카드 슬라이드시 이벤트 함수
@@ -134,7 +134,7 @@ export default function Map() {
   };
 
   // 슬라이드 설정
-  const sliderSettings = {
+  const sliderSettings: Settings = {
     dots: false,
     infinite: false,
     speed: 500,
@@ -196,7 +196,7 @@ export default function Map() {
             if (activeMarkerRef.current)
               activeMarkerRef.current.setImage(markerImage); // 그 전 마커 비활성화
             marker.setImage(activeMarkerImage); // 클릭된 마커 활성화
-            sliderRef.current.slickGoTo(list.contentId - 1);
+            sliderRef.current?.slickGoTo(list.contentId - 1);
           }
           activeMarkerRef.current = marker;
         });
@@ -210,9 +210,10 @@ export default function Map() {
         <div ref={mapRef} className="h-full" />
         <SliderContainer>
           <Slider
-            ref={(slider: any) => {
+            ref={(slider: Slider | null) => {
               sliderRef.current = slider;
             }}
+            /* eslint-disable-next-line react/jsx-props-no-spreading */
             {...sliderSettings}
           >
             {testData.map(list => (
