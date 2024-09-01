@@ -7,6 +7,9 @@ import 'slick-carousel/slick/slick-theme.css';
 import Card from '@/components/Card';
 import { FeedProps } from '@/types/type';
 import styled from 'styled-components';
+import Input from '@/components/Input';
+import Back from '../../../public/svgs/back.svg';
+import Filter from '../../../public/svgs/filter.svg';
 
 // kakao 라는 객체가 window에 존재하고 있다고 인식시켜주기 위함
 declare global {
@@ -92,7 +95,7 @@ const testData: FeedProps[] = [
 
 const SliderContainer = styled.div`
   position: relative;
-  bottom: 184px;
+  bottom: 196px;
   z-index: 10;
   padding: 20px;
   .slick-slide {
@@ -108,6 +111,8 @@ export default function Map() {
   const mapObjectRef = useRef<any>(null);
   const sliderRef = useRef<Slider | null>(null);
   const [markers, setMarkers] = useState<MarkersType>({});
+
+  const [inputValue, setInputValue] = useState('');
 
   // 카드 슬라이드시 이벤트 함수
   const onSlideChange = (index: number) => {
@@ -207,7 +212,15 @@ export default function Map() {
   return (
     <div className="h-screen flex justify-center items-center">
       <div className="max-w-sm h-full overflow-hidden relative">
-        <div ref={mapRef} className="h-full" />
+        <div className="z-10 absolute top-[54px] w-full px-6">
+          <Input
+            leftIcon={<Back />}
+            rightIcon={<Filter />}
+            placeholder="검색어"
+            onChange={setInputValue}
+          />
+        </div>
+        <div ref={mapRef} className="h-screen" />
         <SliderContainer>
           <Slider
             ref={(slider: Slider | null) => {
