@@ -3,9 +3,14 @@
 import React from 'react';
 import Input from '@/components/Input';
 
-export default function Step1() {
+interface Step1Props {
+  nickname: string;
+  onNicknameChange: (nickname: string) => void;
+}
+
+export default function Step1({ nickname, onNicknameChange }: Step1Props) {
   const handleInputChange = (value: string) => {
-    console.log(value);
+    onNicknameChange(value);
   };
 
   return (
@@ -15,7 +20,11 @@ export default function Step1() {
         6글자 이내로 한글만 입력 가능해요
       </p>
       <div className="pt-6">
-        <Input placeholder="여섯글자이름" onChange={handleInputChange} />
+        <Input
+          placeholder="여섯글자이름"
+          value={nickname} // nickname 값을 전달
+          onChange={handleInputChange} // 변경된 값을 부모 컴포넌트에 전달
+        />
       </div>
     </div>
   );
