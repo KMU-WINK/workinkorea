@@ -37,7 +37,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    social_id = Column(String, nullable=False)
+    social_id = Column(String, nullable=False, unique=True)
     social = Column(String, nullable=False)
 
     nickname = Column(String, index=True, unique=True)
@@ -57,11 +57,11 @@ class User(Base):
     jobs = relationship("Job", back_populates="user")
 
     # column validation
-    @validates("login")
+    @validates("social")
     def validate_name(self, key, value):
         login_list = ["kakao", "naver", "google"]
         if value not in login_list:
-            raise ValueError(f"{value} is no in login list : {login_list}")
+            raise ValueError(f"{value} is no in social list : {login_list}")
         return value
 
     @validates("birth")
