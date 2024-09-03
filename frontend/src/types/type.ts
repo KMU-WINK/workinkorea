@@ -37,6 +37,5 @@ export interface FeedProps {
   addr2: string;
   image: string;
   inWishlist: boolean;
-  location: string;
 }
 // job 같은 경우에는 아직 안나와서 추후에 추가 예정
