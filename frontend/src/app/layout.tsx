@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://workinkorea.vercel.app'),
   title: '워크인코리아',
   description: '원하는 곳에서 머무르며 일하다',
   keywords: ['워크인코리아', '워케이션', '일', '휴가'],
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     url: 'https://workinkorea.vercel.app',
     images: [
       {
-        url: '/images/ogImage.png',
+        url: '/images/opengraph-image.png',
         type: 'image/png',
         width: '1200',
         height: '630',
