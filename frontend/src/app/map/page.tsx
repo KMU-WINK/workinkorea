@@ -24,7 +24,7 @@ type MarkersType = {
 
 const testData: FeedProps[] = [
   {
-    contentId: 1,
+    contentid: 1,
     cardType: 'map',
     serviceType: 'default',
     title: '파주 풀빌라',
@@ -41,7 +41,7 @@ const testData: FeedProps[] = [
     mapy: 126.570677,
   },
   {
-    contentId: 2,
+    contentid: 2,
     cardType: 'map',
     serviceType: 'default',
     title: '파주 풀빌라',
@@ -58,7 +58,7 @@ const testData: FeedProps[] = [
     mapy: 126.569477,
   },
   {
-    contentId: 3,
+    contentid: 3,
     cardType: 'map',
     serviceType: 'default',
     title: '파주 풀빌라',
@@ -75,7 +75,7 @@ const testData: FeedProps[] = [
     mapy: 126.56994,
   },
   {
-    contentId: 4,
+    contentid: 4,
     cardType: 'map',
     serviceType: 'default',
     title: '파주 풀빌라',
@@ -182,7 +182,7 @@ export default function Map() {
         const marker = new window.kakao.maps.Marker({
           map,
           position: new window.kakao.maps.LatLng(list.mapx, list.mapy),
-          id: list.contentId,
+          id: list.contentid,
           title: list.title,
           image: markerImage,
           clickable: true,
@@ -191,7 +191,7 @@ export default function Map() {
         // 마커 객체 저장
         setMarkers(prevData => ({
           ...prevData,
-          [list.contentId]: marker,
+          [list.contentid]: marker,
         }));
 
         // 마커 클릭 이벤트
@@ -201,7 +201,7 @@ export default function Map() {
             if (activeMarkerRef.current)
               activeMarkerRef.current.setImage(markerImage); // 그 전 마커 비활성화
             marker.setImage(activeMarkerImage); // 클릭된 마커 활성화
-            sliderRef.current?.slickGoTo(list.contentId - 1);
+            sliderRef.current?.slickGoTo(list.contentid - 1);
           }
           activeMarkerRef.current = marker;
         });
@@ -217,7 +217,7 @@ export default function Map() {
             leftIcon={<Back />}
             rightIcon={<Filter />}
             placeholder="검색어"
-            onChange={setInputValue}
+            // onChange={setInputValue}
           />
         </div>
         <div ref={mapRef} className="h-screen" />
@@ -231,8 +231,8 @@ export default function Map() {
           >
             {testData.map(list => (
               <Card
-                key={list.contentId}
-                id={list.contentId}
+                key={list.contentid}
+                id={list.contentid}
                 cardType={list.cardType}
                 serviceType={list.serviceType}
                 title={list.title}
