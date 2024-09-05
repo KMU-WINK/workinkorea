@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .db.connection import Base, engine
 from .models import *  # 모든 모델을 import
-from .routers import initial, spots, stays, jobs, users
+from .routers import initial, spots, stays, jobs, users, auth
 from .external_services.detailAPI import get_common, get_intro, get_info, get_image
 
 load_dotenv()
@@ -27,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(initial.router)
 app.include_router(spots.router)
 app.include_router(stays.router)
