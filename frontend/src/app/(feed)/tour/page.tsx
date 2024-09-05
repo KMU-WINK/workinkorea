@@ -18,13 +18,13 @@ export default function Tour() {
   const router = useRouter();
 
   const fetchData = async () => {
-    if (loading || !hasMore) return;
+    if (loading || !hasMore) return; // 이미 데이터를 불러오고 있거나 더 이상 데이터가 없으면 종료
     setLoading(true);
 
     try {
       const response = await PublicAxiosInstance.get(`/spots?page=${page}`);
       const data = response.data.data.map((item: FeedProps) => ({
-        contentId: item.contentId,
+        contentid: item.contentid,
         cardType: 'default',
         serviceType: 'default',
         title: item.title,
@@ -66,7 +66,7 @@ export default function Tour() {
   }, [page, loading, hasMore]);
 
   const cardClick = (id: number) => {
-    router.push(`/stay/${id}`);
+    router.push(`/tour/${id}`);
   };
 
   const wishClick = () => {
@@ -78,14 +78,15 @@ export default function Tour() {
       <div className="flex flex-col gap-1 items-center w-full">
         {feedList.map((item: FeedProps) => (
           <Card
-            id={item.contentId}
+            id={item.contentid}
+            key={item.contentid}
             cardType={item.cardType}
             serviceType={item.serviceType}
             title={item.title}
             location={`${item.addr1} ${item.addr2}`}
             image={item.image}
             inWishlist={item.inWishlist}
-            onCardClick={() => cardClick(item.contentId)}
+            onCardClick={() => cardClick(item.contentid)}
             onWishListClick={wishClick}
           />
         ))}

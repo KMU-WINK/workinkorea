@@ -25,6 +25,29 @@ export default function Home() {
     }
   };
 
+  const onClickKaKaoLogin = () => {
+    window.Kakao.Auth.authorize({
+      redirectUri: `${process.env.NEXT_PUBLIC_API_BASE_URI}/auth/kakao`,
+    });
+  };
+
+  const onClickNaverLogin = () => {
+    const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+    const redirectUri = `${process.env.NEXT_PUBLIC_API_BASE_URI}/auth/naver`;
+    const authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=state`;
+
+    window.location.href = authUrl;
+  };
+
+  const onClickGoogleLogin = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = `${process.env.NEXT_PUBLIC_API_BASE_URI}/auth/google`;
+    const scope = 'email profile';
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=state`;
+
+    window.location.href = authUrl;
+  };
+
   return (
     <main className="min-h-screen text-[#000000] p-6" onKeyDown={handleKeyDown}>
       <button
@@ -64,18 +87,30 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2.5">
-              <div className="w-full p-[18px] border border-gray-2 rounded-xl bg-kakao relative text-center">
+              <button
+                onClick={onClickKaKaoLogin}
+                type="button"
+                className="w-full p-[18px] border border-gray-2 rounded-xl bg-kakao relative text-center"
+              >
                 <Kakao className="absolute top-1/2 -translate-y-1/2" />
                 카카오로 시작하기
-              </div>
-              <div className="w-full p-[18px] border border-gray-2 rounded-xl bg-naver text-white relative text-center">
+              </button>
+              <button
+                onClick={onClickNaverLogin}
+                type="button"
+                className="w-full p-[18px] border border-gray-2 rounded-xl bg-naver text-white relative text-center"
+              >
                 <Naver className="absolute top-1/2 -translate-y-1/2" />
                 네이버로 시작하기
-              </div>
-              <div className="w-full p-[18px] border border-gray-2 rounded-xl relative text-center">
+              </button>
+              <button
+                onClick={onClickGoogleLogin}
+                type="button"
+                className="w-full p-[18px] border border-gray-2 rounded-xl relative text-center"
+              >
                 <Google className="absolute top-1/2 -translate-y-1/2" />
                 Google로 시작하기
-              </div>
+              </button>
             </div>
             <span className="text-[14px] font-medium">
               계속 진행하시면 워크인코리아의{' '}

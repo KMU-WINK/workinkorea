@@ -42,7 +42,7 @@ export default function FeedLayout({ children }: Props) {
 
   return (
     <div className="flex flex-col justify-start items-center h-full bg-white relative">
-      <div className="w-full flex flex-col justify-center items-center fixed top-0 z-10 max-w-sm">
+      <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 max-w-sm">
         <div className="w-full px-6 py-3.5 flex justify-center items-center bg-main">
           <Input
             leftIcon={<Back onClick={leftClick} />}
