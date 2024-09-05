@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
-import Script from 'next/script';
 import StyledJsxRegistry from './registry';
-import KakaoScriptLoader from '@/components/KakaoScriptLoader';
+import KakaoMapLoader from '@/components/KakaoScriptLoader/map';
+import KakaoSDKLoader from '@/components/KakaoScriptLoader/sdk';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://workinkorea.vercel.app'),
@@ -35,8 +35,6 @@ const myFont = localFont({
   src: '../../public/fonts/PretendardVariable.woff2',
 });
 
-const API = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_API}&autoload=false`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -45,9 +43,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className="bg-white">
       <body className={myFont.className}>
-        <Script src={API} strategy="beforeInteractive" />
         <StyledJsxRegistry>{children}</StyledJsxRegistry>
-        <KakaoScriptLoader />
+        <KakaoSDKLoader />
+        <KakaoMapLoader />
       </body>
     </html>
   );
