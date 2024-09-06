@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from ..external_services.areaBasedAPI import get_stays
 
 router = APIRouter(
@@ -8,9 +8,12 @@ router = APIRouter(
 
 
 @router.get("")
-async def read_stays(area: str, keyword: str = "", pageNo: int = 1):
-    data = get_stays(area, keyword, pageNo)
-    return data
+async def read_stays(area: str = "", keyword: str = "", pageNo: int = 1):
+    try:
+        data = get_stays(area, keyword, pageNo)
+        return data
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # @router.get("/:id")
