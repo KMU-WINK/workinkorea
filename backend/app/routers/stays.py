@@ -8,9 +8,9 @@ router = APIRouter(
 
 
 @router.get("")
-async def read_stays(area: str = "", keyword: str = "", pageNo: int = 1):
+async def read_stays(keyword: str, area: str = "", pageNo: int = 1):
     try:
-        data = get_stays(area, keyword, pageNo)
+        data = get_stays(keyword, area, pageNo)
         return data
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
