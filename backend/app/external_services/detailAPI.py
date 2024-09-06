@@ -10,7 +10,6 @@ import os
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
-print("API_KEY : ", API_KEY)
 
 
 # 10) [공통정보조회] 오퍼레이션명세	42
@@ -356,7 +355,6 @@ def get_image(contentId):
     #     }
     # }
     data = response.json()
-    print(data)
     return {
         "images": (
             data["response"]["body"]["items"]["item"]

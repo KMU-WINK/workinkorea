@@ -47,35 +47,3 @@ async def favicon():
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-@app.get("/stay_spot_detail")
-async def spot_stay_detail(contentId: int, contentTypeId: int):
-    common = get_common(contentId, contentTypeId)
-    # print("common")
-    # print(common)
-
-    intro = get_intro(contentId, contentTypeId)
-    # print("intro")
-    # print(intro)
-
-    info = get_info(contentId, contentTypeId)
-    # print("info")
-    # print(info)
-
-    image = get_image(contentId)
-    # print("image")
-    # print(image)
-
-    # 빈 딕셔너리 생성
-    combined_dict = {}
-
-    # 딕셔너리들을 순차적으로 합치기
-    combined_dict.update(common)
-    combined_dict.update(intro)
-    combined_dict.update(info)
-    combined_dict.update(image)
-
-    # 결과 확인
-    # print(combined_dict)
-    return combined_dict

@@ -1,16 +1,9 @@
-# 5)	[지역기반관광정보조회] 오퍼레이션명세	22
-import requests
+import requests, os
 from dotenv import load_dotenv
 
-import os
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
-print("API_KEY : ", API_KEY)
-
-
-# 5)	[지역기반관광정보조회] 오퍼레이션명세	22
-ENDPOINT = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1"
 
 
 AREA_CODE = {
@@ -41,18 +34,81 @@ AREA_CODE = {
 }
 
 
+# 5)	[지역기반관광정보조회] 오퍼레이션명세
+ENDPOINT_region = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1"
+
+
+def get_spots_by_region(area: str, pageNo: int = 1):
+
+    white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
+    if area not in white_list:
+        raise ValueError(f"{area} is not in valid area list {white_list}")
+
+    params = {
+        "serviceKey": API_KEY,  # **required**
+        "MobileOS": "ETC",  # **required**
+        "MobileApp": "AppTest",  # **required**
+        "numOfRows": "10",
+        "pageNo": pageNo,
+        "_type": "json",  # type은 json으로 고정
+        # "contentTypeId": "12",  # **관광타입 없음 -> 전체조회**
+        "listYN": "Y",  # 목록구분(Y=목록, N=개수) -> ?뭔솔
+        "arrange": "A",  # (A=제목순, C=수정일순 ,D=생성일순) | 대표이미지가반드시있는정렬(O=제목순, Q=수정일순, R=생성일순)
+        "areaCode": AREA_CODE[area][0],
+    }
+
+    if len(AREA_CODE[area]) >= 2:
+        params["sigunguCode"] = AREA_CODE[area][1]
+
+    response = requests.get(ENDPOINT_region, params=params)
+    data = response.json()
+
+    if data["response"]["body"]["items"]:
+        return data["response"]["body"]
+    else:
+        raise ValueError("No data found")
+
+
+def get_stays_by_region(area: str, pageNo: int = 1):
+
+    white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
+    if area not in white_list:
+        raise ValueError(f"{area} is not in valid area list {white_list}")
+
+    params = {
+        "serviceKey": API_KEY,  # **required**
+        "MobileOS": "ETC",  # **required**
+        "MobileApp": "AppTest",  # **required**
+        "numOfRows": "10",
+        "pageNo": pageNo,
+        "_type": "json",  # type은 json으로 고정
+        "contentTypeId": "32",  # **관광타입 : 숙박**
+        "listYN": "Y",  # 목록구분(Y=목록, N=개수) -> ?뭔솔
+        "arrange": "A",  # (A=제목순, C=수정일순 ,D=생성일순) | 대표이미지가반드시있는정렬(O=제목순, Q=수정일순, R=생성일순)
+        "areaCode": AREA_CODE[area][0],
+    }
+
+    if len(AREA_CODE[area]) >= 2:
+        params["sigunguCode"] = AREA_CODE[area][1]
+
+    response = requests.get(ENDPOINT_region, params=params)
+    data = response.json()
+
+    if data["response"]["body"]["items"]:
+        return data["response"]["body"]
+    else:
+        raise ValueError("No data found")
+
+
 # 7)	[키워드검색조회] 오퍼레이션명세
-def get_spots(keyword: str, area: str = "", pageNo: int = 1):
-    if not len(area) and not len(keyword):
+ENDPOINT_keyword = "https://apis.data.go.kr/B551011/KorService1/searchKeyword1"
+
+
+def get_spots(keyword: str, pageNo: int = 1):
+    if not len(keyword):
         raise ValueError("area or keyword is required")
 
-    if len(area):
-        white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
-        if area not in white_list:
-            raise ValueError(f"{area} is not in valid area list {white_list}")
-
     # API 엔드포인트 URL
-    url = "https://apis.data.go.kr/B551011/KorService1/searchKeyword1"
 
     # API 요청 파라미터
     params = {
@@ -71,17 +127,9 @@ def get_spots(keyword: str, area: str = "", pageNo: int = 1):
         # 만약 문제가 생기면 루프로 돌리기
         # "areaCode": AREA_CODE[area][0],
     }
-    # if len(keyword):
-    #     params["keyword"] = keyword
-
-    if len(area):
-        params["areaCode"] = AREA_CODE[area][0]
-
-        if len(AREA_CODE[area]) >= 2:
-            params["sigunguCode"] = AREA_CODE[area][1]
 
     # API 호출
-    response = requests.get(url, params=params)
+    response = requests.get(ENDPOINT_keyword, params=params)
     data = response.json()
 
     if data["response"]["body"]["items"]:
@@ -90,17 +138,9 @@ def get_spots(keyword: str, area: str = "", pageNo: int = 1):
         raise ValueError("No data found")
 
 
-def get_stays(keyword: str, area: str = "", pageNo: int = 1):
-    if not len(area) and not len(keyword):
+def get_stays(keyword: str, pageNo: int = 1):
+    if not len(keyword):
         raise ValueError("area or keyword is required")
-
-    if len(area):
-        white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
-        if area not in white_list:
-            raise ValueError(f"{area} is not in valid area list {white_list}")
-
-    # API 엔드포인트 URL
-    url = "https://apis.data.go.kr/B551011/KorService1/searchKeyword1"
 
     # API 요청 파라미터
     params = {
@@ -117,17 +157,8 @@ def get_stays(keyword: str, area: str = "", pageNo: int = 1):
         # "areaCode": AREA_CODE[area][0],
     }
 
-    # if len(keyword):
-    #     params["keyword"] = keyword
-
-    if len(area):
-        params["areaCode"] = AREA_CODE[area][0]
-
-        if len(AREA_CODE[area]) >= 2:
-            params["sigunguCode"] = AREA_CODE[area][1]
-
     # API 호출
-    response = requests.get(url, params=params)
+    response = requests.get(ENDPOINT_keyword, params=params)
 
     data = response.json()
 
