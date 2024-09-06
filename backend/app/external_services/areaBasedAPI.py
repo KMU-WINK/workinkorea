@@ -84,7 +84,7 @@ def get_spots(keyword: str, area: str = "", pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
-        return data["response"]["body"]["items"]
+        return data["response"]["body"]
     else:
         raise ValueError("No data found")
 
@@ -131,6 +131,6 @@ def get_stays(keyword: str, area: str = "", pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
-        return data["response"]["body"]["items"]
+        return data["response"]["body"]
     else:
         raise ValueError("No data found")
