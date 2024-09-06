@@ -58,6 +58,7 @@ def get_spots(keyword: str, area: str = "", pageNo: int = 1):
     params = {
         "serviceKey": API_KEY,
         "numOfRows": "10",
+        "pageNo": pageNo,
         "pageNo": "1",
         "MobileOS": "ETC",
         "MobileApp": "AppTest",
