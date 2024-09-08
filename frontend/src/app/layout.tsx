@@ -3,19 +3,27 @@ import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
+import { useEffect, useState } from 'react';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://workinkorea.vercel.app'),
   title: '워크인코리아',
   description: '원하는 곳에서 머무르며 일하다',
   keywords: ['워크인코리아', '워케이션', '일', '휴가'],
-  viewport: 'width=device-width, initial-scale=1.0',
+  viewport:
+    'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
   robots: 'index, follow',
+  manifest: '/manifest.json',
+  icons: [
+    { rel: 'apple-touch-icon', url: 'icons/icon-128x128.png' },
+    { rel: 'icon', url: 'icons/icon-128x128.png' },
+  ],
   openGraph: {
     locale: 'ko_KR',
     siteName: '워크인코리아',
     title: '워크인코리아',
     description: '원하는 곳에서 머무르며 일하다',
+
     type: 'website',
     url: 'https://workinkorea.vercel.app',
     images: [
@@ -39,6 +47,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const userAgent =
+      typeof window.navigator === 'undefined' ? '' : navigator.userAgent;
+    const isMobileDevice = /Mobi|Android/i.test(userAgent);
+    setIsMobile(isMobileDevice);
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isMobile && loading) return <>스플래시 아트</>;
+
   return (
     <html lang="ko" className="bg-white">
       <body className={myFont.className}>
