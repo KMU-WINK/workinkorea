@@ -1,3 +1,10 @@
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // 이미지 도메인 설정 추가
@@ -12,7 +19,7 @@ const nextConfig = {
     });
 
     return config;
-  }
+  },
 };
 
-export default nextConfig;
+module.exports = withPWA(nextConfig);

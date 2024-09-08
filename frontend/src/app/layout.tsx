@@ -9,13 +9,20 @@ export const metadata: Metadata = {
   title: '워크인코리아',
   description: '원하는 곳에서 머무르며 일하다',
   keywords: ['워크인코리아', '워케이션', '일', '휴가'],
-  viewport: 'width=device-width, initial-scale=1.0',
+  viewport:
+    'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
   robots: 'index, follow',
+  manifest: '/manifest.json',
+  icons: [
+    { rel: 'apple-touch-icon', url: 'icons/icon-128x128.png' },
+    { rel: 'icon', url: 'icons/icon-128x128.png' },
+  ],
   openGraph: {
     locale: 'ko_KR',
     siteName: '워크인코리아',
     title: '워크인코리아',
     description: '원하는 곳에서 머무르며 일하다',
+
     type: 'website',
     url: 'https://workinkorea.vercel.app',
     images: [
