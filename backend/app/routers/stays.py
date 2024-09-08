@@ -1,5 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from ..external_services.areaBasedAPI import get_stays, get_stays_by_region
+from ..external_services.areaBasedAPI import (
+    get_stays,
+    get_stays_by_region,
+    get_stays_by_region_and_keyword,
+)
 from ..external_services.detailAPI import get_common, get_intro, get_info, get_image
 
 router = APIRouter(
@@ -9,18 +13,18 @@ router = APIRouter(
 
 
 @router.get("")
-async def read_stays(keyword: str, pageNo: int = 1):
+async def read_stays(area: str = "", keyword: str = "", pageNo: int = 1):
+    if len(area) == 0 and len(keyword) == 0:
+        raise HTTPException(
+            status_code=400, detail="Please provide either area or keyword"
+        )
     try:
-        data = get_stays(keyword, pageNo)
-        return data
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@router.get("/by_region")
-async def read_stays_by_region(area: str, pageNo: int = 1):
-    try:
-        data = get_stays_by_region(area, pageNo)
+        if len(area) > 0 and len(keyword) == 0:
+            data = get_stays_by_region(area, pageNo)
+        elif len(area) == 0 and len(keyword) > 0:
+            data = get_stays(keyword, pageNo)
+        else:  # both area and keyword are provided
+            data = get_stays_by_region_and_keyword(keyword, area, pageNo)
         return data
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
