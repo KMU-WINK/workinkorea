@@ -3,6 +3,7 @@ import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
+import { useEffect, useState } from 'react';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://workinkorea.vercel.app'),
@@ -46,6 +47,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const userAgent =
+      typeof window.navigator === 'undefined' ? '' : navigator.userAgent;
+    const isMobileDevice = /Mobi|Android/i.test(userAgent);
+    setIsMobile(isMobileDevice);
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isMobile && loading) return <>스플래시 아트</>;
+
   return (
     <html lang="ko" className="bg-white">
       <body className={myFont.className}>
