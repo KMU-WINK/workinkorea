@@ -9,7 +9,14 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   // 이미지 도메인 설정 추가
   images: {
-    domains: ['tong.visitkorea.or.kr'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'tong.visitkorea.or.kr',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 
   webpack(config) {
