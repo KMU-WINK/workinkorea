@@ -3,6 +3,9 @@ import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
+import ClientLoading from '@/components/ClientLoading';
+import GoogleAnalytics from '@/lib/GoogleAnalytics';
+
 
 export const viewport: Viewport = {
   minimumScale: 1,
@@ -55,6 +58,7 @@ export default function RootLayout({
     <html lang="ko" className="bg-white">
       <body className={myFont.className}>
         <StyledJsxRegistry>{children}</StyledJsxRegistry>
+        <GoogleAnalytics />
         <KakaoScriptLoader />
       </body>
     </html>
