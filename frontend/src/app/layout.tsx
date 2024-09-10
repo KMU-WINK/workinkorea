@@ -1,16 +1,21 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
+
+export const viewport: Viewport = {
+  minimumScale: 1,
+  initialScale: 1,
+  width: 'device-width',
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://workinkorea.vercel.app'),
   title: '워크인코리아',
   description: '원하는 곳에서 머무르며 일하다',
   keywords: ['워크인코리아', '워케이션', '일', '휴가'],
-  viewport:
-    'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
   robots: 'index, follow',
   manifest: '/manifest.json',
   icons: [
