@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
 import ClientLoading from '@/components/ClientLoading';
+import GoogleAnalytics from '@/lib/GoogleAnalytics';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://workinkorea.vercel.app'),
@@ -53,6 +54,7 @@ export default function RootLayout({
         <StyledJsxRegistry>
           <ClientLoading>{children}</ClientLoading>
         </StyledJsxRegistry>
+        <GoogleAnalytics />
         <KakaoScriptLoader />
       </body>
     </html>
