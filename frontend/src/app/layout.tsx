@@ -3,7 +3,6 @@ import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
-import ClientLoading from '@/components/ClientLoading';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://workinkorea.vercel.app'),
@@ -50,9 +49,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="bg-white">
       <body className={myFont.className}>
-        <StyledJsxRegistry>
-          <ClientLoading>{children}</ClientLoading>
-        </StyledJsxRegistry>
+        <StyledJsxRegistry>{children}</StyledJsxRegistry>
         <KakaoScriptLoader />
       </body>
     </html>
