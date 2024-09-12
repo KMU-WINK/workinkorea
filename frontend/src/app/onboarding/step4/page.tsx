@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
@@ -28,7 +28,6 @@ export default function Step4() {
         ? prevState.filter(option => option !== value)
         : [...prevState, value],
     );
-    console.log('Selected options:', selectedOptions); // 상태 확인
   };
 
   const options = [
@@ -40,6 +39,11 @@ export default function Step4() {
     { text: '오락', icon: <Dice /> },
     { text: '스포츠', icon: <Sport /> },
   ];
+
+  // 상태 확인
+  useEffect(() => {
+    console.log(selectedOptions);
+  }, [selectedOptions]);
 
   return (
     <div className="bg-white min-h-screen flex flex-col justify-between">
