@@ -1,6 +1,5 @@
 export type CardType = 'default' | 'map';
 export type ServiceType = 'default' | 'work';
-
 export interface CardProps {
   id: number;
   cardType: CardType;
@@ -40,3 +39,17 @@ export interface FeedProps {
   location: string;
 }
 // job 같은 경우에는 아직 안나와서 추후에 추가 예정
+
+export interface UserDetail {
+  user: {
+    social: 'kakao' | 'naver' | 'google';
+    nickname: string | null;
+    gender: '남성' | '여성' | null;
+    id: number;
+    social_id: string;
+    birth: string | null;
+  };
+  regions: string[] | null;
+  interests: string[] | null;
+  works: string[] | null;
+}
