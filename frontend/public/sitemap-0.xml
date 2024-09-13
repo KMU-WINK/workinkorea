@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://workinkorea.vercel.app/tour</loc><lastmod>2024-09-10T14:27:29.783Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://workinkorea.vercel.app/main</loc><lastmod>2024-09-10T14:27:29.783Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://workinkorea.vercel.app/wish</loc><lastmod>2024-09-10T14:27:29.783Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://workinkorea.vercel.app</loc><lastmod>2024-09-10T14:27:29.783Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://workinkorea.vercel.app/job</loc><lastmod>2024-09-10T14:27:29.783Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://workinkorea.vercel.app/stay</loc><lastmod>2024-09-10T14:27:29.783Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+</urlset>

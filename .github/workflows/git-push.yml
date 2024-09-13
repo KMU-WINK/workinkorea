@@ -3,18 +3,33 @@ name: Sync to Foked Repo
 on:
   push:
     branches:
-      - main
       - develop
 
 jobs:
-  sync_repo:
+  build:
     runs-on: ubuntu-latest
-
+    container: pandoc/latex
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
-      - name: Push changes to personal repo
-        run: |
-          git remote add personal https://Choi-Jiwon-38:${{ secrets.JIWON_GITHUB_TOKEN }}@github.com/Choi-Jiwon-38/workinkorea.git
-          git push personal ${{ github.ref }}:refs/heads/${{ github.ref_name }}
+      - name: Install mustache (to update the date)
+        run: apk add ruby && gem install mustache
+
+      - name: creates output
+        run: sh ./build.sh
+
+      - name: Pushes to another repository
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.JIWON_GITHUB_TOKEN }}
+        with:
+          source-directory: 'output'
+          destination-github-username: 'Choi-Jiwon-38'
+          destination-repository-name: 'workinkorea'
+          user-email: 'chlrhwldnjs@naver.com'
+          commit-message: ${{ github.event.commits[0].message }}
+          target-branch: develop
+
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
