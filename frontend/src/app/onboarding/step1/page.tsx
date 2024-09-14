@@ -1,21 +1,26 @@
 'use client';
 
 import Input from '@/components/Input';
-import React from 'react';
+import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 
-interface Step1Props {
-  nickname: string;
-  onNicknameChange: (nickname: string) => void;
-}
-
-export default function Step1({ nickname, onNicknameChange }: Step1Props) {
+export default function Step1() {
+  const [nickname, setNickname] = useState('');
   const router = useRouter();
 
-  const handleNextClick = () => {
-    router.push('/onboarding/step2');
+  // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
+  const searchParam = useSearchParams();
+  const socialId = searchParam.get('social_id');
+  const provider = searchParam.get('provider');
+
+  console.log(socialId);
+
+  const handleNextClick = async () => {
+    // 다음 페이지에서도 social id, provider 정보를 search param을 통하여 접근할 수 있도록 추가
+    // props로 전달할 수도 있지만 서버에서 onboarding/step1 ~ /step5까지 search param을 통하여 정보를 전달하기 때문에 통일하기 위함
+    router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);
   };
 
   return (
@@ -42,7 +47,9 @@ export default function Step1({ nickname, onNicknameChange }: Step1Props) {
             <Input
               placeholder="여섯글자이름"
               value={nickname}
-              onChange={e => onNicknameChange(e.target.value)}
+              onChange={e => {
+                setNickname(e.target.value);
+              }}
             />
           </div>
         </div>
