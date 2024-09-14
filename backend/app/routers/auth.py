@@ -128,28 +128,28 @@ async def login(access_token: str, provider: str, db: Session):
     # 회원 가입이 되어있지 않은 유저
     if not user:
         await create_user(UserCreate(social_id=social_id, social=provider), db=db)
-        return RedirectResponse(url=f"{client_url}/onboarding/step1")
+        return RedirectResponse(url=f"{client_url}/onboarding/step1?social_id={social_id}&provider={provider}")
 
     # 온보딩 과정을 모두 진행하지 않은 유저
     # 온보딩 Step 1을 수행하지 않은 유저
     if not user.nickname:
-        return RedirectResponse(url=f"{client_url}/onboarding/step1")
+        return RedirectResponse(url=f"{client_url}/onboarding/step1?social_id={social_id}&provider={provider}")
 
     # 온보딩 Step 2를 수행하지 않은 유저
     if not (user.birth and user.gender):
-        return RedirectResponse(url=f"{client_url}/onboarding/step2")
+        return RedirectResponse(url=f"{client_url}/onboarding/step2?social_id={social_id}&provider={provider}")
 
     # 온보딩 Step 3을 수행하지 않은 유저
     if not user.regions:
-        return RedirectResponse(url=f"{client_url}/onboarding/step3")
+        return RedirectResponse(url=f"{client_url}/onboarding/step3?social_id={social_id}&provider={provider}")
 
     # 온보딩 Step 4를 수행하지 않은 유저
     if not user.works:
-        return RedirectResponse(url=f"{client_url}/onboarding/step4")
+        return RedirectResponse(url=f"{client_url}/onboarding/step4?social_id={social_id}&provider={provider}")
     
     # 온보딩 Step 5를 수행하지 않은 유저
     if not user.interests:
-        return RedirectResponse(url=f"{client_url}/onboarding/step5")
+        return RedirectResponse(url=f"{client_url}/onboarding/step5?social_id={social_id}&provider={provider}")
 
     # 회원가입이 되어있는 유저
     # JWT 토큰 생성 후 쿠키 설정
