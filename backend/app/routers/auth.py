@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..models.User import User
+from .users import create_user
 from ..db.session import get_db
 from fastapi.responses import RedirectResponse
 import requests
 import os
 import jwt
 from datetime import datetime, timedelta
+from ..schemas.user import UserCreate
+import httpx
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
 ALGORITHM = "HS256"
@@ -27,7 +30,7 @@ router = APIRouter(
 )
 
 @router.get("/kakao")
-async def kakaoAuth(code: str):
+async def kakaoAuth(code: str, db: Session = Depends(get_db)):
     client_id = os.getenv('KAKAO_REST_API_KEY') 
     redirect_uri = os.getenv('KAKAO_REDIRECT_URI')
 
@@ -39,25 +42,32 @@ async def kakaoAuth(code: str):
     _res = requests.post(_url, headers=_headers)
     _result = _res.json()
     
-    access_token = _result["access_token"]
-    return login(access_token=access_token, provider="kakao")
+    access_token = _result.get("access_token")
+    if not access_token:
+        raise ValueError("Access token not found in response")
+    
+    # login 호출 시 await 추가
+    return await login(access_token=access_token, provider="kakao", db=db)
 
 
 @router.get('/naver')
-async def naverAuth(state: str, code: str):
+async def naverAuth(state: str, code: str, db: Session = Depends(get_db)):
     client_id = os.getenv("NAVER_CLIENT_ID")
     client_secret = os.getenv("NAVER_CLIENT_SECRET")
     redirect_uri = os.getenv("NAVER_REDIRECT_URI")
     
     _url = f'https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&code={code}&state={state}'
-    _res = requests.post(_url, headers={'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret': client_secret})
+    _res = requests.post(_url, headers={'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret})
     _result = _res.json()
 
-    access_token = _result["access_token"]
-    return login(access_token=access_token, provider="naver")
+    access_token = _result.get("access_token")
+    if not access_token:
+        raise ValueError("Access token not found in response")
+    
+    return await login(access_token=access_token, provider="naver", db=db)
 
 @router.get("/google")
-async def googleAuth(state: str, code: str):
+async def googleAuth(state: str, code: str, db: Session = Depends(get_db)):
     client_id = os.getenv('GOOGLE_CLIENT_ID')
     client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
     redirect_uri = os.getenv('GOOGLE_REDIRECT_URI')
@@ -74,46 +84,54 @@ async def googleAuth(state: str, code: str):
 
     _result = requests.post(token_url, data=token_data).json()
 
-    access_token = _result["access_token"]
+    access_token = _result.get("access_token")
+    if not access_token:
+        raise ValueError("Access token not found in response")
     
-    return login(access_token=access_token, provider="google")
+    return await login(access_token=access_token, provider="google", db=db)
 
 
-def get_user(social_id: str, provider: str, db: Session = Depends(get_db)):
+# get_user는 비동기가 아니므로 async나 await가 필요하지 않음.
+def get_user(social_id: str, provider: str, db: Session):
     return db.query(User).filter(User.social_id == social_id, User.social == provider).first()
 
-def login(access_token: str, provider: str):
-    db = next(get_db())
-    # Access Token을 이용하여 각 소셜 서비스의 고유 id 값 조회
-    if provider == 'kakao':
-        user_info = requests.get(
-            "https://kapi.kakao.com/v2/user/me",
-            headers={"Authorization": f"Bearer {access_token}"}
-        ).json()
-        social_id = str(user_info.get("id"))
+
+async def login(access_token: str, provider: str, db: Session):
+    async with httpx.AsyncClient() as client:
+        if provider == 'kakao':
+            user_info = (await client.get(
+                "https://kapi.kakao.com/v2/user/me",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )).json()
+            social_id = str(user_info.get("id"))
         
-    if provider == 'naver':
-        user_info = requests.get(
-            "https://openapi.naver.com/v1/nid/me",
-            headers={"Authorization": f"Bearer {access_token}"}
-        ).json()
-        social_id = user_info.get("response", {}).get("id")
-    
-    if provider == 'google':
-        user_info = requests.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access_token}"}).json()
-        social_id = user_info["id"]
-    
+        elif provider == 'naver':
+            user_info = (await client.get(
+                "https://openapi.naver.com/v1/nid/me",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )).json()
+            social_id = user_info.get("response", {}).get("id")
+        
+        elif provider == 'google':
+            user_info = (await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo", 
+                headers={"Authorization": f"Bearer {access_token}"}
+            )).json()
+            social_id = user_info.get("id")
+
     # 해당 id, provider를 통하여 db에 사용자 유무 판별
     user = get_user(social_id=social_id, provider=provider, db=db)
-    
+
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
-    # 회원가입 시, 필요한 소셜 id와 provider를 search param에 포함 
     client_url = os.getenv("WINK_CLIENT_URI")
-    
+
     if not user:
+        # 비동기 create_user 호출 시 await 사용
+        await create_user(UserCreate(social_id=social_id, social=provider), db=db)
         return RedirectResponse(url=f"{client_url}/onboarding?social_id={social_id}&provider={provider}")
-    
-    access_token = create_jwt_token(user.nickname)
+
+    # JWT 토큰 생성 후 쿠키 설정
+    jwt_token = create_jwt_token(user.nickname)
     response = RedirectResponse(url=f"{client_url}")
-    response.set_cookie(key="access_token", value=access_token, httponly=True, samesite="Strict")
+    response.set_cookie(key="access_token", value=jwt_token, httponly=True, samesite="Strict")
     return response
