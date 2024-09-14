@@ -125,11 +125,33 @@ async def login(access_token: str, provider: str, db: Session):
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
     client_url = os.getenv("WINK_CLIENT_URI")
 
+    # 회원 가입이 되어있지 않은 유저
     if not user:
-        # 비동기 create_user 호출 시 await 사용
         await create_user(UserCreate(social_id=social_id, social=provider), db=db)
-        return RedirectResponse(url=f"{client_url}/onboarding?social_id={social_id}&provider={provider}")
+        return RedirectResponse(url=f"{client_url}/onboarding/step1")
 
+    # 온보딩 과정을 모두 진행하지 않은 유저
+    # 온보딩 Step 1을 수행하지 않은 유저
+    if not user.nickname:
+        return RedirectResponse(url=f"{client_url}/onboarding/step1")
+
+    # 온보딩 Step 2를 수행하지 않은 유저
+    if not (user.birth and user.gender):
+        return RedirectResponse(url=f"{client_url}/onboarding/step2")
+
+    # 온보딩 Step 3을 수행하지 않은 유저
+    if not user.regions:
+        return RedirectResponse(url=f"{client_url}/onboarding/step3")
+
+    # 온보딩 Step 4를 수행하지 않은 유저
+    if not user.works:
+        return RedirectResponse(url=f"{client_url}/onboarding/step4")
+    
+    # 온보딩 Step 5를 수행하지 않은 유저
+    if not user.interests:
+        return RedirectResponse(url=f"{client_url}/onboarding/step5")
+
+    # 회원가입이 되어있는 유저
     # JWT 토큰 생성 후 쿠키 설정
     jwt_token = create_jwt_token(user.nickname)
     response = RedirectResponse(url=f"{client_url}")
