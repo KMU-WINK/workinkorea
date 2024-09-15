@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import Character from '../../../../../public/svgs/character.svg';
-import Dropdown from '../../../../../public/svgs/dropdown.svg';
-import Map from '../../../../../public/svgs/map.svg';
+import Character from 'public/svgs/character.svg';
+import Dropdown from 'public/svgs/dropdown.svg';
+import Map from 'public/svgs/map.svg';
 
 interface DropDownProps {
   options: string[];

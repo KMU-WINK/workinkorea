@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Back from '../../../public/svgs/back.svg';
-import SearchIcon from '../../../public/svgs/search.svg';
+import Back from 'public/svgs/back.svg';
+import SearchIcon from 'public/svgs/search.svg';
 import DropDown from '@/app/search/_components/DropDown';
 import TrendList from '@/app/search/_components/TrendList';
 import Button from '@/components/Button';
