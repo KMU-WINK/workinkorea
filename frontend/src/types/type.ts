@@ -13,6 +13,7 @@ export interface CardProps {
   onWishListClick: (id: number) => void;
   inWishlist?: boolean;
   company?: string;
+  contenttypeid?: string;
 }
 
 export interface BannerProps {
@@ -26,17 +27,36 @@ export interface BannerProps {
   backgroundImage: React.ReactNode;
 }
 
-export interface FeedProps {
+export interface FeedProps extends CardProps {
   contentid: number;
-  cardType: CardType;
-  serviceType: ServiceType;
-  title: string;
   firstimage: string;
   firstimage2: string;
   addr1: string;
   addr2: string;
-  image: string;
-  inWishlist: boolean;
-  location: string;
 }
 // job 같은 경우에는 아직 안나와서 추후에 추가 예정
+
+export interface SpotInfo {
+  title: string;
+  homepage: string;
+  address: string;
+  image: string;
+  number: string;
+  telName?: string;
+  overview: string;
+  link: string;
+  time?: string;
+  restDate: string;
+  inTime?: string;
+  outTime?: string;
+}
+
+export interface SpotExtraInfo {
+  parking?: string; // 12, 14, 28, 32, 38
+  expGuide?: string; // 12 : 체험 안내
+  useFee?: string; // 14 : usefee - 이용 요금 / 28 : usefeeleports - 이장료
+  eventPeriod?: string; // 14 : eventstartdate ~ eventenddate
+  openDateShopping?: string; // 38 : 개장일
+  firstMenu?: string; // 39 : 대표 메뉴
+  packing?: string; // 39 : 포장 가능
+}
