@@ -20,10 +20,7 @@ import {
   InfoRowType38,
   InfoRowType39,
 } from '../../_components/InfoItem';
-import {
-  processTimeString,
-  extractLinkOrValue,
-} from '../../_utils/stringUtils';
+import { formatString, extractLinkOrValue } from '../../_utils/stringUtils';
 import { SpotExtraInfo, SpotInfo } from '@/types/type';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
@@ -217,7 +214,7 @@ export default function Tour() {
                 <pre>
                   {contentTypeId === 32
                     ? `${spotInfo.inTime} ~ ${spotInfo.outTime}`
-                    : processTimeString(spotInfo.time || '')}
+                    : formatString(spotInfo.time || '')}
                 </pre>
               </InfoRow>
               <InfoRow>

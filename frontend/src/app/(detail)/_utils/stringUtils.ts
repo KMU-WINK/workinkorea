@@ -1,4 +1,5 @@
-export const processTimeString = (str: string) => {
+//
+export const formatString = (str: string) => {
   return str
     .replace(/<br\s*\/?>/g, '\n') // <br> 태그를 줄바꿈으로 대체
     .trim();
