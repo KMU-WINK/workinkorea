@@ -28,11 +28,19 @@ export default function Search() {
   ];
 
   const handleSearch = () => {
-    const url = `/search-results?category=${encodeURIComponent(
-      selectedCategory,
-    )}&location=${encodeURIComponent(selectedLocation)}&query=${encodeURIComponent(
+    const basePath =
+      selectedCategory === '채용'
+        ? '/job'
+        : selectedCategory === '숙박'
+          ? '/stay'
+          : selectedCategory === '관광'
+            ? '/tour'
+            : '';
+
+    const url = `${basePath}?location=${encodeURIComponent(selectedLocation)}&keyword=${encodeURIComponent(
       searchQuery,
     )}`;
+
     router.push(url);
   };
 
