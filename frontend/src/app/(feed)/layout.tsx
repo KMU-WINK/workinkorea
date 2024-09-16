@@ -7,7 +7,6 @@ import Image from 'next/image';
 import Input from '@/components/Input';
 
 import Back from '../../../public/svgs/back.svg';
-import Filter from '../../../public/svgs/filter.svg';
 
 interface Props {
   children: React.ReactNode;
@@ -20,18 +19,16 @@ export default function FeedLayout({ children }: Props) {
   const leftClick = () => {
     console.log('leftClick');
   };
-  const rightClick = () => {
-    console.log('rightClick');
-  };
+
   // pathname에 따라 mapClick 함수 다르게 설정
   useEffect(() => {
     if (pathname === '/stay') {
       setMapClick(() => () => {
         console.log('mapClick : stay');
       });
-    } else if (pathname === '/tour') {
+    } else if (pathname === '/spot') {
       setMapClick(() => () => {
-        console.log('mapClick : tour');
+        console.log('mapClick : spot');
       });
     } else {
       setMapClick(() => () => {
@@ -44,7 +41,7 @@ export default function FeedLayout({ children }: Props) {
     <div className="flex flex-col justify-start items-center h-full bg-white relative">
       <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 sm:max-w-sm">
         <div className="w-full px-6 py-3.5 flex justify-center items-center bg-main">
-          <Input leftIcon={<Back onClick={leftClick} />} />
+          <Input leftIcon={<Back onClick={leftClick} />} readOnly />
         </div>
         <div className="px-6 py-4 bg-white">
           <div

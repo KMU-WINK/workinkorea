@@ -101,7 +101,7 @@ def get_stays_by_region(area: str, pageNo: int = 1):
 
 
 # 7)	[키워드검색조회] 오퍼레이션명세
-ENDPOINT_keyword = "https://apis.data.go.kr/B551011/KorService1/searchKeyword1"
+ENDPOINT_keyword = "http://apis.data.go.kr/B551011/KorService1/searchKeyword1"
 
 
 def get_spots(keyword: str, pageNo: int = 1):
