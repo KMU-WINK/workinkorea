@@ -126,7 +126,7 @@ export default function Search() {
           </div>
         </div>
         <div className="w-full px-4 py-4">
-          <Button onClick={handleSearch} isSelect text="검색하기" />
+          <Button onClick={handleSearch} isAllowed text="검색하기" />
         </div>
       </div>
     </div>

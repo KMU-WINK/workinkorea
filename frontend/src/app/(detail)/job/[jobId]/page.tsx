@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Heart from '../../../../../public/svgs/heart.svg';
-import HeartColor from '../../../../../public/svgs/heart-color.svg';
-import Location from '../../../../../public/svgs/location.svg';
-import GoSmall from '../../../../../public/svgs/go-small.svg';
-import BackWhite from '../../../../../public/svgs/back-white.svg';
+import Heart from 'public/svgs/heart.svg';
+import HeartColor from 'public/svgs/heart-color.svg';
+import Location from 'public/svgs/location.svg';
+import GoSmall from 'public/svgs/go-small.svg';
+import BackWhite from 'public/svgs/back-white.svg';
 
 interface JobInfo {
   title: string;

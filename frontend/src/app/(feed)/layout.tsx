@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 import Input from '@/components/Input';
 
-import Back from '../../../public/svgs/back.svg';
+import Back from 'public/svgs/back.svg';
 
 interface Props {
   children: React.ReactNode;

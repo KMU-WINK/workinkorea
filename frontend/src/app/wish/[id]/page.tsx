@@ -8,7 +8,7 @@ import Card from '@/components/Card';
 
 import { CardProps } from '@/types/type';
 
-import Back from '../../../../public/svgs/back.svg';
+import Back from 'public/svgs/back.svg';
 
 interface WishType {
   id: number;
