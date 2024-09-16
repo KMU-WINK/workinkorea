@@ -79,6 +79,8 @@ export default function Step3() {
                 key={location.name}
                 image={
                   <Image
+                    width={170}
+                    height={120}
                     src={location.image.src}
                     alt={location.name}
                     className="w-full h-full object-cover"
