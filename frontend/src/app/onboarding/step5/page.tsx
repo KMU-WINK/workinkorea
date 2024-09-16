@@ -15,7 +15,6 @@ import Learning from 'public/svgs/emoji/learning.svg';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
 export default function Step3() {
-  const router = useRouter();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
@@ -27,9 +26,7 @@ export default function Step3() {
         social_id: socialId,
         interests: selectedOptions,
       });
-      router.push(
-        `/onboarding/step5?social_id=${socialId}&provider=${provider}`,
-      );
+      await PublicAxiosInstance.get(`/auth/token?social_id=${socialId}`);
     } catch (e) {
       console.error(e);
     }

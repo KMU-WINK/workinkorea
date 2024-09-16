@@ -152,10 +152,28 @@ async def login(access_token: str, provider: str, db: Session):
         return RedirectResponse(url=f"{client_url}/onboarding/step5?social_id={social_id}&provider={provider}")
 
     # 회원가입이 되어있는 유저
-    # JWT 토큰 생성 후 쿠키 설정
+    return await get_access_token(user.social_id, db)
+
+# username 기반 토큰 발급
+@router.get("/token")
+async def get_access_token(social_id: str, db: Session = Depends(get_db)):
+    # 사용자가 DB에 있는지 확인
+    user = db.query(User).filter(User.social_id == social_id).first()
+    client_url = os.getenv("WINK_CLIENT_URI")
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="사용자가 존재하지 않습니다.",
+        )
+
+    # JWT 토큰 생성
     jwt_token = create_jwt_token(user.nickname)
-    response = RedirectResponse(url=f"{client_url}")
-    response.set_cookie(key="access_token", value=jwt_token, httponly=True, samesite="Strict")
+
+    # 클라이언트 측에 쿠키 설정 및 메인 페이지로 리디렉션
+    response = RedirectResponse(url=f"{client_url}/main")
+    response.set_cookie(key="access_token", value=jwt_token, httponly=True, samesite="lax")
+
     return response
 
 
