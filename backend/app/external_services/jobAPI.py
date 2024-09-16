@@ -116,9 +116,12 @@ def get_jobs(area: str, keyword: str, pageNo: int = 1):
                         "empmnTtl",
                         "wageAmt",
                         "wrkpAdres",
+                        "salStleCd",
                     ]:
                         if key == "empmnInfoNo":
                             tmp["contentId"] = value
+                        elif key == "salStleCd":
+                            tmp["salStle"] = TOUR_salStleCd[value] if value else ""
                         else:
                             tmp[key] = value
 
