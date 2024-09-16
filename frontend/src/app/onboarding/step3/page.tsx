@@ -13,6 +13,7 @@ import JejuImage from 'public/images/location/제주.png';
 import ChuncheonImage from 'public/images/location/춘천.png';
 import ImageButton from '@/app/onboarding/_components/ImageButton';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import Image from 'next/image';
 
 export default function Step3() {
   const router = useRouter();
@@ -77,7 +78,7 @@ export default function Step3() {
               <ImageButton
                 key={location.name}
                 image={
-                  <img
+                  <Image
                     src={location.image.src}
                     alt={location.name}
                     className="w-full h-full object-cover"
