@@ -129,7 +129,7 @@ def get_jobs(area: str, keyword: str, pageNo: int = 1):
     params = {
         "serviceKey": API_KEY,
         "numOfRows": "10",
-        "pageNo": "1",
+        "pageNo": pageNo,
         "pbancBgngYmd": "2024-07-01",  # 시작 날짜
         "pbancEndYmd": today,  # 종료 날짜
         "resultType": "json",
