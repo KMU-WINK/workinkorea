@@ -5,13 +5,13 @@ import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SelectButton from '@/components//SelectButton';
 import Button from '@/components/Button';
-import Activity from '../../../../public/svgs/emoji/paragliding.svg';
-import Rest from '../../../../public/svgs/emoji/sofa.svg';
-import City from '../../../../public/svgs/emoji/coffee.svg';
-import Leaf from '../../../../public/svgs/emoji/leaf.svg';
-import Fire from '../../../../public/svgs/emoji/fire.svg';
-import Moai from '../../../../public/svgs/emoji/moai.svg';
-import Learning from '../../../../public/svgs/emoji/learning.svg';
+import Activity from 'public/svgs/emoji/paragliding.svg';
+import Rest from 'public/svgs/emoji/sofa.svg';
+import City from 'public/svgs/emoji/coffee.svg';
+import Leaf from 'public/svgs/emoji/leaf.svg';
+import Fire from 'public/svgs/emoji/fire.svg';
+import Moai from 'public/svgs/emoji/moai.svg';
+import Learning from 'public/svgs/emoji/learning.svg';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
 export default function Step3() {

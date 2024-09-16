@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import CalendarIcon from '../../../public/svgs/calender.svg';
+import CalendarIcon from 'public/svgs/calender.svg';
 
 interface InputProps {
   state: string | undefined;

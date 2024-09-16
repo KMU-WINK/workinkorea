@@ -1,6 +1,6 @@
 import React from 'react';
-import HeartOutline from '../../../../../public/svgs/heart.svg';
-import HeartFilled from '../../../../../public/svgs/heart-color.svg';
+import HeartOutline from 'public/svgs/heart.svg';
+import HeartFilled from 'public/svgs/heart-color.svg';
 
 export interface ImageButtonProps {
   image: React.ReactNode;
