@@ -5,13 +5,13 @@ import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 import SelectButton from '@/components/SelectButton';
-import Marketing from '../../../../public/svgs/emoji/marketing.svg';
-import Sound from '../../../../public/svgs/emoji/sound.svg';
-import Greeting from '../../../../public/svgs/emoji/greeting.svg';
-import Egg from '../../../../public/svgs/emoji/egg.svg';
-import Hotel from '../../../../public/svgs/emoji/hotel.svg';
-import Dice from '../../../../public/svgs/emoji/dice.svg';
-import Sport from '../../../../public/svgs/emoji/weight.svg';
+import Marketing from 'public/svgs/emoji/marketing.svg';
+import Sound from 'public/svgs/emoji/sound.svg';
+import Greeting from 'public/svgs/emoji/greeting.svg';
+import Egg from 'public/svgs/emoji/egg.svg';
+import Hotel from 'public/svgs/emoji/hotel.svg';
+import Dice from 'public/svgs/emoji/dice.svg';
+import Sport from 'public/svgs/emoji/weight.svg';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
 export default function Step4() {

@@ -1,25 +1,12 @@
 'use client';
 
-import Input from '@/components/Input';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 import SelectButton from '@/components/SelectButton';
-import styled from 'styled-components';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import DatePicker from '@/components/DatePicker';
-
-const StyledInput = styled(Input)`
-  &::-webkit-calendar-picker-indicator {
-    display: none;
-    -webkit-appearance: none;
-  }
-  &::-webkit-clear-button,
-  &::-webkit-inner-spin-button {
-    display: none;
-  }
-`;
 
 export default function Step2() {
   const router = useRouter();

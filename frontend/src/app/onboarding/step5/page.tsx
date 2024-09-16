@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import SelectButton from '@/components//SelectButton';
 import Button from '@/components/Button';
 import Activity from 'public/svgs/emoji/paragliding.svg';
