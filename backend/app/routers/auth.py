@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from ..models.User import User
 from .users import create_user
@@ -19,7 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 def create_jwt_token(user_nickname: str):
     # JWT 토큰 생성
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode = {"sub": user_nickname, "exp": expire}
+    to_encode = {"nickname": user_nickname, "exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -157,3 +157,73 @@ async def login(access_token: str, provider: str, db: Session):
     response = RedirectResponse(url=f"{client_url}")
     response.set_cookie(key="access_token", value=jwt_token, httponly=True, samesite="Strict")
     return response
+
+
+# access token(jwt token) 검증
+def verify_jwt_token(token: str):
+    try:
+        # JWT 토큰을 검증하고 payload 반환
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # payload에서 닉네임 추출
+        nickname = payload.get("nickname")
+        if nickname is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token: no subject",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return nickname
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+
+def get_current_user(
+    request: Request, db: Session = Depends(get_db)
+):
+    # Authorization 헤더에서 토큰 가져오기
+    auth_header = request.headers.get("Authorization")
+    
+    if auth_header is None:
+        # Authorization 헤더가 없을 때
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header is missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not auth_header.startswith("Bearer "):
+        # 올바른 토큰의 형태가 주어지지 않았을 때, 토큰이 존재하지 않을 때
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = auth_header.split(" ")[1]
+
+    # 토큰 검증 로직 (verify_token 함수 호출 등)
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    nickname: str = verify_jwt_token(token, credentials_exception)
+
+    # 사용자 조회 로직
+    user = db.query(User).filter(User.nickname == nickname).first()
+    if user is None:
+        raise credentials_exception
+
+    return user
