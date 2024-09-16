@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 import SelectButton from '@/components/SelectButton';
 import Marketing from '../../../../public/svgs/emoji/marketing.svg';
@@ -12,15 +12,29 @@ import Egg from '../../../../public/svgs/emoji/egg.svg';
 import Hotel from '../../../../public/svgs/emoji/hotel.svg';
 import Dice from '../../../../public/svgs/emoji/dice.svg';
 import Sport from '../../../../public/svgs/emoji/weight.svg';
+import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
 export default function Step4() {
   const router = useRouter();
-
-  const handleNextClick = () => {
-    router.push('/onboarding/step5');
-  };
-
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  const searchParam = useSearchParams();
+  const socialId = searchParam.get('social_id');
+  const provider = searchParam.get('provider');
+
+  const handleNextClick = async () => {
+    try {
+      await PublicAxiosInstance.patch('/users/interest', {
+        social_id: socialId,
+        interests: selectedOptions,
+      });
+      router.push(
+        `/onboarding/step5?social_id=${socialId}&provider=${provider}`,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleInputChange = (value: string) => {
     setSelectedOptions(prevState =>
@@ -65,8 +79,8 @@ export default function Step4() {
             최대 0개까지 선택 가능하며 나중에 설정에서 변경할 수 있어요.
           </p>
           <div className="pt-5">
-            {options.map(option => (
-              <div className="pt-2">
+            {options.map((option, index) => (
+              <div className="pt-2" key={index}>
                 <SelectButton
                   key={option.text}
                   text={option.text}
@@ -82,7 +96,7 @@ export default function Step4() {
       <div className="w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isSelect
+          isAllowed={selectedOptions.length > 0}
           onClick={handleNextClick} // 구문 수정: 함수 호출을 올바르게 처리
         />
       </div>

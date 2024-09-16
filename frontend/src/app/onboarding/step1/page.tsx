@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
+import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
 export default function Step1() {
   const [nickname, setNickname] = useState('');
@@ -15,12 +16,20 @@ export default function Step1() {
   const socialId = searchParam.get('social_id');
   const provider = searchParam.get('provider');
 
-  console.log(socialId);
-
   const handleNextClick = async () => {
-    // 다음 페이지에서도 social id, provider 정보를 search param을 통하여 접근할 수 있도록 추가
-    // props로 전달할 수도 있지만 서버에서 onboarding/step1 ~ /step5까지 search param을 통하여 정보를 전달하기 때문에 통일하기 위함
-    router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);
+    try {
+      await PublicAxiosInstance.patch('/users/nickname', {
+        social_id: socialId,
+        nickname: nickname,
+      });
+      // 다음 페이지에서도 social id, provider 정보를 search param을 통하여 접근할 수 있도록 추가
+      // props로 전달할 수도 있지만 서버에서 onboarding/step1 ~ /step5까지 search param을 통하여 정보를 전달하기 때문에 통일하기 위함
+      router.push(
+        `/onboarding/step2?social_id=${socialId}&provider=${provider}`,
+      );
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -57,7 +66,7 @@ export default function Step1() {
       <div className="w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isSelect
+          isAllowed={nickname !== ''} // TODO: 해당 부분 6글자, 한글 구성인지 validate하는 로직으로 수정 필요
           onClick={handleNextClick} // 구문 수정: 함수 호출을 올바르게 처리
         />
       </div>

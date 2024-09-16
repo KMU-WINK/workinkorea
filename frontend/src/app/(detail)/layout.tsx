@@ -15,7 +15,7 @@ const MainLayout = ({ children }: Props) => {
           onClick={() => {
             console.log('gml');
           }}
-          isSelect
+          isAllowed={true} // TODO: 수정 필요할 수 있음. 24.09.16 Button 컴포넌트 수정 작업이 있었음
           text="상세 페이지로 이동"
         />
       </div>

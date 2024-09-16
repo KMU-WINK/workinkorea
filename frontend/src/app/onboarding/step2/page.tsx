@@ -3,11 +3,12 @@
 import Input from '@/components/Input';
 import React, { useRef, useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
-import CalendarIcon from '../../../../public/svgs/calender.svg';
 import SelectButton from '@/components/SelectButton';
 import styled from 'styled-components';
+import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import DatePicker from '@/components/DatePicker';
 
 const StyledInput = styled(Input)`
   &::-webkit-calendar-picker-indicator {
@@ -22,27 +23,32 @@ const StyledInput = styled(Input)`
 
 export default function Step2() {
   const router = useRouter();
-
-  const handleNextClick = () => {
-    router.push('/onboarding/step3');
-  };
-
   const [gender, setGender] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null); // input 요소에 접근하기 위한 ref 생성
+  const [birth, setBirth] = useState<string>(); // YYYY-MM-DD
+
+  // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
+  const searchParam = useSearchParams();
+  const socialId = searchParam.get('social_id');
+  const provider = searchParam.get('provider');
+
+  const handleNextClick = async () => {
+    try {
+      await PublicAxiosInstance.patch('/users/info', {
+        social_id: socialId,
+        birth: birth,
+        gender: gender,
+      });
+      router.push(
+        `/onboarding/step3?social_id=${socialId}&provider=${provider}`,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // 성별 선택
   const handleGenderSelect = (selectedGender: string) => {
     setGender(selectedGender);
-  };
-
-  const handleInputChange = (value: string) => {
-    console.log(value);
-  };
-
-  const handleCalendarIconClick = () => {
-    if (inputRef.current) {
-      inputRef.current.showPicker(); // input 요소를 클릭하여 날짜 선택 UI를 띄움
-    }
   };
 
   return (
@@ -63,13 +69,7 @@ export default function Step2() {
           <p className="font-light text-xl">나이와 성별을 알려주세요</p>
           <p className="font-normal text-lg pt-4">생년월일</p>
           <div className="pt-4">
-            <StyledInput
-              // ref={inputRef}
-              placeholder="생년월일"
-              // type="date"
-              onChange={handleInputChange}
-              rightIcon={<CalendarIcon onClick={handleCalendarIconClick} />}
-            />
+            <DatePicker state={birth} setState={setBirth} />
           </div>
           <p className="font-normal text-lg pt-4">성별</p>
           <div className="pt-4 flex justify-between gap-2 w-full sm:w-auto flex-1 text-center">
@@ -89,7 +89,7 @@ export default function Step2() {
       <div className="w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isSelect
+          isAllowed={gender !== '' && typeof birth !== undefined}
           onClick={handleNextClick} // 구문 수정: 함수 호출을 올바르게 처리
         />
       </div>
