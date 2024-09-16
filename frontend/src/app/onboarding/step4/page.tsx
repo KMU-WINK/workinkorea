@@ -24,9 +24,9 @@ export default function Step4() {
 
   const handleNextClick = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/interest', {
+      await PublicAxiosInstance.patch('/users/work', {
         social_id: socialId,
-        interests: selectedOptions,
+        works: selectedOptions,
       });
       router.push(
         `/onboarding/step5?social_id=${socialId}&provider=${provider}`,

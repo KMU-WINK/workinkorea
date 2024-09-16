@@ -25,7 +25,7 @@ export default function Step3() {
     try {
       await PublicAxiosInstance.patch('/users/interest', {
         social_id: socialId,
-        works: selectedOptions,
+        interests: selectedOptions,
       });
       router.push(
         `/onboarding/step5?social_id=${socialId}&provider=${provider}`,
