@@ -14,11 +14,12 @@ export default function Header({
 }: HeaderProps) {
   return (
     <div className="flex justify-between px-6 py-[18px] items-center">
-      {onLeftClick && (
-        <div onClick={onLeftClick} className="cursor-pointer">
-          <Back />
-        </div>
-      )}
+      <div
+        onClick={onLeftClick}
+        className={`${onLeftClick ? 'cursor-pointer' : 'opacity-0'}`}
+      >
+        <Back />
+      </div>
       <p>{text}</p>
       <p
         className={`font-semibold ${rightText && 'cursor-pointer'}`}
