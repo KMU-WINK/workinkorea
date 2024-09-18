@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import Modal from './_components/Modal';
-import Close from '../../../public/svgs/close.svg';
-import Kakao from '../../../public/svgs/kakao.svg';
-import Naver from '../../../public/svgs/naver.svg';
-import Google from '../../../public/svgs/google.svg';
+import Close from 'public/svgs/close.svg';
+import Kakao from 'public/svgs/kakao.svg';
+import Naver from 'public/svgs/naver.svg';
+import Google from 'public/svgs/google.svg';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);

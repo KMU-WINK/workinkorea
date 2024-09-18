@@ -9,7 +9,7 @@ interface InputProps {
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
-  onChange?: (e: React.ChangeEvent) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClick?: () => void;
 }
 

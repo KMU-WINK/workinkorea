@@ -37,6 +37,21 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }: any) {
+      addComponents({
+        '.hide-calendar': {
+          '-webkit-appearance': 'none',
+          '-moz-appearance': 'textfield',
+          appearance: 'none',
+          position: 'relative',
+          'z-index': '1',
+        },
+        '.hide-calendar::-webkit-calendar-picker-indicator': {
+          display: 'none',
+        },
+      });
+    },
+  ],
 };
 export default config;

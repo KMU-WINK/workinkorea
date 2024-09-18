@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 
-import Heart from '../../../../../public/svgs/heart.svg';
-import HeartColor from '../../../../../public/svgs/heart-color.svg';
-import Location from '../../../../../public/svgs/location.svg';
-import GoSmall from '../../../../../public/svgs/go-small.svg';
-import BackWhite from '../../../../../public/svgs/back-white.svg';
+import Heart from 'public/svgs/heart.svg';
+import HeartColor from 'public/svgs/heart-color.svg';
+import Location from 'public/svgs/location.svg';
+import GoSmall from 'public/svgs/go-small.svg';
+import BackWhite from 'public/svgs/back-white.svg';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import {
@@ -247,7 +247,7 @@ export default function Tour() {
           onClick={() => {
             bottomClick(spotInfo.link);
           }}
-          isSelect={!!spotInfo.link}
+          isAllowed={!!spotInfo.link}
           text="상세 페이지로 이동"
         />
       </div>

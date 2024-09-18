@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Back from '../../../public/svgs/back.svg';
-import Go from '../../../public/svgs/go.svg';
+import Back from 'public/svgs/back.svg';
+import Go from 'public/svgs/go.svg';
 
 interface WishType {
   id: number;

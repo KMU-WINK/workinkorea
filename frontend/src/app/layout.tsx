@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 const myFont = localFont({
-  src: '../../public/fonts/PretendardVariable.woff2',
+  src: '../../public/fonts/PretendardVariable.woff2', // note: 이 부분은 절대 경로가 먹히지 않는 것으로 보임
 });
 
 export default function RootLayout({
