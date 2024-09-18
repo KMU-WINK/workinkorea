@@ -83,7 +83,6 @@ export default function Job() {
         `/jobs/detail?contentId=${contentId}&contentTypeId=${contentTypeId}`,
       );
       const data = response.data;
-      console.log('response.data', data);
       setJobInfo({
         empmnTtl: data.empmnTtl,
         dtyCn: data.dtyCn,
