@@ -16,6 +16,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'academy.visitkorea.or.kr', // 추가된 도메인
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 

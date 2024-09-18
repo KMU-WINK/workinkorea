@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
 
-import { FeedProps, JobInfo } from '@/types/type';
+import { FeedProps, JobProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { formatSalary } from '../../utils/stringUtils';
 
 export default function Job() {
-  const [feedList, setFeedList] = useState<JobInfo[]>([]);
+  const [feedList, setFeedList] = useState<JobProps[]>([]);
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -27,10 +28,9 @@ export default function Job() {
       const response = await PublicAxiosInstance.get(
         `/jobs?area=${area}&keyword=${keyword}&pageNo=${page}`,
       );
-      // console.log('response.data: ', response.data);
       setPageCount(response.data.pageNo);
 
-      const data = response.data.items.item.map((item: JobInfo) => ({
+      const data = response.data.items.item.map((item: JobProps) => ({
         contentId: item.contentId,
         cardType: 'default',
         serviceType: 'work',
@@ -47,7 +47,7 @@ export default function Job() {
       setFeedList(prevList => {
         // 기존 데이터와 중복되지 않는 데이터만 필터링
         const newData = data.filter(
-          (newItem: JobInfo) =>
+          (newItem: JobProps) =>
             !prevList.some(
               prevItem => prevItem.contentId === newItem.contentId,
             ),
@@ -65,10 +65,6 @@ export default function Job() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log('page : ', page);
-  }, [page]);
 
   useEffect(() => {
     fetchData();
@@ -91,8 +87,11 @@ export default function Job() {
     };
   }, [page, loading]);
 
-  const cardClick = (id: string, contenttypeid?: string, image?: string) => {
-    router.push(`/job/${id}?contenttypeid=${contenttypeid}?thumbnail=${image}`);
+  const cardClick = (id: string, contentTypeId?: string, image?: string) => {
+    const pushImage = image === '/svgs/job-default.svg' ? '' : image;
+    router.push(
+      `/job/${id}?contenttypeid=${contentTypeId}?thumbnail=${pushImage}`,
+    );
   };
   const wishClick = () => {
     console.log('wishClick');
@@ -101,7 +100,7 @@ export default function Job() {
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black">
       <div className="flex flex-col gap-1 items-center w-full mb-10">
-        {feedList.map((item: JobInfo) => (
+        {feedList.map((item: JobProps) => (
           <Card
             id={item.contentId}
             key={item.contentId}
@@ -114,11 +113,11 @@ export default function Job() {
             image={item.image}
             inWishlist={item.inWishlist}
             onCardClick={() =>
-              cardClick(item.contentId, item.contenttypeid, item.image)
+              cardClick(item.contentId, item.contentTypeId, item.image)
             }
             onWishListClick={wishClick}
-            contenttypeid={item.contenttypeid}
-            workType={item.workType}
+            contenttypeid={item.contentTypeId}
+            workType={formatSalary(item.workType)}
           />
         ))}
       </div>

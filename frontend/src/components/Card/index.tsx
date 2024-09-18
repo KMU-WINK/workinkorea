@@ -123,7 +123,6 @@ export default function Card({
   company = '',
   workType,
 }: CardProps) {
-  console.log('workType', workType);
   return (
     <Container $cardType={cardType} onClick={onCardClick}>
       <ImageSection $cardType={cardType}>
@@ -169,9 +168,8 @@ export default function Card({
           >
             {serviceType === 'work' && company && (
               <>
-                {/*<Price $cardType={cardType}></Price>*/}
                 <Price $cardType={cardType}>
-                  {workType} {price?.toLocaleString('ko-KR')}원
+                  {workType} {Number(price)?.toLocaleString('ko-KR')}원
                 </Price>
               </>
             )}

@@ -35,7 +35,6 @@ export interface FeedProps extends CardProps {
   addr1: string;
   addr2: string;
 }
-// job 같은 경우에는 아직 안나와서 추후에 추가 예정
 
 export interface SpotInfo {
   title: string;
@@ -62,7 +61,7 @@ export interface SpotExtraInfo {
   packing?: string; // 39 : 포장 가능
 }
 
-export interface JobInfo extends CardProps {
+export interface JobProps extends CardProps {
   contentTypeId: string;
   contentId: string;
   cardType: CardType;
@@ -75,12 +74,20 @@ export interface JobInfo extends CardProps {
   salStle?: string;
 }
 
-// {
-//   "contentTypeId": "tour",
-//   "contentId": "ilsang111_5",
-//   "corpoNm": "디오션리조트",
-//   "corpoLogoFileUrl": "https://academy.visitkorea.or.kr/cmm/fms/FileDown.do?atchFileId=20230804172422701393&fileSn=0",
-//   "empmnTtl": "디오션 호텔 프런트 신규 및 경력직 채용",
-//   "wrkpAdres": "전라남도 여수시 소호로 295 (소호동)",
-//   "wageAmt": "26000000"
-// }
+export interface JobInfo {
+  empmnTtl: string; // 채용정보 글 제목 -> tour / open
+  dtyCn: string; // 직무 내용 -> tour / open
+  salStle: string; // 급여형태코드 -> tour / open
+  wageAmt: string; // 임금금액 -> tour / open
+  eplmtStleN1: string; // 고용형태 1코드 -> tour / open
+  eplmtStleN2: string; // 고용형태 2코드 -> tour / open
+  labrTimeCn: string; // 근로시간내용 -> tour / open
+  ordtmEmpmnYn: string; // 상시채용여부 -> tour / open
+  rcptDdlnDe: string; // 접수마감일 -> tour / open
+  pvltrt: string; // 우대조건 -> tour / open
+  wrkpAdres: string; // 근무지주소 -> tour / open
+  tursmEmpmnInfoURL: string; // 페이지 URL -> tour / open
+  rcritPnum?: string; // 모집인원수 -> tour
+  corpoNm?: string; // 기업명 -> open
+  corpoLogoFileUrl?: string; // 기업로고파일 URL -> open
+}
