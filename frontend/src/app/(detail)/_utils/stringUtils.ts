@@ -12,12 +12,12 @@ export const extractLinkOrValue = (str: string): string => {
 
 export const formatDateString = (dateString: string): string => {
   if (dateString.length !== 8) {
-    return 'Invalid date format'; // 날짜 형식이 잘못된 경우 처리
+    return dateString;
   }
 
-  const year = dateString.substring(0, 4); // 연도
-  const month = dateString.substring(4, 6); // 월
-  const day = dateString.substring(6, 8); // 일
+  const year = dateString.substring(0, 4);
+  const month = dateString.substring(4, 6);
+  const day = dateString.substring(6, 8);
 
   return `${year}.${month}.${day}`;
 };
