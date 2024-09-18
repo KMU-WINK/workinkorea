@@ -1,6 +1,5 @@
 export type CardType = 'default' | 'map';
 export type ServiceType = 'default' | 'work';
-
 export interface CardProps {
   id: string;
   cardType: CardType;
@@ -36,6 +35,20 @@ export interface FeedProps extends CardProps {
   addr2: string;
 }
 
+export interface UserDetail {
+  user: {
+    social: 'kakao' | 'naver' | 'google';
+    nickname: string | null;
+    gender: '남성' | '여성' | null;
+    id: number;
+    social_id: string;
+    birth: string | null;
+  };
+  regions: string[] | null;
+  interests: string[] | null;
+  works: string[] | null;
+}
+
 export interface SpotInfo {
   title: string;
   homepage: string;
@@ -58,7 +71,7 @@ export interface SpotExtraInfo {
   eventPeriod?: string; // 14 : eventstartdate ~ eventenddate
   openDateShopping?: string; // 38 : 개장일
   firstMenu?: string; // 39 : 대표 메뉴
-  packing?: string; // 39 : 포장 가능
+  packing?: string; // 39 :s 포장 가능
 }
 
 export interface JobProps extends CardProps {

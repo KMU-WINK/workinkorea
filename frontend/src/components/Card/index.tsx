@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import styled from 'styled-components';
 import { CardProps, CardType, ServiceType } from '@/types/type';
-import Heart from '../../../public/svgs/heart.svg';
-import ColorHeart from '../../../public/svgs/heart-color.svg';
+import Heart from 'public/svgs/heart.svg';
+import ColorHeart from 'public/svgs/heart-color.svg';
 
 const Container = styled.div<{ $cardType: CardType }>`
   display: flex;

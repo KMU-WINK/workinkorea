@@ -28,11 +28,19 @@ export default function Search() {
   ];
 
   const handleSearch = () => {
-    const url = `/search-results?category=${encodeURIComponent(
-      selectedCategory,
-    )}&location=${encodeURIComponent(selectedLocation)}&query=${encodeURIComponent(
+    const basePath =
+      selectedCategory === '채용'
+        ? '/job'
+        : selectedCategory === '숙박'
+          ? '/stay'
+          : selectedCategory === '관광'
+            ? '/tour'
+            : '';
+
+    const url = `${basePath}?location=${encodeURIComponent(selectedLocation)}&keyword=${encodeURIComponent(
       searchQuery,
     )}`;
+
     router.push(url);
   };
 
@@ -118,7 +126,7 @@ export default function Search() {
           </div>
         </div>
         <div className="w-full px-4 py-4">
-          <Button onClick={handleSearch} isSelect text="검색하기" />
+          <Button onClick={handleSearch} isAllowed text="검색하기" />
         </div>
       </div>
     </div>
