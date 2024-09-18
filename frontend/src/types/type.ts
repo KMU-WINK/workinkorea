@@ -2,7 +2,7 @@ export type CardType = 'default' | 'map';
 export type ServiceType = 'default' | 'work';
 
 export interface CardProps {
-  id: number;
+  id: string;
   cardType: CardType;
   serviceType: ServiceType;
   title: string;
@@ -10,10 +10,11 @@ export interface CardProps {
   image: string;
   price?: number;
   onCardClick: React.MouseEventHandler<HTMLDivElement>;
-  onWishListClick: (id: number) => void;
+  onWishListClick: (id: string) => void;
   inWishlist?: boolean;
   company?: string;
   contenttypeid?: string;
+  workType?: string;
 }
 
 export interface BannerProps {
@@ -28,7 +29,7 @@ export interface BannerProps {
 }
 
 export interface FeedProps extends CardProps {
-  contentid: number;
+  contentid: string;
   firstimage: string;
   firstimage2: string;
   addr1: string;
@@ -60,3 +61,26 @@ export interface SpotExtraInfo {
   firstMenu?: string; // 39 : 대표 메뉴
   packing?: string; // 39 : 포장 가능
 }
+
+export interface JobInfo extends CardProps {
+  contentTypeId: string;
+  contentId: string;
+  cardType: CardType;
+  serviceType: ServiceType;
+  corpoNm: string;
+  corpoLogoFileUrl?: string;
+  empmnTtl?: string;
+  wrkpAdres?: string;
+  wageAmt?: string;
+  salStle?: string;
+}
+
+// {
+//   "contentTypeId": "tour",
+//   "contentId": "ilsang111_5",
+//   "corpoNm": "디오션리조트",
+//   "corpoLogoFileUrl": "https://academy.visitkorea.or.kr/cmm/fms/FileDown.do?atchFileId=20230804172422701393&fileSn=0",
+//   "empmnTtl": "디오션 호텔 프런트 신규 및 경력직 채용",
+//   "wrkpAdres": "전라남도 여수시 소호로 295 (소호동)",
+//   "wageAmt": "26000000"
+// }

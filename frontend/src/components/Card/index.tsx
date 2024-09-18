@@ -78,18 +78,29 @@ const InfoContainer = styled.div<{
       : '9px'};
 `;
 
-const BottomContainer = styled.div`
-  display: flex;
+const BottomContainer = styled.div<{
+  $serviceType: string;
+  $price: number;
+  $company: string;
+}>`
+  display: ${props =>
+    props.$serviceType === 'work' && props.$company && !props.$price
+      ? 'none'
+      : 'flex'};
   justify-content: space-between;
 `;
 
-const Price = styled.p<{ $cardType: CardType }>`
+const Price = styled.pre<{ $cardType: CardType }>`
   font-size: ${props => (props.$cardType === 'map' ? '0.875rem' : '0.75rem')};
   font-weight: ${props => (props.$cardType === 'map' ? '500' : '400')};
 `;
 
 const Location = styled.p<{ $cardType: CardType }>`
   font-size: ${props => (props.$cardType === 'map' ? '0.625rem' : '0.75rem')};
+  word-break: keep-all;
+  white-space: nowrap; /* 한 줄로 처리 */
+  overflow: hidden; /* 넘치는 텍스트는 숨김 */
+  text-overflow: ellipsis; /* 넘치는 부분을 ...으로 처리 */
 `;
 
 const WishButton = styled.button`
@@ -110,7 +121,9 @@ export default function Card({
   onWishListClick,
   inWishlist = false,
   company = '',
+  workType,
 }: CardProps) {
+  console.log('workType', workType);
   return (
     <Container $cardType={cardType} onClick={onCardClick}>
       <ImageSection $cardType={cardType}>
@@ -149,11 +162,18 @@ export default function Card({
           )}
         </DetailContainer>
         <InfoContainer $cardType={cardType} $serviceType={serviceType}>
-          <BottomContainer>
+          <BottomContainer
+            $serviceType={serviceType}
+            $price={price || 0}
+            $company={company}
+          >
             {serviceType === 'work' && company && (
-              <Price $cardType={cardType}>
-                시급 {price?.toLocaleString('ko-KR')}원
-              </Price>
+              <>
+                {/*<Price $cardType={cardType}></Price>*/}
+                <Price $cardType={cardType}>
+                  {workType} {price?.toLocaleString('ko-KR')}원
+                </Price>
+              </>
             )}
             {serviceType === 'default' && cardType === 'map' && (
               <Price $cardType={cardType}>
