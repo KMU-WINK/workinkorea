@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Back from 'public/svgs/back.svg';
 import SearchIcon from 'public/svgs/search.svg';
-import DropDown from '@/app/search/_components/DropDown';
+import DropDown from '../../components/DropDown';
 import TrendList from '@/app/search/_components/TrendList';
 import Button from '@/components/Button';
+import Character from 'public/svgs/character.svg';
+import Map from 'public/svgs/map.svg';
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,28 +72,31 @@ export default function Search() {
             </div>
             <div className="border border-gray-3 border-t-0 rounded-b-md">
               {/* DropDown 컴포넌트 */}
-              <div className="flex items-center h-12 pl-4">
-                <DropDown
-                  options={['채용', '숙박', '관광']}
-                  selectedOption={selectedCategory}
-                  setSelectedOption={setSelectedCategory}
-                  type="category"
-                />
-
-                <DropDown
-                  options={[
-                    '부산',
-                    '경주',
-                    '강릉',
-                    '여수',
-                    '전주',
-                    '제주',
-                    '춘천',
-                  ]}
-                  selectedOption={selectedLocation}
-                  setSelectedOption={setSelectedLocation}
-                  type="location"
-                />
+              <div className="flex items-center h-12 px-4">
+                <div className="flex-1">
+                  <DropDown
+                    options={['채용', '숙박', '관광']}
+                    selectedOption={selectedCategory}
+                    setSelectedOption={setSelectedCategory}
+                    icon={<Character />}
+                  />
+                </div>
+                <div className="flex-1">
+                  <DropDown
+                    options={[
+                      '부산',
+                      '경주',
+                      '강릉',
+                      '여수',
+                      '전주',
+                      '제주',
+                      '춘천',
+                    ]}
+                    selectedOption={selectedLocation}
+                    setSelectedOption={setSelectedLocation}
+                    icon={<Map />}
+                  />
+                </div>
               </div>
             </div>
           </div>

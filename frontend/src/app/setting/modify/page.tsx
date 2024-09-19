@@ -13,6 +13,32 @@ import DatePicker from '@/components/DatePicker';
 import Arrow from '../.././../../public/svgs/dropdown.svg';
 import Back from '../../../../public/svgs/back.svg';
 import { useRouter } from 'next/navigation';
+import DropDown from '@/components/DropDown';
+import Marketing from 'public/svgs/emoji/marketing.svg';
+import Sound from 'public/svgs/emoji/sound.svg';
+import Greeting from 'public/svgs/emoji/greeting.svg';
+import Egg from 'public/svgs/emoji/egg.svg';
+import Hotel from 'public/svgs/emoji/hotel.svg';
+import Dice from 'public/svgs/emoji/dice.svg';
+import Sport from 'public/svgs/emoji/weight.svg';
+import BusanImage from 'public/images/location/부산.png';
+import GyeongjuImage from 'public/images/location/경주.png';
+import GangneungImage from 'public/images/location/강릉.png';
+import YeosuImage from 'public/images/location/여수.png';
+import JeonjuImage from 'public/images/location/전주.png';
+import JejuImage from 'public/images/location/제주.png';
+import ChuncheonImage from 'public/images/location/춘천.png';
+import { state } from 'sucrase/dist/types/parser/traverser/base';
+
+const locations = [
+  { name: '부산', image: BusanImage },
+  { name: '경주', image: GyeongjuImage },
+  { name: '강릉', image: GangneungImage },
+  { name: '여수', image: YeosuImage },
+  { name: '전주', image: JeonjuImage },
+  { name: '제주', image: JejuImage },
+  { name: '춘천', image: ChuncheonImage },
+];
 
 export default function SettingModify() {
   const [profileImg, setProfileImg] = useState<File | null>();
@@ -21,8 +47,24 @@ export default function SettingModify() {
     gender: '남자',
   });
   const [birth, setBirth] = useState<string>('');
-  const [additionalInfo, setAdditionalInfo] = useState('');
+  const [work, setWork] = useState('마케팅');
+  const [region, setRegion] = useState('부산');
   const imageRef = useRef<HTMLInputElement>(null);
+
+  const additionalItems = [
+    {
+      title: '하고 싶은 일',
+      options: ['마케팅', '홍보', '인사', '요식업', '숙박업', '오락', '스포츠'],
+      state: work,
+      setState: setWork,
+    },
+    {
+      title: '머무르고 싶은 지역',
+      options: ['부산', '경주', '강릉', '여수', '전주', '제주', '춘천'],
+      state: region,
+      setState: setRegion,
+    },
+  ];
 
   const router = useRouter();
   const profileClick = () => {
@@ -112,10 +154,16 @@ export default function SettingModify() {
         <hr className="mt-8 border-gray-2" />
         {/*추가 정보*/}
         <div className="flex flex-col gap-7 p-6 font-light">
-          <div>
-            <p>하고 싶은 일</p>
-            {/*드롭다운 컴포넌트 추가*/}
-          </div>
+          {additionalItems.map((item, index) => (
+            <div key={index} className="flex justify-between items-center">
+              <p className="flex-1">{item.title}</p>
+              <DropDown
+                options={item.options}
+                selectedOption={item.state}
+                setSelectedOption={item.setState}
+              />
+            </div>
+          ))}
           <div
             className="flex justify-between cursor-pointer"
             onClick={gotoTourPageClick}

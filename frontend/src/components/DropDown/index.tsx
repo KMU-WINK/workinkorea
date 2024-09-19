@@ -1,20 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
-import Character from 'public/svgs/character.svg';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import Dropdown from 'public/svgs/dropdown.svg';
-import Map from 'public/svgs/map.svg';
 
 interface DropDownProps {
   options: string[];
   selectedOption: string;
   setSelectedOption: (option: string) => void;
-  type: 'category' | 'location'; // 드롭다운 타입: 카테고리 or 지역
+  icon?: ReactNode;
 }
 
 export default function DropDown({
   options,
   selectedOption,
   setSelectedOption,
-  type,
+  icon,
 }: DropDownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -23,12 +21,12 @@ export default function DropDown({
     setIsOpen(!isOpen);
   };
 
-  const getIcon = () => {
-    if (type === 'category') {
-      return <Character className="mr-1" />;
-    }
-    return <Map className="mr-2" />;
-  };
+  // const getIcon = () => {
+  //   if (type === 'category') {
+  //     return <Character className="mr-1" />;
+  //   }
+  //   return <Map className="mr-2" />;
+  // };
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -53,11 +51,11 @@ export default function DropDown({
 
   return (
     <div
-      className="relative flex items-center py-2 cursor-pointer min-w-44"
+      className="relative flex items-center py-2 cursor-pointer"
       onClick={handleDropdownClick}
       ref={dropDownRef} // ref 설정
     >
-      {getIcon()}
+      <div className="mr-2">{icon}</div>
       <span>{selectedOption}</span>
       <div className={`mx-2 transform  ${isOpen ? 'rotate-180' : ''}`}>
         <Dropdown />
