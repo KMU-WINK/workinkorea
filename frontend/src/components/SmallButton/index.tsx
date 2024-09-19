@@ -8,7 +8,7 @@ export default function SmallButton({ text, onClick }: SmallButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className="bg-main py-[18px] px-4 text-center rounded-xl text-white whitespace-nowrap"
+      className="bg-main py-3.5 px-4 text-center rounded-xl text-white whitespace-nowrap text-sm"
     >
       {text}
     </button>

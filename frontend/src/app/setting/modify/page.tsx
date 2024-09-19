@@ -12,6 +12,7 @@ import SmallButton from '@/components/SmallButton';
 import DatePicker from '@/components/DatePicker';
 import Arrow from '../.././../../public/svgs/dropdown.svg';
 import Back from '../../../../public/svgs/back.svg';
+import { useRouter } from 'next/navigation';
 
 export default function SettingModify() {
   const [profileImg, setProfileImg] = useState<File | null>();
@@ -22,6 +23,8 @@ export default function SettingModify() {
   const [birth, setBirth] = useState<string>('');
   const [additionalInfo, setAdditionalInfo] = useState('');
   const imageRef = useRef<HTMLInputElement>(null);
+
+  const router = useRouter();
   const profileClick = () => {
     imageRef.current?.click();
   };
@@ -37,7 +40,13 @@ export default function SettingModify() {
     setUserInfo({ ...userInfo, gender });
   };
 
-  const submitClick = () => {};
+  const gotoTourPageClick = () => {
+    router.push('/setting/modify/tour');
+  };
+
+  const submitClick = () => {
+    router.push('/setting');
+  };
   return (
     <div className="h-screen flex justify-center items-center">
       <div className="max-w-sm h-full overflow-hidden relative w-full">
@@ -50,8 +59,11 @@ export default function SettingModify() {
           ref={imageRef}
           onChange={profileImageChange}
         />
-        <div className="relative cursor-pointer" onClick={profileClick}>
-          <div className="mt-6 mb-[18px] mx-auto rounded-full overflow-hidden w-[50px] h-[50px] relative">
+        <div className="relative">
+          <div
+            className="mt-6 mb-[18px] mx-auto rounded-full overflow-hidden w-[50px] h-[50px] relative cursor-pointer"
+            onClick={profileClick}
+          >
             <Image
               src={
                 profileImg ? URL.createObjectURL(profileImg) : ProfileDefault
@@ -61,7 +73,10 @@ export default function SettingModify() {
               style={{ objectFit: 'cover' }}
             />
           </div>
-          <span className="relative bottom-[38px] left-[201px] w-fit rounded-full flex justify-center items-center px-[3.5px] py-[2.8px] bg-gray-1">
+          <span
+            className="relative bottom-[38px] left-[201px] w-fit rounded-full flex justify-center items-center px-[3.5px] py-[2.8px] bg-gray-1 cursor-pointer"
+            onClick={profileClick}
+          >
             <Camera />
           </span>
         </div>
@@ -101,7 +116,10 @@ export default function SettingModify() {
             <p>하고 싶은 일</p>
             {/*드롭다운 컴포넌트 추가*/}
           </div>
-          <div className="flex justify-between">
+          <div
+            className="flex justify-between cursor-pointer"
+            onClick={gotoTourPageClick}
+          >
             <p>관심있는 관광</p>
             <div className="flex gap-2.5 items-center">
               <p>액티비티</p>

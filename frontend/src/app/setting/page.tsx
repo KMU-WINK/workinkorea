@@ -4,14 +4,26 @@ import Header from '@/components/Header';
 import Image from 'next/image';
 import ProfileDefault from '../../../public/images/profile-default.jpg';
 import Content from '@/components/Content';
+import { useRouter } from 'next/navigation';
 
 export default function Setting() {
-  const onBackButtonClick = () => {};
-  const onLogoutClick = () => {};
+  const router = useRouter();
+  const backButtonClick = () => {
+    router.back();
+  };
+  const modifyClick = () => {
+    router.push('/setting/modify');
+  };
+  const logoutClick = () => {};
   return (
     <div className="h-screen flex justify-center items-center">
       <div className="max-w-sm h-full overflow-hidden relative w-full">
-        <Header onLeftClick={onBackButtonClick} text="설정" rightText="수정" />
+        <Header
+          onLeftClick={backButtonClick}
+          text="설정"
+          rightText="수정"
+          onRightClick={modifyClick}
+        />
         <div className="mt-6 mb-[18px] mx-auto rounded-full overflow-hidden w-[50px] h-[50px] relative">
           {/*유저 이미지 받아오기*/}
           <Image src={ProfileDefault} alt="profile-image" fill />
@@ -47,7 +59,7 @@ export default function Setting() {
         </div>
         <hr className="border-gray-1 my-3 border-8" />
         <div className="mt-[10px] mx-6">
-          <Content text="로그아웃" onClick={onLogoutClick} />
+          <Content text="로그아웃" onClick={logoutClick} />
         </div>
       </div>
     </div>

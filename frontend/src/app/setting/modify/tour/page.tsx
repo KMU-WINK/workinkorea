@@ -11,9 +11,11 @@ import Moai from 'public/svgs/emoji/moai.svg';
 import Learning from 'public/svgs/emoji/learning.svg';
 import React, { useState } from 'react';
 import Button from '@/components/Button';
+import { useRouter } from 'next/navigation';
 
-export default function ModifyActivity() {
+export default function ModifyTour() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const router = useRouter();
   const options = [
     { text: '액티비티', icon: <Activity /> },
     { text: '휴식', icon: <Rest /> },
@@ -23,8 +25,12 @@ export default function ModifyActivity() {
     { text: '문화재', icon: <Moai /> },
     { text: '배움', icon: <Learning /> },
   ];
-  const backClick = () => {};
-  const selectButtonClick = () => {};
+  const backClick = () => {
+    router.back();
+  };
+  const selectButtonClick = () => {
+    router.push('/setting/modify');
+  };
   const handleInputChange = (value: string) => {
     setSelectedOptions(prevState =>
       prevState.includes(value)
@@ -57,7 +63,7 @@ export default function ModifyActivity() {
         <Button
           text="완료하기"
           isAllowed={selectedOptions.length > 0}
-          onClick={selectButtonClick} // 구문 수정: 함수 호출을 올바르게 처리
+          onClick={selectButtonClick}
         />
       </div>
     </div>
