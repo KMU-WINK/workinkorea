@@ -270,7 +270,7 @@ export default function Job() {
           onClick={() => {
             bottomClick(jobInfo.tursmEmpmnInfoURL);
           }}
-          isSelect={!!jobInfo.tursmEmpmnInfoURL}
+          isAllowed={!!jobInfo.tursmEmpmnInfoURL}
           text="상세 페이지로 이동"
         />
       </div>
