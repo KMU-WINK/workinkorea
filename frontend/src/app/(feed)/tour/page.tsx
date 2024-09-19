@@ -88,7 +88,7 @@ export default function Tour() {
     };
   }, [page, loading]);
 
-  const cardClick = (id: number, contenttypeid?: string) => {
+  const cardClick = (id: string, contenttypeid?: string) => {
     router.push(`/spot/${id}?contenttypeid=${contenttypeid}`);
   };
   const wishClick = () => {

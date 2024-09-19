@@ -88,7 +88,7 @@ export default function Stay() {
     };
   }, [page, loading]);
 
-  const cardClick = (id: number) => {
+  const cardClick = (id: string) => {
     router.push(`/spot/${id}?contenttypeid=32`);
   };
   const wishClick = () => {
