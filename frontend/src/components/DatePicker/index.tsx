@@ -35,9 +35,14 @@ export default function DatePicker({
         className={`hide-calendar text-black bg-transparent outline-none flex-1 placeholder-gray-4 ${disabled && 'cursor-pointer'}`}
         readOnly={disabled || readOnly}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          const date = new Date(e.target.value);
-          const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환, 서버에서 받는 규격과 통일
-          setState(formattedDate);
+          // DatePicker에서 '삭제' 버튼을 클릭한 경우
+          if (e.target.value === '') {
+            setState('');
+          } else {
+            const date = new Date(e.target.value);
+            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환, 서버에서 받는 규격과 통일
+            setState(formattedDate);
+          }
         }}
       />
       <CalendarIcon />
