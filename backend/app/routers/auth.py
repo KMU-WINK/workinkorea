@@ -10,10 +10,15 @@ import jwt
 from datetime import datetime, timedelta
 from ..schemas.user import UserCreate
 import httpx
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import JSONResponse
+
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 def create_jwt_token(user_nickname: str):
@@ -152,11 +157,11 @@ async def login(access_token: str, provider: str, db: Session):
         return RedirectResponse(url=f"{client_url}/onboarding/step5?social_id={social_id}&provider={provider}")
 
     # 회원가입이 되어있는 유저
-    return await get_access_token(user.social_id, db)
+    return await get_access_token(user.social_id, db, True)
 
 # username 기반 토큰 발급
 @router.get("/token")
-async def get_access_token(social_id: str, db: Session = Depends(get_db)):
+async def get_access_token(social_id: str, db: Session = Depends(get_db), isLogin: bool = False):
     # 사용자가 DB에 있는지 확인
     user = db.query(User).filter(User.social_id == social_id).first()
     client_url = os.getenv("WINK_CLIENT_URI")
@@ -170,9 +175,16 @@ async def get_access_token(social_id: str, db: Session = Depends(get_db)):
     # JWT 토큰 생성
     jwt_token = create_jwt_token(user.nickname)
 
-    # 클라이언트 측에 쿠키 설정 및 메인 페이지로 리디렉션
-    response = RedirectResponse(url=f"{client_url}/main")
-    response.set_cookie(key="access_token", value=jwt_token, httponly=True, samesite="lax")
+    if (isLogin):
+        response = RedirectResponse(url=f"{client_url}/main")
+    else:
+        # RedirectResponse 사용 시, 클라이언트 측에서 CORS 에러가 발생하여 URL만 반환
+        response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
+    
+    # 클라이언트 측에 쿠키 설정
+    response.set_cookie(
+        key="access_token", value=jwt_token, httponly=True, samesite="lax"
+    )
 
     return response
 
