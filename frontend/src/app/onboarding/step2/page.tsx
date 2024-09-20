@@ -11,7 +11,7 @@ import DatePicker from '@/components/DatePicker';
 export default function Step2() {
   const router = useRouter();
   const [gender, setGender] = useState('');
-  const [birth, setBirth] = useState<string>(); // YYYY-MM-DD
+  const [birth, setBirth] = useState<string>(''); // YYYY-MM-DD
 
   // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
   const searchParam = useSearchParams();
@@ -76,7 +76,7 @@ export default function Step2() {
       <div className="w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isAllowed={gender !== '' && typeof birth !== undefined}
+          isAllowed={gender !== '' && birth !== ''}
           onClick={handleNextClick} // 구문 수정: 함수 호출을 올바르게 처리
         />
       </div>
