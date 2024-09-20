@@ -6,6 +6,8 @@ import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { createUserNickname } from '@/services/users';
+import axios from 'axios';
 
 export default function Step1() {
   const [nickname, setNickname] = useState('');
@@ -18,9 +20,9 @@ export default function Step1() {
 
   const handleNextClick = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/nickname', {
+      await createUserNickname({
         social_id: socialId,
-        nickname: nickname,
+        nickname,
       });
       // 다음 페이지에서도 social id, provider 정보를 search param을 통하여 접근할 수 있도록 추가
       // props로 전달할 수도 있지만 서버에서 onboarding/step1 ~ /step5까지 search param을 통하여 정보를 전달하기 때문에 통일하기 위함
@@ -28,6 +30,11 @@ export default function Step1() {
         `/onboarding/step2?social_id=${socialId}&provider=${provider}`,
       );
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 422) {
+          // todo: social_id가 없을 경우 예외처리
+        }
+      }
       console.error(e);
     }
   };

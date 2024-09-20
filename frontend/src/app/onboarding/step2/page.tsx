@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 import SelectButton from '@/components/SelectButton';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import DatePicker from '@/components/DatePicker';
+import { createUserInfo } from '@/services/users';
+import axios from 'axios';
 
 export default function Step2() {
   const router = useRouter();
@@ -20,16 +22,21 @@ export default function Step2() {
 
   const handleNextClick = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/info', {
+      await createUserInfo({
         social_id: socialId,
-        birth: birth,
-        gender: gender,
+        birth,
+        gender,
       });
       router.push(
         `/onboarding/step3?social_id=${socialId}&provider=${provider}`,
       );
     } catch (e) {
-      console.error(e);
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 422) {
+          // todo: social_id 가 없을 경우 예외처리
+        }
+      }
+      console.log(e);
     }
   };
 
@@ -76,7 +83,7 @@ export default function Step2() {
       <div className="w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isAllowed={gender !== '' && typeof birth !== undefined}
+          isAllowed={gender !== '' && typeof birth !== 'undefined'}
           onClick={handleNextClick} // 구문 수정: 함수 호출을 올바르게 처리
         />
       </div>
