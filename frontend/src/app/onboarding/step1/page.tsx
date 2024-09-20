@@ -33,11 +33,9 @@ export default function Step1() {
   };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between">
-      <div className="px-6">
-        <div className="py-3 min-h-14">
-          {/* 백 버튼이 필요하다면 여기에 추가할 수 있음 */}
-        </div>
+    <div className="flex justify-center min-h-screen">
+      <div className="w-full max-w-[393px] flex flex-col items-start px-6">
+        <div className="py-3 min-h-14"></div>
         <div className="flex gap-2">
           {/* Badge 컴포넌트 - 현재는 Step1이라 1만 선택된 상태 */}
           <Badge number={1} isSelected />
@@ -47,7 +45,7 @@ export default function Step1() {
           <Badge number={5} isSelected={false} />
         </div>
 
-        <div className="pt-6">
+        <div className="pt-6 w-full">
           <p className="font-light text-xl">반가워요! 뭐라고 불러드릴까요?</p>
           <p className="font-normal text-md text-gray-3 pt-3">
             6글자 이내로 한글만 입력 가능해요
@@ -63,7 +61,7 @@ export default function Step1() {
           </div>
         </div>
       </div>
-      <div className="w-full fixed bottom-0 bg-white">
+      <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
           isAllowed={nickname !== ''} // TODO: 해당 부분 6글자, 한글 구성인지 validate하는 로직으로 수정 필요
