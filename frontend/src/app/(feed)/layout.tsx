@@ -20,14 +20,13 @@ export default function FeedLayout({ children }: Props) {
   const [location, setLocation] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
 
-  const leftClick = () => {
-    console.log('leftClick');
+  const backClick = () => {
+    router.back();
   };
 
   // 경로에 따라 mapClick 함수 다르게 설정
   useEffect(() => {
     const re = parseUrl(fullUrl);
-    console.log(re);
     setContentType(re.type || '');
     setLocation(re.location || '');
     setKeyword(re.keyword || '');
@@ -41,7 +40,7 @@ export default function FeedLayout({ children }: Props) {
     <div className="flex flex-col justify-start items-center h-full bg-white relative">
       <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 sm:max-w-sm">
         <div className="w-full px-6 py-3.5 flex justify-center items-center bg-main">
-          <Input leftIcon={<Back onClick={leftClick} />} readOnly />
+          <Input leftIcon={<Back />} onClick={backClick} readOnly />
         </div>
         <div className="px-6 py-4 bg-white">
           <div
