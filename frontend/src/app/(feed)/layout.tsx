@@ -40,7 +40,12 @@ export default function FeedLayout({ children }: Props) {
     <div className="flex flex-col justify-start items-center h-full bg-white relative">
       <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 sm:max-w-sm">
         <div className="w-full px-6 py-3.5 flex justify-center items-center bg-main">
-          <Input leftIcon={<Back />} onClick={backClick} readOnly />
+          <Input
+            leftIcon={<Back />}
+            onClick={backClick}
+            placeholder={keyword || location || '검색어'}
+            readOnly
+          />
         </div>
         <div className="px-6 py-4 bg-white">
           <div
