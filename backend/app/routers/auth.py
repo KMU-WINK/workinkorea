@@ -210,11 +210,19 @@ async def get_access_token(
         response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
 
     response.set_cookie(
-        key="accessToken", value=jwt_token, httponly=True, samesite="lax"
+        key="accessToken",
+        value=jwt_token,
+        httponly=True,
+        samesite="none",
+        secure=True,
+        domain=".workinkorea.info",
     )
     response.set_cookie(
         key="social_id",
         value=social_id,
+        samesite="none",
+        secure=True,
+        domain=".workinkorea.info",
     )
 
     return response
