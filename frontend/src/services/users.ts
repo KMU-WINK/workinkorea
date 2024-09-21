@@ -7,6 +7,15 @@ import {
   CreateUserWorkProps,
 } from '@/types/user';
 
+const getUserDetail = async (socialId: string) => {
+  try {
+    const response = await PublicAxiosInstance.get(`/users/detail/${socialId}`);
+    return response.data;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const createUserNickname = async ({
   social_id,
   nickname,
@@ -62,4 +71,5 @@ export {
   createUserRegion,
   createUserWork,
   createUserInterest,
+  getUserDetail,
 };

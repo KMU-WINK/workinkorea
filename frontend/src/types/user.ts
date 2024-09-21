@@ -1,6 +1,15 @@
-export interface UserInfo {
-  social_id: string;
-  gender: string;
+export interface UserDetail {
+  user: {
+    id: number;
+    social_id: string;
+    birth: string;
+    social: string;
+    nickname: string;
+    gender: string;
+  };
+  regions: string[] | null;
+  interests: string[] | null;
+  works: string[] | null;
 }
 
 export interface CreateUserNicknameProps {

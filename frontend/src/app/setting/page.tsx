@@ -5,9 +5,17 @@ import Image from 'next/image';
 import ProfileDefault from '../../../public/images/profile-default.jpg';
 import Content from '@/components/Content';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getUserDetail } from '@/services/users';
+import { UserDetail } from '@/types/user';
+import { formatDateWithDots } from '@/utils/dateUtils';
 
 export default function Setting() {
+  const [userDetail, setUserDetail] = useState<UserDetail>();
   const router = useRouter();
+
+  // todo: social_id 받기
+  const socialId = '';
   const backButtonClick = () => {
     router.back();
   };
@@ -15,6 +23,15 @@ export default function Setting() {
     router.push('/setting/modify');
   };
   const logoutClick = () => {};
+
+  const fetchUserInfo = async () => {
+    const result = await getUserDetail(socialId);
+    setUserDetail(result);
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
   return (
     <div className="h-screen flex justify-center items-center">
       <div className="max-w-sm h-full overflow-hidden relative w-full">
@@ -31,30 +48,30 @@ export default function Setting() {
         <div className="px-6">
           <div className="flex justify-between py-4">
             <p className="font-medium">닉네임</p>
-            <p>여섯글자 이름</p>
+            <p>{userDetail?.user.nickname}</p>
           </div>
           <div className="flex justify-between py-4">
             <p>생년월일</p>
-            <p>2022.01.01</p>
+            <p>{formatDateWithDots(userDetail?.user.birth || '')}</p>
           </div>
           <div className="flex justify-between py-4">
             <p>성별</p>
-            <p>여자</p>
+            <p>{userDetail?.user.gender}</p>
           </div>
         </div>
         <hr className="border-gray-1 my-3" />
         <div className="px-6">
           <div className="flex justify-between py-4">
             <p>하고 싶은 일</p>
-            <p>인사</p>
+            <p>{userDetail?.works && userDetail?.works[0]}</p>
           </div>
           <div className="flex justify-between py-4">
             <p>머무르고 싶은 지역</p>
-            <p>부산</p>
+            <p>{userDetail?.regions && userDetail.regions[0]}</p>
           </div>
           <div className="flex justify-between py-4">
-            <p>관심있는 관광</p>
-            <p>액티비티, 자연, 문화재, 핫플</p>
+            <p className="whitespace-nowrap">관심있는 관광</p>
+            <p className="pl-4">{userDetail?.interests?.join(',')}</p>
           </div>
         </div>
         <hr className="border-gray-1 my-3 border-8" />

@@ -2,8 +2,7 @@
 
 import Input from '@/components/Input';
 import SelectButton from '@/components/SelectButton';
-import React, { ChangeEvent, useRef, useState } from 'react';
-import { UserInfo } from '@/types/user';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Header from '@/components/Header';
 import Image from 'next/image';
 import ProfileDefault from '../../../../public/images/profile-default.jpg';
@@ -11,73 +10,97 @@ import Camera from '../../../../public/svgs/camera.svg';
 import SmallButton from '@/components/SmallButton';
 import DatePicker from '@/components/DatePicker';
 import Arrow from '../.././../../public/svgs/dropdown.svg';
-import Back from '../../../../public/svgs/back.svg';
 import { useRouter } from 'next/navigation';
 import DropDown from '@/components/DropDown';
-import Marketing from 'public/svgs/emoji/marketing.svg';
-import Sound from 'public/svgs/emoji/sound.svg';
-import Greeting from 'public/svgs/emoji/greeting.svg';
-import Egg from 'public/svgs/emoji/egg.svg';
-import Hotel from 'public/svgs/emoji/hotel.svg';
-import Dice from 'public/svgs/emoji/dice.svg';
-import Sport from 'public/svgs/emoji/weight.svg';
-import BusanImage from 'public/images/location/부산.png';
-import GyeongjuImage from 'public/images/location/경주.png';
-import GangneungImage from 'public/images/location/강릉.png';
-import YeosuImage from 'public/images/location/여수.png';
-import JeonjuImage from 'public/images/location/전주.png';
-import JejuImage from 'public/images/location/제주.png';
-import ChuncheonImage from 'public/images/location/춘천.png';
-import { state } from 'sucrase/dist/types/parser/traverser/base';
+import {
+  createUserInfo,
+  createUserNickname,
+  createUserRegion,
+  createUserWork,
+  getUserDetail,
+} from '@/services/users';
+import axios from 'axios';
+import { UserDetail } from '@/types/user';
 
-const locations = [
-  { name: '부산', image: BusanImage },
-  { name: '경주', image: GyeongjuImage },
-  { name: '강릉', image: GangneungImage },
-  { name: '여수', image: YeosuImage },
-  { name: '전주', image: JeonjuImage },
-  { name: '제주', image: JejuImage },
-  { name: '춘천', image: ChuncheonImage },
-];
-
+interface UserInfo {
+  profileImg: File | null;
+  nickname: string;
+  gender: string;
+  work: string;
+  region: string;
+  interests: string[];
+}
 export default function SettingModify() {
-  const [profileImg, setProfileImg] = useState<File | null>();
+  // birth 를 제외한 유저 정보 (birth는 DatePicker 컴포넌트 특성상 따로 뻈습니다.)
   const [userInfo, setUserInfo] = useState<UserInfo>({
-    social_id: '',
-    gender: '남자',
+    profileImg: null,
+    nickname: '',
+    gender: '',
+    work: '',
+    region: '',
+    interests: [],
   });
   const [birth, setBirth] = useState<string>('');
-  const [work, setWork] = useState('마케팅');
-  const [region, setRegion] = useState('부산');
   const imageRef = useRef<HTMLInputElement>(null);
+  // 수정된 닉네임만 중복확인할 수 있도록 하는 변수
+  const nicknameRef = useRef('');
+
+  const router = useRouter();
+
+  // todo : 전역 변수로 저장되어있는 social_id 가져오기
+  const socialId = '';
 
   const additionalItems = [
     {
       title: '하고 싶은 일',
       options: ['마케팅', '홍보', '인사', '요식업', '숙박업', '오락', '스포츠'],
-      state: work,
-      setState: setWork,
+      state: userInfo.work,
+      setState: (option: string) => {
+        setUserInfo({ ...userInfo, work: option });
+      },
     },
     {
       title: '머무르고 싶은 지역',
       options: ['부산', '경주', '강릉', '여수', '전주', '제주', '춘천'],
-      state: region,
-      setState: setRegion,
+      state: userInfo.region,
+      setState: (option: string) => {
+        setUserInfo({ ...userInfo, region: option });
+      },
     },
   ];
 
-  const router = useRouter();
   const profileClick = () => {
     imageRef.current?.click();
   };
 
   const profileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target?.files) {
-      setProfileImg(e.target?.files[0]);
-      console.log(e.target.files[0]);
+      setUserInfo({ ...userInfo, profileImg: e.target?.files[0] });
     }
   };
-  const duplicateCheck = () => {};
+
+  const nickNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserInfo({ ...userInfo, nickname: e.target.value });
+  };
+
+  // 닉네임 중복확인 버튼 클릭
+  const duplicateCheck = async () => {
+    try {
+      await createUserNickname({
+        social_id: socialId,
+        nickname: userInfo.nickname,
+      });
+      alert('사용 가능한 닉네임 입니다.');
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 400) {
+          alert('이미 존재하는 닉네임 입니다.');
+        }
+      }
+      console.log(e);
+    }
+  };
+
   const genderSelectClick = (gender: string) => {
     setUserInfo({ ...userInfo, gender });
   };
@@ -86,12 +109,54 @@ export default function SettingModify() {
     router.push('/setting/modify/tour');
   };
 
-  const submitClick = () => {
-    router.push('/setting');
+  const submitClick = async () => {
+    try {
+      await createUserInfo({
+        social_id: socialId,
+        birth,
+        gender: userInfo.gender,
+      });
+      await createUserRegion({
+        social_id: socialId,
+        regions: [userInfo.region],
+      });
+      await createUserWork({
+        social_id: socialId,
+        works: [userInfo.work],
+      });
+      router.push('/setting');
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 400) {
+          // todo: social_id가 없을 경우 예외처리
+        }
+      }
+      console.log(e);
+    }
   };
+
+  const fetchUserInfo = async () => {
+    const result: UserDetail = await getUserDetail(socialId);
+    // todo: profileImg api 연결
+    setUserInfo({
+      profileImg: null,
+      nickname: result.user.nickname,
+      gender: result.user.gender,
+      region: (result.regions && result.regions[0]) || '부산',
+      work: (result.works && result.works[0]) || '마케팅',
+      interests: result.interests || [],
+    });
+    setBirth(result.user.birth);
+    nicknameRef.current = result.user.nickname;
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="max-w-sm h-full overflow-hidden relative w-full">
+      <div className="max-w-sm h-full relative w-full">
         <Header text="설정" rightText="완료" onRightClick={submitClick} />
         {/*프로필 사진*/}
         <input
@@ -108,7 +173,9 @@ export default function SettingModify() {
           >
             <Image
               src={
-                profileImg ? URL.createObjectURL(profileImg) : ProfileDefault
+                userInfo.profileImg
+                  ? URL.createObjectURL(userInfo.profileImg)
+                  : ProfileDefault
               }
               alt="profile-image"
               fill
@@ -127,8 +194,16 @@ export default function SettingModify() {
           <div>
             <p className="pb-4">닉네임</p>
             <div className="flex gap-1">
-              <Input placeholder="닉네임" />
-              <SmallButton text="중복확인" onClick={duplicateCheck} />
+              <Input
+                placeholder="닉네임"
+                value={userInfo.nickname}
+                onChange={nickNameChange}
+              />
+              <SmallButton
+                text="중복확인"
+                onClick={duplicateCheck}
+                isAllowed={userInfo.nickname !== nicknameRef.current}
+              />
             </div>
           </div>
           <div>
@@ -168,9 +243,9 @@ export default function SettingModify() {
             className="flex justify-between cursor-pointer"
             onClick={gotoTourPageClick}
           >
-            <p>관심있는 관광</p>
-            <div className="flex gap-2.5 items-center">
-              <p>액티비티</p>
+            <p className="whitespace-nowrap">관심있는 관광</p>
+            <div className="flex gap-2.5 items-center pl-4">
+              <p>{userInfo.interests.join(', ')}</p>
               <div className="-rotate-90 flex h-3">
                 <Arrow />
               </div>

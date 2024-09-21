@@ -12,6 +12,8 @@ import Learning from 'public/svgs/emoji/learning.svg';
 import React, { useState } from 'react';
 import Button from '@/components/Button';
 import { useRouter } from 'next/navigation';
+import { createUserInterest } from '@/services/users';
+import axios from 'axios';
 
 export default function ModifyTour() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -25,11 +27,27 @@ export default function ModifyTour() {
     { text: '문화재', icon: <Moai /> },
     { text: '배움', icon: <Learning /> },
   ];
+
+  // todo : 전역 변수로 저장되어있는 social_id 가져오기
+  const socialId = '';
   const backClick = () => {
     router.back();
   };
-  const selectButtonClick = () => {
-    router.push('/setting/modify');
+  const selectButtonClick = async () => {
+    try {
+      await createUserInterest({
+        social_id: socialId,
+        interests: selectedOptions,
+      });
+      router.push('/setting/modify');
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 400) {
+          // todo: social_id가 없을 경우 예외처리
+        }
+      }
+      console.log(e);
+    }
   };
   const handleInputChange = (value: string) => {
     setSelectedOptions(prevState =>
