@@ -8,6 +8,8 @@ import Card from '@/components/Card';
 import { FeedProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 export default function Stay() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -16,6 +18,8 @@ export default function Stay() {
   const [pageCount, setPageCount] = useState(1);
   const [area, setArea] = useState<string>('강릉');
   const [keyword, setKeyword] = useState<string>('');
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const router = useRouter();
 
@@ -92,6 +96,7 @@ export default function Stay() {
     router.push(`/spot/${id}?contenttypeid=32`);
   };
   const wishClick = () => {
+    if (!isLoggedIn) openModal();
     console.log('wishClick');
   };
 

@@ -9,6 +9,8 @@ import { FeedProps, JobProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { formatSalary } from '../../utils/stringUtils';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 export default function Job() {
   const [feedList, setFeedList] = useState<JobProps[]>([]);
@@ -17,6 +19,8 @@ export default function Job() {
   const [loading, setLoading] = useState(false);
   const [area, setArea] = useState<string>('강릉');
   const [keyword, setKeyword] = useState<string>('');
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const router = useRouter();
 
@@ -94,6 +98,7 @@ export default function Job() {
     );
   };
   const wishClick = () => {
+    if (!isLoggedIn) openModal();
     console.log('wishClick');
   };
 
