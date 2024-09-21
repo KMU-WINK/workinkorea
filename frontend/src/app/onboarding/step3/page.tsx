@@ -19,7 +19,7 @@ export default function Step3() {
   const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
-  // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
+  // 서버에서 클라이언트로 전달하는 search param 을 로컬 변수에 저장
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
   const provider = searchParam.get('provider');
