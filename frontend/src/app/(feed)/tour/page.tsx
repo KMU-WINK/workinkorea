@@ -5,12 +5,11 @@ import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
 
-import { FeedProps, JobProps } from '@/types/type';
+import { FeedProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
-import { formatSalary } from '@/app/utils/stringUtils';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 
@@ -87,7 +86,7 @@ export default function Tour() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, [window.location.href]);
+  }, []);
 
   useEffect(() => {
     if (area) fetchData();

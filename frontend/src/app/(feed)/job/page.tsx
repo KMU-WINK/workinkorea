@@ -85,7 +85,7 @@ export default function Job() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, [window.location.href]);
+  }, []);
 
   useEffect(() => {
     if (area) fetchData();
