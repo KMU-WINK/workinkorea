@@ -6,15 +6,12 @@ import Close from 'public/svgs/close.svg';
 import Kakao from 'public/svgs/kakao.svg';
 import Naver from 'public/svgs/naver.svg';
 import Google from 'public/svgs/google.svg';
+import useModalStore from '@/app/stores/modalStore';
 
-interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal() {
+  const { isOpen, closeModal } = useModalStore();
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') onClose();
+    if (e.key === 'Escape') closeModal();
   };
 
   const onClickKaKaoLogin = () => {
@@ -41,7 +38,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} handleKeyDown={handleKeyDown}>
+    <Modal isOpen={isOpen} onClose={closeModal} handleKeyDown={handleKeyDown}>
       <div
         className="flex flex-col justify-center pt-14 px-6
           pb-20 relative bg-white
@@ -50,7 +47,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       >
         <Close
           className="absolute top-4 right-4 cursor-pointer"
-          onClick={onClose}
+          onClick={closeModal}
         />
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
