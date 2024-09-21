@@ -19,22 +19,37 @@ export default function Step1() {
   const socialId = searchParam.get('social_id');
   const provider = searchParam.get('provider');
 
-  const handleDuplicateCheck = async () => {
+  const handleNextClick = async () => {
     try {
       await PublicAxiosInstance.patch('/users/nickname', {
         social_id: socialId,
         nickname: nickname,
       });
-      setIsNicknameUnique(true);
+      router.push(
+        `/onboarding/step2?social_id=${socialId}&provider=${provider}`,
+      );
     } catch (e) {
       console.error(e);
-      setIsNicknameUnique(false);
-      alert('중복된 닉네임입니다.');
     }
   };
 
-  const handleNextClick = async () => {
-    router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);
+  const handleDuplicateCheck = async () => {
+    try {
+      const response = await PublicAxiosInstance.get(`/users/nickname/check`, {
+        params: { nickname: nickname },
+      });
+
+      if (response.data.isUnique) {
+        setIsNicknameUnique(true); // 닉네임이 중복되지 않음
+        alert('사용 가능한 닉네임입니다.');
+      } else {
+        setIsNicknameUnique(false); // 닉네임이 중복됨
+        alert('이미 존재하는 닉네임입니다. 다른 닉네임을 입력해주세요.');
+      }
+    } catch (error) {
+      console.error('중복 검사 오류:', error);
+      alert('중복 검사 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
   };
 
   // 닉네임 입력 시 6글자 초과 방지
@@ -42,13 +57,13 @@ export default function Step1() {
     const newNickname = e.target.value;
     if (newNickname.length <= 6) {
       setNickname(newNickname);
-      // setIsNicknameUnique(null); // 닉네임이 변경되면 중복 검사 초기화
+      setIsNicknameUnique(null); // 닉네임이 변경되면 중복 검사 초기화
     }
   };
 
   return (
     <div className="flex justify-center min-h-screen">
-      <div className="w-full max-w-[393px] flex flex-col items-start px-6 mb-[90px]">
+      <div className="w-full max-w-[393px] flex flex-col items-start px-6">
         <div className="py-3 min-h-14"></div>
         <div className="flex gap-2">
           <Badge number={1} isSelected />
@@ -83,7 +98,7 @@ export default function Step1() {
       <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isAllowed={nickname !== '' && isNicknameUnique == true} // 닉네임이 중복되지 않는 경우에만 버튼 활성화
+          isAllowed={nickname !== '' && isNicknameUnique} // 닉네임이 중복되지 않는 경우에만 버튼 활성화
           onClick={handleNextClick}
         />
       </div>
