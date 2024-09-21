@@ -116,7 +116,12 @@ export default function Job() {
   };
 
   const bottomClick = (link: string) => {
-    router.push(extractLinkOrValue(link));
+    const url = extractLinkOrValue(link);
+    window.open(url, '_blank'); // 새 탭에서 링크 열기
+  };
+
+  const addressClick = () => {
+    router.push(`/map?contentId=${contentId}&contentTypeId=${contentTypeId}`);
   };
 
   return (
@@ -161,7 +166,10 @@ export default function Job() {
                 <Heart className="cursor-pointer" onClick={clickHeart} />
               )}
             </div>
-            <div className="w-fit flex items-center cursor-pointer">
+            <div
+              className="w-fit flex items-center cursor-pointer"
+              onClick={addressClick}
+            >
               <Location />
               <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                 {jobInfo.wrkpAdres}
@@ -261,7 +269,9 @@ export default function Job() {
           </div>
           <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
             <span className="font-bold">업무 내용</span>
-            <pre>{jobInfo.dtyCn}</pre>
+            <pre className="whitespace-pre-wrap break-words">
+              {jobInfo.dtyCn}
+            </pre>
           </div>
         </div>
       </div>
