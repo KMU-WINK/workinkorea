@@ -1,19 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import insert, delete
 from sqlalchemy.orm import Session
-from ..schemas.user import (
-    UserBase,
-    UserInfoUpdate,
-    UserCreate,
-    UserNicknameUpdate,
-    UserRegionUpdate,
-    UserInterestUpdate,
-    UserWorkUpdate,
-)
-from ..models.Interest import Interest
-from ..models.Region import Region
-from ..models.Work import Work
-from ..models.User import User, User_Region, User_Interest, User_Work
+from ..models.User import User
 from ..models.Spot import Spot
 from ..models.Stay import Stay
 from ..models.Job import Job
