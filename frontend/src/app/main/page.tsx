@@ -16,6 +16,7 @@ import Go from '../../../public/svgs/go.svg';
 import SettingColor from '../../../public/svgs/setting-color.svg';
 import useUserStore from '../stores/loginStore';
 import useModalStore from '../stores/modalStore';
+import { useRouter } from 'next/navigation';
 
 interface BannerInfo {
   type:
@@ -37,6 +38,7 @@ interface AdInfo {
 }
 
 export default function MainPage() {
+  const router = useRouter();
   const [bannerInfo, setBannerInfo] = useState<BannerInfo[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: '',
@@ -46,6 +48,8 @@ export default function MainPage() {
     title: '',
     link: '/',
   });
+  // user 정보에 따라 location 적용
+  const [location, setLocation] = useState<string>('제주');
   const { openModal } = useModalStore();
   const { isLoggedIn, login } = useUserStore();
 
@@ -82,13 +86,17 @@ export default function MainPage() {
       profile: '/images/profile-test.png',
     });
     setAdInfo({
-      title: '내용',
+      title: '워크인코리아 공식 노션 바로가기',
       link: '/',
     });
   }, []);
 
-  const gun = () => {
-    console.log('hi');
+  const inputClick = () => {
+    router.push('/search');
+  };
+
+  const tagClick = (type: string) => {
+    router.push(`/${type}?location=${location}&keyword=`);
   };
 
   console.log(isLoggedIn);
@@ -133,21 +141,36 @@ export default function MainPage() {
           </div>
           <div className="border border-gray-2 rounded-lg flex flex-col items-center">
             <div className="p-6 w-full flex flex-col gap-7 justify-center items-center">
-              <Input leftIcon={<Search />} disabled onClick={gun} />
+              <Input leftIcon={<Search />} disabled onClick={inputClick} />
               <div className="flex justify-center items-center gap-5 text-gray-4 text-xs">
-                <div className="flex flex-col justify-center items-center gap-2 cursor-pointer">
+                <div
+                  className="flex flex-col justify-center items-center gap-2 cursor-pointer"
+                  onClick={() => {
+                    tagClick('job');
+                  }}
+                >
                   <div className="border border-gray-2 rounded-full flex justify-center items-center p-3">
                     <JobIcon />
                   </div>
                   <span>채용</span>
                 </div>
-                <div className="flex flex-col justify-center items-center gap-2 cursor-pointer">
+                <div
+                  className="flex flex-col justify-center items-center gap-2 cursor-pointer"
+                  onClick={() => {
+                    tagClick('stay');
+                  }}
+                >
                   <div className="border border-gray-2 rounded-full flex justify-center items-center p-3">
                     <StayIcon />
                   </div>
                   <span>숙소</span>
                 </div>
-                <div className="flex flex-col justify-center items-center gap-2 cursor-pointer">
+                <div
+                  className="flex flex-col justify-center items-center gap-2 cursor-pointer"
+                  onClick={() => {
+                    tagClick('tour');
+                  }}
+                >
                   <div className="border border-gray-2 rounded-full flex justify-center items-center p-3">
                     <TourIcon />
                   </div>
