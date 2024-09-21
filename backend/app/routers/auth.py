@@ -202,9 +202,11 @@ async def get_access_token(social_id: str, db: Session = Depends(get_db)):
 
     # 클라이언트 측에 쿠키 설정 및 메인 페이지로 리디렉션
     response = RedirectResponse(url=f"{client_url}/main")
+    print(response)
     response.set_cookie(
         key="access_token", value=jwt_token, httponly=True, samesite="lax"
     )
+    print(response)
 
     return response
 
