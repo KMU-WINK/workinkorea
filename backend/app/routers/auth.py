@@ -206,12 +206,17 @@ async def get_access_token(social_id: str, db: Session = Depends(get_db), isLogi
     else:
         # RedirectResponse 사용 시, 클라이언트 측에서 CORS 에러가 발생하여 URL만 반환
         response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
-    
-    # 클라이언트 측에 쿠키 설정
+        
     response.set_cookie(
-        key="access_token", value=jwt_token, httponly=True, samesite="lax"
+        key="accessToken",
+        value=jwt_token,
+        httponly=True,
+        samesite="lax"
     )
-
+    response.set_cookie(
+        key="social_id",
+        value=social_id,
+    )
     return response
 
 
