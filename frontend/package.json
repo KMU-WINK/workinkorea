@@ -18,7 +18,8 @@
     "react-dom": "^18",
     "sharp": "^0.33.5",
     "styled-components": "^6.1.11",
-    "styled-jsx": "^5.1.6"
+    "styled-jsx": "^5.1.6",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",

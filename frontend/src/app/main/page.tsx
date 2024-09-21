@@ -14,6 +14,8 @@ import StayIcon from '../../../public/svgs/stay-icon.svg';
 import TourIcon from '../../../public/svgs/tour-icon.svg';
 import Go from '../../../public/svgs/go.svg';
 import SettingColor from '../../../public/svgs/setting-color.svg';
+import useUserStore from '../stores/loginStore';
+import useModalStore from '../stores/modalStore';
 
 interface BannerInfo {
   type:
@@ -44,8 +46,23 @@ export default function MainPage() {
     title: '',
     link: '/',
   });
+  const { openModal } = useModalStore();
+  const { isLoggedIn, login } = useUserStore();
 
   useEffect(() => {
+    const checkIsLoggedIn = () => {
+      const cookies = document.cookie.split('; ');
+      const socialIdCookie = cookies.find(cookie =>
+        cookie.startsWith('social_id='),
+      );
+
+      if (socialIdCookie) {
+        const socialId = socialIdCookie.split('=')[1];
+        login(socialId);
+      }
+    };
+
+    checkIsLoggedIn();
     setBannerInfo([
       {
         type: 'white-filter-on',
@@ -74,6 +91,8 @@ export default function MainPage() {
     console.log('hi');
   };
 
+  console.log(isLoggedIn);
+
   return (
     <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
       <div
@@ -97,10 +116,20 @@ export default function MainPage() {
                 {userInfo.name ? userInfo.name : '사용자'}
               </span>
             </div>
-            <div className="flex gap-2">
-              <HeartColor className="cursor-pointer" />
-              <SettingColor className="cursor-pointer" />
-            </div>
+            {isLoggedIn ? (
+              <div className="flex gap-2">
+                <HeartColor className="cursor-pointer" />
+                <SettingColor className="cursor-pointer" />
+              </div>
+            ) : (
+              <button
+                onClick={openModal}
+                className="text-black underline-offset-1 text-xs font-semibold"
+                type="button"
+              >
+                회원가입/로그인
+              </button>
+            )}
           </div>
           <div className="border border-gray-2 rounded-lg flex flex-col items-center">
             <div className="p-6 w-full flex flex-col gap-7 justify-center items-center">
