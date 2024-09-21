@@ -39,8 +39,8 @@ export default function Step2() {
   };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between">
-      <div className="px-6">
+    <div className="flex justify-center min-h-screen">
+      <div className="w-full max-w-[393px] flex flex-col items-start px-6">
         <div className="py-3 min-h-14">
           {/* 백 버튼이 필요하다면 여기에 추가할 수 있음 */}
         </div>
@@ -52,7 +52,7 @@ export default function Step2() {
           <Badge number={5} isSelected={false} />
         </div>
 
-        <div className="pt-6">
+        <div className="pt-6 w-full">
           <p className="font-light text-xl">나이와 성별을 알려주세요</p>
           <p className="font-normal text-lg pt-4">생년월일</p>
           <div className="pt-4">
@@ -73,7 +73,7 @@ export default function Step2() {
           </div>
         </div>
       </div>
-      <div className="w-full fixed bottom-0 bg-white">
+      <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
           isAllowed={gender !== '' && birth !== ''}
