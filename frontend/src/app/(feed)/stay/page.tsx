@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { parseUrl } from '../_utils/stringUtils';
 import Card from '@/components/Card';
 
-import { FeedProps, JobProps } from '@/types/type';
+import { FeedProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import Image from 'next/image';
@@ -87,7 +87,7 @@ export default function Stay() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, [window.location.href]);
+  }, []);
 
   useEffect(() => {
     if (area) fetchData();
