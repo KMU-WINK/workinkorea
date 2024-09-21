@@ -40,7 +40,7 @@ export default function Step2() {
 
   return (
     <div className="flex justify-center min-h-screen">
-      <div className="w-full max-w-[393px] flex flex-col items-start px-6 mb-[90x]">
+      <div className="w-full max-w-[393px] flex flex-col items-start px-6">
         <div className="py-3 min-h-14">
           {/* 백 버튼이 필요하다면 여기에 추가할 수 있음 */}
         </div>
