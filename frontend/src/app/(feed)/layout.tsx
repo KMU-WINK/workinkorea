@@ -26,10 +26,10 @@ export default function FeedLayout({ children }: Props) {
 
   // 경로에 따라 mapClick 함수 다르게 설정
   useEffect(() => {
-    const re = parseUrl(fullUrl);
-    setContentType(re.type || '');
-    setLocation(re.location || '');
-    setKeyword(re.keyword || '');
+    const feedInfo = parseUrl(fullUrl);
+    setContentType(feedInfo.type || '');
+    setLocation(feedInfo.location || '');
+    setKeyword(feedInfo.keyword || '');
   }, [fullUrl]);
 
   const mapClick = (type: string, location: string, keyword: string) => {
@@ -37,8 +37,8 @@ export default function FeedLayout({ children }: Props) {
   };
 
   return (
-    <div className="flex flex-col justify-start items-center h-full bg-white relative">
-      <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 sm:max-w-sm">
+    <div className="flex flex-col justify-start items-center h-full bg-white relative ">
+      <div className="w-full flex flex-col justify-center items-center fixed top-0 z-20 sm:max-w-sm ">
         <div className="w-full px-6 py-3.5 flex justify-center items-center bg-main">
           <Input
             leftIcon={<Back />}
@@ -47,25 +47,25 @@ export default function FeedLayout({ children }: Props) {
             readOnly
           />
         </div>
-        <div className="px-6 py-4 bg-white">
-          <div
-            className="w-full h-20 relative overflow-hidden rounded-xl"
-            onClick={() => mapClick(contentType, location, keyword)}
-            role="button"
-            tabIndex={0}
-          >
-            <Image
-              src="/svgs/feed-banner.svg"
-              alt="banner"
-              layout="responsive"
-              width={0}
-              height={0}
-            />
-            <span className="text-white">지도로 검색하기</span>
-          </div>
-        </div>
+        {/*<div className="px-6 py-4 bg-white">*/}
+        {/*  <div*/}
+        {/*    className="w-full h-20 relative overflow-hidden rounded-xl"*/}
+        {/*    onClick={() => mapClick(contentType, location, keyword)}*/}
+        {/*    role="button"*/}
+        {/*    tabIndex={0}*/}
+        {/*  >*/}
+        {/*    <Image*/}
+        {/*      src="/svgs/feed-banner.svg"*/}
+        {/*      alt="banner"*/}
+        {/*      layout="responsive"*/}
+        {/*      width={0}*/}
+        {/*      height={0}*/}
+        {/*    />*/}
+        {/*    <span className="text-white">지도로 검색하기</span>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
       </div>
-      <div className="w-full max-w-sm px-6 mt-[212px]">{children}</div>
+      <div className="w-full max-w-sm px-6 mt-[86px]">{children}</div>
     </div>
   );
 }
