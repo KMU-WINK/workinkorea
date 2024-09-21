@@ -187,7 +187,9 @@ async def login(access_token: str, provider: str, db: Session):
 
 # username 기반 토큰 발급
 @router.get("/token")
-async def get_access_token(social_id: str, db: Session = Depends(get_db), isLogin: bool = False):
+async def get_access_token(
+    social_id: str, db: Session = Depends(get_db), isLogin: bool = False
+):
     # 사용자가 DB에 있는지 확인
     user = db.query(User).filter(User.social_id == social_id).first()
     client_url = os.getenv("WINK_CLIENT_URI")
@@ -201,25 +203,20 @@ async def get_access_token(social_id: str, db: Session = Depends(get_db), isLogi
     # JWT 토큰 생성
     jwt_token = create_jwt_token(user.nickname)
 
-    if (isLogin):
+    if isLogin:
         response = RedirectResponse(url=f"{client_url}/main")
     else:
         # RedirectResponse 사용 시, 클라이언트 측에서 CORS 에러가 발생하여 URL만 반환
         response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
-    print(response)    
 
     response.set_cookie(
-        key="accessToken",
-        value=jwt_token,
-        httponly=True,
-        samesite="lax"
+        key="accessToken", value=jwt_token, httponly=True, samesite="lax"
     )
     response.set_cookie(
         key="social_id",
         value=social_id,
     )
-    print(response)
-    
+
     return response
 
 

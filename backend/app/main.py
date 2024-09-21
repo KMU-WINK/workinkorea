@@ -21,8 +21,8 @@ WHITE_LIST = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8000",
-    "http://workinkorea.vercel.app",
-    "https://workinkorea.vercel.app",
+    "https://workinkorea.info",
+    "http://workinkorea.info",
 ]
 
 
