@@ -11,6 +11,8 @@ import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
 import { formatSalary } from '@/app/utils/stringUtils';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -20,6 +22,8 @@ export default function Tour() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const router = useRouter();
 
@@ -110,6 +114,7 @@ export default function Tour() {
     router.push(`/spot/${id}?contenttypeid=${contenttypeid}`);
   };
   const wishClick = () => {
+    if (!isLoggedIn) openModal();
     console.log('wishClick');
   };
 

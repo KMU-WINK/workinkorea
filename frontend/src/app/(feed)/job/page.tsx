@@ -11,6 +11,8 @@ import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { formatSalary } from '../../utils/stringUtils';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 export default function Job() {
   const [feedList, setFeedList] = useState<JobProps[]>([]);
@@ -20,6 +22,8 @@ export default function Job() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const router = useRouter();
 
@@ -111,6 +115,7 @@ export default function Job() {
     );
   };
   const wishClick = () => {
+    if (!isLoggedIn) openModal();
     console.log('wishClick');
   };
 

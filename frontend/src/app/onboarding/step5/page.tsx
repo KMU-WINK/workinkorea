@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import SelectButton from '@/components//SelectButton';
 import Button from '@/components/Button';
 import Activity from 'public/svgs/emoji/paragliding.svg';
@@ -18,7 +18,7 @@ export default function Step3() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
-  const provider = searchParam.get('provider');
+  const router = useRouter();
 
   const handleNextClick = async () => {
     try {
@@ -26,7 +26,11 @@ export default function Step3() {
         social_id: socialId,
         interests: selectedOptions,
       });
-      await PublicAxiosInstance.get(`/auth/token?social_id=${socialId}`);
+      const data = await PublicAxiosInstance.get(
+        `/auth/token?social_id=${socialId}`,
+      );
+      const redirectUrl = data.data.redirect_url;
+      router.push(redirectUrl);
     } catch (e) {
       console.error(e);
     }

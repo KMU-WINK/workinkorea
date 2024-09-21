@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
 import KakaoScriptLoader from '@/components/KakaoScriptLoader';
 import GoogleAnalytics from '@/lib/GoogleAnalytics';
+import LoginModal from '@/components/Modals/LoginModal';
 
 export const viewport: Viewport = {
   minimumScale: 1,
@@ -59,6 +60,7 @@ export default function RootLayout({
         <StyledJsxRegistry>{children}</StyledJsxRegistry>
         <GoogleAnalytics />
         <KakaoScriptLoader />
+        <LoginModal />
       </body>
     </html>
   );

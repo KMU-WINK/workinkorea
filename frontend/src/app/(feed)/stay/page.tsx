@@ -10,6 +10,8 @@ import { FeedProps, JobProps } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import Image from 'next/image';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 export default function Stay() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -19,6 +21,8 @@ export default function Stay() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const router = useRouter();
 
@@ -109,6 +113,7 @@ export default function Stay() {
     router.push(`/spot/${id}?contenttypeid=32`);
   };
   const wishClick = () => {
+    if (!isLoggedIn) openModal();
     console.log('wishClick');
   };
 
