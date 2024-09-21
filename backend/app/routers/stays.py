@@ -5,6 +5,8 @@ from ..external_services.areaBasedAPI import (
     get_stays_by_region_and_keyword,
 )
 from ..external_services.detailAPI import get_common, get_intro, get_info, get_image
+from ..external_services.locationBaseAPI import get_location_based_list
+
 
 router = APIRouter(
     prefix="/stays",
@@ -52,3 +54,14 @@ async def spot_stay_detail(contentId: int, contentTypeId: int):
     # 결과 확인
     # print(combined_dict)
     return combined_dict
+
+
+@router.get("/location")
+async def spot_stay_location(
+    mapX: str,
+    mapY: str,
+    radius: int = 20000,
+    numOfRows: int = 3000,
+):
+    data = get_location_based_list(mapX, mapY, radius, numOfRows, contentTypeId=32)
+    return data
