@@ -148,10 +148,10 @@ export default function MainPage() {
               description={info.description}
               backgroundImage={
                 <Image
+                  className="object-cover"
                   src={info.backgroundImage}
                   alt="Background"
-                  layout="fill"
-                  objectFit="cover"
+                  fill={true}
                   quality={100}
                 />
               }
