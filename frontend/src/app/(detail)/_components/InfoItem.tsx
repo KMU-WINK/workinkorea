@@ -23,7 +23,7 @@ export const InfoRow = styled.div`
   gap: 16px;
   overflow-x: hidden;
   > span {
-    min-width: 48px;
+    min-width: 82px;
     font-weight: bold;
   }
   > pre {
