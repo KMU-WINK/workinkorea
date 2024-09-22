@@ -54,6 +54,10 @@ export interface SpotInfo {
   homepage: string;
   address: string;
   image: string;
+  inWishlist: boolean;
+  location: string;
+  mapx?: number;
+  mapy?: number;
   number: string;
   telName?: string;
   overview: string;
