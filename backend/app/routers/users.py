@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File
 from sqlalchemy import insert, delete
 from sqlalchemy.orm import Session
 from ..schemas.user import (
@@ -14,6 +14,7 @@ from ..models.Work import Work
 from ..models.User import User, User_Region, User_Interest, User_Work
 from ..db.session import get_db
 from .auth import get_current_user
+import base64
 
 router = APIRouter(
     prefix="/users",
@@ -84,6 +85,7 @@ async def read_users(db: Session = Depends(get_db)):
 @router.get("/detail")
 async def read_user(request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
+    # current_user = db.query(User).filter(User.id == 1).first() #for test
 
     if current_user is None:
         raise HTTPException(status_code=400, detail=f"user not found. request.header.Authorization: {request.headers.get("Authorization")}")
@@ -110,13 +112,15 @@ async def update_user_nickname(request: Request, payload:NicknameUpdate, db: Ses
             status_code=400,
             detail=f"nickname is already exist. {nickname}",
         )
+    try:
+        # 닉네임 업데이트
+        user_to_update.nickname = nickname
+        db.commit()
+        db.refresh(user_to_update)
 
-    # 닉네임 업데이트
-    user_to_update.nickname = nickname
-    db.commit()
-    db.refresh(user_to_update)
-
-    return {"message": "Nickname updated successfully.", "user": user_to_update}
+        return {"message": "Nickname updated successfully.", "user": user_to_update}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.patch("/info")
@@ -279,8 +283,24 @@ async def update_user_work(request: Request, payload: WorkUpdate, db: Session = 
 @router.patch("/profile")
 async def update_user_profile(request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
+    # current_user = db.query(User).filter(User.id == 1).first() #for test
+    form = await request.form() 
+    profile: UploadFile = form.get("profile")
+    if not profile:
+        raise HTTPException(status_code=400, detail="Profile is required")
+    
+    # 프로필 사진을 Base64로 인코딩
+    profile_data = await profile.read()
+    profile_base64 = base64.b64encode(profile_data).decode('utf-8')
+    
+    # Base64 인코딩된 데이터를 데이터베이스에 저장
+    current_user.profile_picture_base64 = profile_base64
+    
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
 
-    return "update_user_profile"
+    return "Profile updated successfully"  
 
 @router.delete("")
 async def delete_user(id: int):
