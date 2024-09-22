@@ -44,8 +44,8 @@
   │ │ ├── Region.py # Defines database models for region in onboarding.
   │ │ ├── Interest.py # Defines database models for interest in onboarding.
   │ │ ├── Stay.py # Defines database models for stay in wishlist.
-  │ │ ├── Spot.py # Defines database models for interest in wishlist.
-  │ │ ├── Job.py # Defines database models for interest in wishlist.
+  │ │ ├── Spot.py # Defines database models for spot in wishlist.
+  │ │ ├── Job.py # Defines database models for job in wishlist.
   │ │ └── User.py # Defines database models for users.
   │ ├── external_services
   │ │ ├── **init**.py
