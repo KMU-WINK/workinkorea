@@ -142,6 +142,7 @@ async def update_user_region(request: Request, payload: RegionUpdate, db: Sessio
     user_to_update = get_current_user(request, db)  
 
     white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
+    
     # 지역 예외처리
     for region in payload.regions:
         if region not in white_list:
@@ -278,7 +279,7 @@ async def update_user_work(request: Request, payload: WorkUpdate, db: Session = 
 @router.patch("/profile")
 async def update_user_profile(request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
-    
+
     return "update_user_profile"
 
 @router.delete("")

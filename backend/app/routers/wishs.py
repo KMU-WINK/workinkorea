@@ -49,15 +49,22 @@ async def add_spot_wish(
     db: Session = Depends(get_db),
 ):
     typeOfWish = payload.type
-    contentTypeId = payload.content
+    contentTypeId = payload.contentTypeId
     contentId = payload.contentId
     if typeOfWish not in ["spot", "stay", "job"]:
         raise HTTPException(
-            status_code=400, detail="type must be in [ spot, stay, job ]"
+            status_code=400,
+            detail=f"type must be in [ spot, stay, job ]. you sent {typeOfWish}",
         )
+
     current_user = get_current_user(request, db)
 
     if typeOfWish == "spot":
+        if contentTypeId not in ["12", "14", "15", "25", "28", "32", "38", "39"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not a spot content. spot contentTypeId must be in [ 12, 14, 15, 25, 28, 32, 38, 39 ]. you sent {contentTypeId}",
+            )
         chk_wish = (
             db.query(Spot)
             .filter(
@@ -75,6 +82,11 @@ async def add_spot_wish(
             content_id=contentId,
         )
     elif typeOfWish == "stay":
+        if contentTypeId != "32":
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not a stay content. stay contentTypeId must be in 32. you sent {contentTypeId}",
+            )
         chk_wish = (
             db.query(Stay)
             .filter(
@@ -92,6 +104,11 @@ async def add_spot_wish(
             content_id=contentId,
         )
     elif typeOfWish == "job":
+        if contentTypeId not in ["open", "tour"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not a job content. job contentTypeId must be in [ open, tour ]. you sent {contentTypeId}",
+            )
         chk_wish = (
             db.query(Job)
             .filter(
@@ -124,16 +141,22 @@ async def delete_spot_wish(
     db: Session = Depends(get_db),
 ):
     typeOfWish = payload.type
-    contentTypeId = payload.content
+    contentTypeId = payload.contentTypeId
     contentId = payload.contentId
     if typeOfWish not in ["spot", "stay", "job"]:
         raise HTTPException(
-            status_code=400, detail="type must be in [ spot, stay, job ]"
+            status_code=400,
+            detail=f"type must be in [ spot, stay, job ]. you sent {typeOfWish}",
         )
 
     current_user = get_current_user(request, db)
 
     if typeOfWish == "spot":
+        if contentTypeId not in ["12", "14", "15", "25", "28", "32", "38", "39"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not a spot content. spot contentTypeId must be in [ 12, 14, 15, 25, 28, 32, 38, 39 ]. you sent {contentTypeId}",
+            )
         chk_wish = (
             db.query(Spot)
             .filter(
@@ -151,6 +174,11 @@ async def delete_spot_wish(
             Spot.content_id == contentId,
         ).delete()
     elif typeOfWish == "stay":
+        if contentTypeId != "32":
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not a stay content. stay contentTypeId must be in 32. you sent {contentTypeId}",
+            )
         chk_wish = (
             db.query(Stay)
             .filter(
@@ -168,6 +196,11 @@ async def delete_spot_wish(
             Stay.content_id == contentId,
         ).delete()
     elif typeOfWish == "job":
+        if contentTypeId not in ["open", "tour"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not a job content. job contentTypeId must be in [ open, tour ]. you sent {contentTypeId}",
+            )
         chk_wish = (
             db.query(Job)
             .filter(
