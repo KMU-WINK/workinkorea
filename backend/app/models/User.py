@@ -75,7 +75,7 @@ class User(Base):
 
     @validates("gender")
     def validate_gender(self, key, value):
-        genders = ["남성", "여성"]
+        genders = ["남자", "여자"]
         if value not in genders:
             raise ValueError(f"{value} is not in valid gender :{genders}")
         return value

@@ -1,20 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import insert, delete
 from sqlalchemy.orm import Session
 from ..schemas.user import (
-    UserBase,
-    UserInfoUpdate,
-    UserCreate,
-    UserNicknameUpdate,
-    UserRegionUpdate,
-    UserInterestUpdate,
-    UserWorkUpdate,
+    InfoUpdate,
+    RegionUpdate,
+    InterestUpdate,
+    WorkUpdate,
+    NicknameUpdate
 )
 from ..models.Interest import Interest
 from ..models.Region import Region
 from ..models.Work import Work
 from ..models.User import User, User_Region, User_Interest, User_Work
 from ..db.session import get_db
+from .auth import get_current_user
 
 router = APIRouter(
     prefix="/users",
@@ -23,8 +22,6 @@ router = APIRouter(
 
 
 # utility function
-
-
 def get_regions_by_id(id: str, db: Session = Depends(get_db)):
     # 유저가 가지고 있는 region_id 리스트 가져오기
     region_ids = (
@@ -84,256 +81,206 @@ async def read_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 
 
-@router.get("/detail/{social_id}")
-async def read_user(social_id: str, db: Session = Depends(get_db)):
-    exist = db.query(User).filter(User.social_id == social_id).first()
-    print(exist)
-    if exist is None:
-        raise HTTPException(status_code=400, detail=f"user not found. id: {social_id}")
+@router.get("/detail")
+async def read_user(request: Request, db: Session = Depends(get_db)):
+    current_user = get_current_user(request, db)
 
-    region_names = get_regions_by_id(exist.id, db)
-    interest_names = get_interests_by_id(exist.id, db)
-    work_names = get_works_by_id(exist.id, db)
+    if current_user is None:
+        raise HTTPException(status_code=400, detail=f"user not found. request.header.Authorization: {request.headers.get("Authorization")}")
+
+    region_names = get_regions_by_id(current_user.id, db)
+    interest_names = get_interests_by_id(current_user.id, db)
+    work_names = get_works_by_id(current_user.id, db)
     return {
-        "user": exist,
+        "user": current_user,
         "regions": region_names if region_names else None,
         "interests": interest_names if interest_names else None,
         "works": work_names if work_names else None,
     }
 
 
-@router.post("")
-async def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    try:
-        # User 모델 인스턴스 생성 (id는 자동 생성)
-        new_user = User(social_id=user.social_id, social=user.social)
-        # 데이터베이스에 새로운 유저 추가
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        return new_user
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
-
-
 @router.patch("/nickname")
-async def update_user_nickname(user: UserNicknameUpdate, db: Session = Depends(get_db)):
+async def update_user_nickname(request: Request, payload:NicknameUpdate, db: Session = Depends(get_db)):
+    user_to_update = get_current_user(request, db)
+    nickname = payload.nickname
 
-    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
-
-    # id 유효하지 않은 경우 에러
-    if user_to_update is None:
+    exists = db.query(User).filter(User.nickname == nickname).first()
+    if exists:  # 닉네임 중복 체크
         raise HTTPException(
-            status_code=400, detail=f"user not found. social_id: {user.social_id}"
+            status_code=400,
+            detail=f"nickname is already exist. {nickname}",
         )
 
-    else:
-        exists = db.query(User).filter(User.nickname == user.nickname).first()
-        if exists:  # 닉네임 중복 체크
-            raise HTTPException(
-                status_code=400,
-                detail=f"nickname is already exist. {user.nickname}",
-            )
+    # 닉네임 업데이트
+    user_to_update.nickname = nickname
+    db.commit()
+    db.refresh(user_to_update)
 
-        # 닉네임 업데이트
-        user_to_update.nickname = user.nickname
-        db.commit()
-        db.refresh(user_to_update)
-
-        return {"message": "Nickname updated successfully.", "user": user_to_update}
+    return {"message": "Nickname updated successfully.", "user": user_to_update}
 
 
 @router.patch("/info")
-async def update_user_info(user: UserInfoUpdate, db: Session = Depends(get_db)):
+async def update_user_info(request: Request, payload: InfoUpdate, db: Session = Depends(get_db)):
+    user_to_update = get_current_user(request, db)
 
-    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
+    try:
+        user_to_update.birth = payload.birth
+        user_to_update.gender = payload.gender
+        db.commit()
+        db.refresh(user_to_update)
 
-    # id 유효하지 않은 경우 에러
-    if user_to_update is None:
-        raise HTTPException(
-            status_code=400, detail=f"user not found. social_id: {user.social_id}"
-        )
-
-    else:
-        # 유저 정보 업데이트
-        try:
-            user_to_update.birth = user.birth
-            user_to_update.gender = user.gender
-            db.commit()
-            db.refresh(user_to_update)
-
-            return {"message": "User updated successfully.", "user": user_to_update}
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))
+        return {"message": "User updated successfully.", "user": user_to_update}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 #### Region
 
 
 @router.patch("/region")
-async def update_user_region(user: UserRegionUpdate, db: Session = Depends(get_db)):
+async def update_user_region(request: Request, payload: RegionUpdate, db: Session = Depends(get_db)):
+    user_to_update = get_current_user(request, db)  
 
-    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
-
-    # id 유효하지 않은 경우 에러
-    if user_to_update is None:
-        raise HTTPException(
-            status_code=400, detail=f"user not found. social_id: {user.social_id}"
-        )
-
-    else:
-        white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
-        # 지역 예외처리
-        for region in user.regions:
-            if region not in white_list:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"region is not valid. {region} is not in selections {white_list}",
-                )
-
-        # 기존의 User_Region 데이터를 삭제
-        delete_stmt = delete(User_Region).where(
-            User_Region.c.user_id == user_to_update.id
-        )
-        db.execute(delete_stmt)
-        db.commit()
-
-        # 유저 정보 업데이트
-        for region in user.regions:
-            region_id = db.query(Region).filter(Region.name == region).first().id
-            stmt = insert(User_Region).values(
-                user_id=user_to_update.id, region_id=region_id
+    white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
+    
+    # 지역 예외처리
+    for region in payload.regions:
+        if region not in white_list:
+            raise HTTPException(
+                status_code=400,
+                detail=f"region is not valid. {region} is not in selections {white_list}",
             )
-            # print(region_id)
-            db.execute(stmt)
-            db.commit()
-        db.refresh(user_to_update)
 
-        region_names = get_regions_by_id(user_to_update.id, db)
+    # 기존의 User_Region 데이터를 삭제
+    delete_stmt = delete(User_Region).where(
+        User_Region.c.user_id == user_to_update.id
+    )
+    db.execute(delete_stmt)
+    db.commit()
 
-        return {
-            "message": "User updated successfully.",
-            "user": user_to_update,
-            "region_names": region_names,
-        }
+    # 유저 정보 업데이트
+    for region in payload.regions:
+        region_id = db.query(Region).filter(Region.name == region).first().id
+        stmt = insert(User_Region).values(
+            user_id=user_to_update.id, region_id=region_id
+        )
+        # print(region_id)
+        db.execute(stmt)
+        db.commit()
+    db.refresh(user_to_update)
+
+    region_names = get_regions_by_id(user_to_update.id, db)
+
+    return {
+        "message": "User updated successfully.",
+        "user": user_to_update,
+        "region_names": region_names,
+    }
 
 
 #### Interest
 
 
 @router.patch("/interest")
-async def update_user_interest(user: UserInterestUpdate, db: Session = Depends(get_db)):
+async def update_user_interest(request: Request, payload: InterestUpdate, db: Session = Depends(get_db)):
+    user_to_update = get_current_user(request, db)  
 
-    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
+    white_list = [
+        "액티비티",
+        "휴식",
+        "도심",
+        "자연",
+        "핫플",
+        "문화재",
+        "배움",
+    ]
+    # 예외처리
+    for interest in payload.interests:
+        if interest not in white_list:
+            raise HTTPException(
+                status_code=400,
+                detail=f"interest is not valid. {interest} is not in selections {white_list}",
+            )
+    # 기존의 User_Interest 데이터를 삭제
+    delete_stmt = delete(User_Interest).where(
+        User_Interest.c.user_id == user_to_update.id
+    )
+    db.execute(delete_stmt)
+    db.commit()
 
-    # id 유효하지 않은 경우 에러
-    if user_to_update is None:
-        raise HTTPException(
-            status_code=400, detail=f"user not found. social_id: {user.social_id}"
+    # 유저 정보 업데이트
+    for interest in payload.interests:
+        interest_id = (
+            db.query(Interest).filter(Interest.name == interest).first().id
         )
-
-    else:
-        white_list = [
-            "액티비티",
-            "휴식",
-            "도심",
-            "자연",
-            "핫플",
-            "문화재",
-            "배움",
-        ]
-        # 예외처리
-        for interest in user.interests:
-            if interest not in white_list:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"interest is not valid. {interest} is not in selections {white_list}",
-                )
-        # 기존의 User_Interest 데이터를 삭제
-        delete_stmt = delete(User_Interest).where(
-            User_Interest.c.user_id == user_to_update.id
+        stmt = insert(User_Interest).values(
+            user_id=user_to_update.id, interest_id=interest_id
         )
-        db.execute(delete_stmt)
+        # print(region_id)
+        db.execute(stmt)
         db.commit()
+    db.refresh(user_to_update)
 
-        # 유저 정보 업데이트
-        for interest in user.interests:
-            interest_id = (
-                db.query(Interest).filter(Interest.name == interest).first().id
-            )
-            stmt = insert(User_Interest).values(
-                user_id=user_to_update.id, interest_id=interest_id
-            )
-            # print(region_id)
-            db.execute(stmt)
-            db.commit()
-        db.refresh(user_to_update)
+    interest_names = get_interests_by_id(user_to_update.id, db)
 
-        interest_names = get_interests_by_id(user_to_update.id, db)
-
-        return {
-            "message": "User updated successfully.",
-            "user": user_to_update,
-            "interests": interest_names,
-        }
+    return {
+        "message": "User updated successfully.",
+        "user": user_to_update,
+        "interests": interest_names,
+    }
 
 
 #### Work
 
 
 @router.patch("/work")
-async def update_user_work(user: UserWorkUpdate, db: Session = Depends(get_db)):
+async def update_user_work(request: Request, payload: WorkUpdate, db: Session = Depends(get_db)):
+    user_to_update = get_current_user(request, db)  
 
-    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
+    white_list = [
+        "마케팅",
+        "홍보",
+        "인사",
+        "요식업",
+        "숙박업",
+        "오락",
+        "스포츠",
+    ]
+    # 예외처리
+    for work in payload.works:
+        if work not in white_list:
+            raise HTTPException(
+                status_code=400,
+                detail=f"work is not valid. {work} is not in selections {white_list}",
+            )
+    # 기존의 User_Work 데이터를 삭제
+    delete_stmt = delete(User_Work).where(User_Work.c.user_id == user_to_update.id)
+    db.execute(delete_stmt)
+    db.commit()
 
-    # id 유효하지 않은 경우 에러
-    if user_to_update is None:
-        raise HTTPException(
-            status_code=400, detail=f"user not found. social_id: {user.social_id}"
-        )
-
-    else:
-        white_list = [
-            "마케팅",
-            "홍보",
-            "인사",
-            "요식업",
-            "숙박업",
-            "오락",
-            "스포츠",
-        ]
-        # 예외처리
-        for work in user.works:
-            if work not in white_list:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"work is not valid. {work} is not in selections {white_list}",
-                )
-        # 기존의 User_Work 데이터를 삭제
-        delete_stmt = delete(User_Work).where(User_Work.c.user_id == user_to_update.id)
-        db.execute(delete_stmt)
+    # 유저 정보 업데이트
+    for work in payload.works:
+        work_id = db.query(Work).filter(Work.name == work).first().id
+        stmt = insert(User_Work).values(user_id=user_to_update.id, work_id=work_id)
+        print("work_id", work_id)
+        print(stmt)
+        db.execute(stmt)
         db.commit()
+    db.refresh(user_to_update)
 
-        # 유저 정보 업데이트
-        for work in user.works:
-            work_id = db.query(Work).filter(Work.name == work).first().id
-            stmt = insert(User_Work).values(user_id=user_to_update.id, work_id=work_id)
-            print("work_id", work_id)
-            print(stmt)
-            db.execute(stmt)
-            db.commit()
-        db.refresh(user_to_update)
+    work_names = get_works_by_id(user_to_update.id, db)
 
-        work_names = get_works_by_id(user_to_update.id, db)
+    return {
+        "message": "User updated successfully.",
+        "user": user_to_update,
+        "works": work_names,
+    }
 
-        return {
-            "message": "User updated successfully.",
-            "user": user_to_update,
-            "works": work_names,
-        }
+@router.patch("/profile")
+async def update_user_profile(request: Request, db: Session = Depends(get_db)):
+    current_user = get_current_user(request, db)
 
+    return "update_user_profile"
 
 @router.delete("")
 async def delete_user(id: int):

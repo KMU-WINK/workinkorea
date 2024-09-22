@@ -101,7 +101,7 @@ def get_stays_by_region(area: str, pageNo: int = 1):
 
 
 # 7)	[키워드검색조회] 오퍼레이션명세
-ENDPOINT_keyword = "https://apis.data.go.kr/B551011/KorService1/searchKeyword1"
+ENDPOINT_keyword = "http://apis.data.go.kr/B551011/KorService1/searchKeyword1"
 
 
 def get_spots(keyword: str, pageNo: int = 1):
@@ -156,6 +156,79 @@ def get_stays(keyword: str, pageNo: int = 1):
         "contentTypeId": 32,
         # "areaCode": AREA_CODE[area][0],
     }
+
+    # API 호출
+    response = requests.get(ENDPOINT_keyword, params=params)
+
+    data = response.json()
+
+    if data["response"]["body"]["items"]:
+        return data["response"]["body"]
+    else:
+        raise ValueError("No data found")
+
+
+# 둘 다 사용하기
+def get_stays_by_region_and_keyword(keyword: str, area: str, pageNo: int = 1):
+    if not len(keyword):
+        raise ValueError("area or keyword is required")
+
+    white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
+    if area not in white_list:
+        raise ValueError(f"{area} is not in valid area list {white_list}")
+
+    # API 요청 파라미터
+    params = {
+        "serviceKey": API_KEY,
+        "numOfRows": "10",
+        "pageNo": pageNo,
+        "MobileOS": "ETC",
+        "MobileApp": "AppTest",
+        "_type": "json",
+        "listYN": "Y",
+        "arrange": "A",
+        "keyword": keyword,
+        "contentTypeId": 32,
+        "areaCode": AREA_CODE[area][0],
+    }
+    if len(AREA_CODE[area]) >= 2:
+        params["sigunguCode"] = AREA_CODE[area][1]
+
+    # API 호출
+    response = requests.get(ENDPOINT_keyword, params=params)
+
+    data = response.json()
+
+    if data["response"]["body"]["items"]:
+        return data["response"]["body"]
+    else:
+        raise ValueError("No data found")
+
+
+def get_spots_by_region_and_keyword(keyword: str, area: str, pageNo: int = 1):
+    if not len(keyword):
+        raise ValueError("area or keyword is required")
+
+    white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
+    if area not in white_list:
+        raise ValueError(f"{area} is not in valid area list {white_list}")
+
+    # API 요청 파라미터
+    params = {
+        "serviceKey": API_KEY,
+        "numOfRows": "10",
+        "pageNo": pageNo,
+        "MobileOS": "ETC",
+        "MobileApp": "AppTest",
+        "_type": "json",
+        "listYN": "Y",
+        "arrange": "A",
+        "keyword": keyword,
+        # "contentTypeId": 32,
+        "areaCode": AREA_CODE[area][0],
+    }
+    if len(AREA_CODE[area]) >= 2:
+        params["sigunguCode"] = AREA_CODE[area][1]
 
     # API 호출
     response = requests.get(ENDPOINT_keyword, params=params)

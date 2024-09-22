@@ -8,7 +8,7 @@ import Card from '@/components/Card';
 
 import { CardProps } from '@/types/type';
 
-import Back from '../../../../public/svgs/back.svg';
+import Back from 'public/svgs/back.svg';
 
 interface WishType {
   id: number;
@@ -64,7 +64,7 @@ export default function WishDetail() {
   useEffect(() => {
     setFeedList([
       {
-        id: 1,
+        id: '1',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -77,7 +77,7 @@ export default function WishDetail() {
         inWishlist: false,
       },
       {
-        id: 2,
+        id: '2',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -90,7 +90,7 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
-        id: 3,
+        id: '3',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -103,7 +103,7 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
-        id: 4,
+        id: '4',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -116,7 +116,7 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
-        id: 5,
+        id: '5',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -129,7 +129,7 @@ export default function WishDetail() {
         inWishlist: false,
       },
       {
-        id: 6,
+        id: '6',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -142,7 +142,7 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
-        id: 7,
+        id: '7',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',
@@ -155,7 +155,7 @@ export default function WishDetail() {
         inWishlist: true,
       },
       {
-        id: 8,
+        id: '8',
         onCardClick: () => {},
         onWishListClick: () => {},
         cardType: 'default',

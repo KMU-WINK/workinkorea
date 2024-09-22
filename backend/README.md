@@ -40,16 +40,21 @@
   │ │ └── user.py # Defines schemas for users.
   │ ├── models
   │ │ ├── **init**.py
-  │ │ ├── item.py # Defines database models for items.
-  │ │ └── user.py # Defines database models for users.
+  │ │ ├── Work.py # Defines database models for work in onboarding.
+  │ │ ├── Region.py # Defines database models for region in onboarding.
+  │ │ ├── Interest.py # Defines database models for interest in onboarding.
+  │ │ ├── Stay.py # Defines database models for stay in wishlist.
+  │ │ ├── Spot.py # Defines database models for spot in wishlist.
+  │ │ ├── Job.py # Defines database models for job in wishlist.
+  │ │ └── User.py # Defines database models for users.
   │ ├── external_services
   │ │ ├── **init**.py
   │ │ ├── email.py # Defines functions for sending emails.
   │ │ └── notification.py # Defines functions for sending notifications
   │ └── utils
-  │ ├── **init**.py
-  │ ├── authentication.py # Defines functions for authentication.
-  │ └── validation.py # Defines functions for validation.
+  │   ├── **init**.py
+  │   ├── authentication.py # Defines functions for authentication.
+  │   └── validation.py # Defines functions for validation.
   ├── tests
   │ ├── **init**.py
   │ ├── test_main.py
@@ -59,16 +64,6 @@
   ├── .gitignore
   └── README.md
   ```
-- app/: Contains the main application files.
-- main.py: Initializes the FastAPI application.
-- dependencies.py: Defines dependencies used by the routers.
-- routers/: Contains router modules.
-- crud/: Contains CRUD (Create, Read, Update, Delete) operation modules.
-- schemas/: Contains Pydantic schema modules.
-- models/: Contains database model modules.
-- external_services/: Contains modules for interacting with external services. **(API is here)**
-- utils/: Contains utility modules.
-- tests/: Contains test modules.
 
 ## 설치 방법
 
