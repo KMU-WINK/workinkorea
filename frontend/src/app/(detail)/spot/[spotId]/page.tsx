@@ -158,14 +158,16 @@ export default function Tour() {
   };
 
   const bottomClick = (link: string) => {
-    router.push(extractLinkOrValue(link));
+    const url = extractLinkOrValue(link);
+    window.open(url, '_blank'); // 새 탭에서 링크 열기
+  };
+
+  const addressClick = () => {
+    router.push(`/map?contentId=${contentId}&contentTypeId=${contentTypeId}`);
   };
 
   return (
-    <div
-      className="flex flex-col justify-start items-center h-full w-screen bg-white text-black
-    "
-    >
+    <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
       <div
         className="flex flex-col justify-start items-center gap-3
         w-full bg-white sm:max-w-sm
@@ -201,12 +203,21 @@ export default function Tour() {
                 <Heart className="cursor-pointer" onClick={clickHeart} />
               )}
             </div>
-            <div className="w-fit flex items-center cursor-pointer">
+            <div
+              className="w-fit flex items-center cursor-pointer"
+              onClick={addressClick}
+            >
               <Location />
-              <span className="text-sm">{spotInfo.address}</span>
+              <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                {spotInfo.address}
+              </span>
               <GoSmall />
             </div>
             <div className="w-full flex flex-col gap-2 text-xs">
+              <InfoRow>
+                <span>주소</span>
+                <pre>{spotInfo.address}</pre>
+              </InfoRow>
               <InfoRow>
                 <span>
                   {contentTypeId === 32 ? '체크인/아웃 시간' : '운영 시간'}
@@ -238,7 +249,9 @@ export default function Tour() {
           {contentTypeId == 39 && <InfoRowType39 extraInfo={extraInfo} />}
           <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
             <span className="font-bold">소개</span>
-            <span>{spotInfo.overview}</span>
+            <span className="whitespace-pre-wrap break-words">
+              {spotInfo.overview}
+            </span>
           </div>
         </div>
       </div>

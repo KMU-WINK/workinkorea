@@ -17,7 +17,7 @@ export default function ImageButton({
 }: ImageButtonProps) {
   return (
     <div
-      className={`h-32 relative rounded-xl cursor-pointer overflow-hidden ${
+      className={`h-[120px] relative rounded-xl cursor-pointer overflow-hidden ${
         isSelected ? 'border-2 border-main' : 'border border-gray-200'
       }`}
       onClick={onToggleSelect}
