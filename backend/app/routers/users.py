@@ -102,9 +102,9 @@ async def read_user(request: Request, db: Session = Depends(get_db)):
 
 
 @router.patch("/nickname")
-async def update_user_nickname(request: Request, payload:NicknameUpdate, db: Session = Depends(get_db)):
-    user_to_update = get_current_user(request, db)
-    nickname = payload.nickname
+async def update_user_nickname(user:NicknameUpdate, db: Session = Depends(get_db)):
+    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
+    nickname = user.nickname
 
     exists = db.query(User).filter(User.nickname == nickname).first()
     if exists:  # 닉네임 중복 체크
@@ -124,12 +124,12 @@ async def update_user_nickname(request: Request, payload:NicknameUpdate, db: Ses
 
 
 @router.patch("/info")
-async def update_user_info(request: Request, payload: InfoUpdate, db: Session = Depends(get_db)):
-    user_to_update = get_current_user(request, db)
+async def update_user_info(user: InfoUpdate, db: Session = Depends(get_db)):
+    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
 
     try:
-        user_to_update.birth = payload.birth
-        user_to_update.gender = payload.gender
+        user_to_update.birth = user.birth
+        user_to_update.gender = user.gender
         db.commit()
         db.refresh(user_to_update)
 
@@ -142,13 +142,13 @@ async def update_user_info(request: Request, payload: InfoUpdate, db: Session = 
 
 
 @router.patch("/region")
-async def update_user_region(request: Request, payload: RegionUpdate, db: Session = Depends(get_db)):
-    user_to_update = get_current_user(request, db)  
+async def update_user_region(user:RegionUpdate, db: Session = Depends(get_db)):
+    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
 
     white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
     
     # 지역 예외처리
-    for region in payload.regions:
+    for region in user.regions:
         if region not in white_list:
             raise HTTPException(
                 status_code=400,
@@ -163,7 +163,7 @@ async def update_user_region(request: Request, payload: RegionUpdate, db: Sessio
     db.commit()
 
     # 유저 정보 업데이트
-    for region in payload.regions:
+    for region in user.regions:
         region_id = db.query(Region).filter(Region.name == region).first().id
         stmt = insert(User_Region).values(
             user_id=user_to_update.id, region_id=region_id
@@ -186,8 +186,8 @@ async def update_user_region(request: Request, payload: RegionUpdate, db: Sessio
 
 
 @router.patch("/interest")
-async def update_user_interest(request: Request, payload: InterestUpdate, db: Session = Depends(get_db)):
-    user_to_update = get_current_user(request, db)  
+async def update_user_interest(user: InterestUpdate, db: Session = Depends(get_db)):
+    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
 
     white_list = [
         "액티비티",
@@ -199,7 +199,7 @@ async def update_user_interest(request: Request, payload: InterestUpdate, db: Se
         "배움",
     ]
     # 예외처리
-    for interest in payload.interests:
+    for interest in user.interests:
         if interest not in white_list:
             raise HTTPException(
                 status_code=400,
@@ -213,7 +213,7 @@ async def update_user_interest(request: Request, payload: InterestUpdate, db: Se
     db.commit()
 
     # 유저 정보 업데이트
-    for interest in payload.interests:
+    for interest in user.interests:
         interest_id = (
             db.query(Interest).filter(Interest.name == interest).first().id
         )
@@ -235,11 +235,9 @@ async def update_user_interest(request: Request, payload: InterestUpdate, db: Se
 
 
 #### Work
-
-
 @router.patch("/work")
-async def update_user_work(request: Request, payload: WorkUpdate, db: Session = Depends(get_db)):
-    user_to_update = get_current_user(request, db)  
+async def update_user_work(user: WorkUpdate, db: Session = Depends(get_db)):
+    user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
 
     white_list = [
         "마케팅",
@@ -251,7 +249,7 @@ async def update_user_work(request: Request, payload: WorkUpdate, db: Session = 
         "스포츠",
     ]
     # 예외처리
-    for work in payload.works:
+    for work in user.works:
         if work not in white_list:
             raise HTTPException(
                 status_code=400,
@@ -263,11 +261,9 @@ async def update_user_work(request: Request, payload: WorkUpdate, db: Session = 
     db.commit()
 
     # 유저 정보 업데이트
-    for work in payload.works:
+    for work in user.works:
         work_id = db.query(Work).filter(Work.name == work).first().id
         stmt = insert(User_Work).values(user_id=user_to_update.id, work_id=work_id)
-        print("work_id", work_id)
-        print(stmt)
         db.execute(stmt)
         db.commit()
     db.refresh(user_to_update)
