@@ -6,6 +6,17 @@ import Badge from '@/app/onboarding/_components/Badge';
 import Button from '@/components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import styled from 'styled-components';
+
+const CheckWrapper = styled.div`
+  padding-top: 24px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  > div {
+    height: 53px;
+  }
+`;
 
 export default function Step1() {
   const [nickname, setNickname] = useState('');
@@ -19,17 +30,24 @@ export default function Step1() {
   const socialId = searchParam.get('social_id');
   const provider = searchParam.get('provider');
 
+  const [isInitial, setIsInitial] = useState<boolean | null>(true);
+  const [isDuplicate, setDuplicate] = useState<boolean | null>();
+
   const handleDuplicateCheck = async () => {
     try {
       await PublicAxiosInstance.patch('/users/nickname', {
         social_id: socialId,
         nickname: nickname,
       });
+      setDuplicate(false);
       setIsNicknameUnique(true);
     } catch (e) {
       console.error(e);
+      setDuplicate(true);
       setIsNicknameUnique(false);
       alert('중복된 닉네임입니다.');
+    } finally {
+      setIsInitial(false);
     }
   };
 
@@ -63,7 +81,7 @@ export default function Step1() {
           <p className="font-normal text-md text-gray-3 pt-3">
             6글자 이내로 한글만 입력 가능해요
           </p>
-          <div className="pt-6 flex gap-1 items-center">
+          <CheckWrapper>
             <Input
               placeholder="여섯글자이름"
               value={nickname}
@@ -77,7 +95,16 @@ export default function Step1() {
                 중복확인
               </button>
             </div>
-          </div>
+          </CheckWrapper>
+
+          {!isInitial && isDuplicate && (
+            <span className="text-sm text-[#F00]">중복된 닉네임입니다.</span>
+          )}
+          {!isInitial && !isDuplicate && (
+            <span className="text-sm text-[#00F]">
+              사용 가능한 닉네임입니다.
+            </span>
+          )}
         </div>
       </div>
       <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
