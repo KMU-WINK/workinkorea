@@ -18,9 +18,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 def create_jwt_token(user_social_id: str):
     # JWT 토큰 생성
-    print("socail_id", user_social_id)
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode = {"socail_id": user_social_id, "exp": expire}
+    to_encode = {"social_id": user_social_id, "exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -309,10 +308,10 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     )
 
     social_id: str = verify_jwt_token(token)
-    print(social_id)
+
     # 사용자 조회 로직
     user = db.query(User).filter(User.social_id == social_id).first()
-    print(user)
+
     if user is None:
         raise credentials_exception
 
