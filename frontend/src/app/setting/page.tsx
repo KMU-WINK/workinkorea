@@ -34,14 +34,14 @@ export default function Setting() {
   }, []);
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="max-w-sm h-full overflow-hidden relative w-full">
-        <Header
-          onLeftClick={backButtonClick}
-          text="설정"
-          rightText="수정"
-          onRightClick={modifyClick}
-        />
-        <div className="mt-6 mb-[18px] mx-auto rounded-full overflow-hidden w-[50px] h-[50px] relative">
+      <Header
+        onLeftClick={backButtonClick}
+        text="설정"
+        rightText="수정"
+        onRightClick={modifyClick}
+      />
+      <div className="pt-[84px] max-w-sm h-full overflow-hidden relative w-full">
+        <div className="mb-[18px] mx-auto rounded-full overflow-hidden w-[50px] h-[50px] relative">
           {/*유저 이미지 받아오기*/}
           <Image src={ProfileDefault} alt="profile-image" fill />
         </div>

@@ -37,7 +37,7 @@ export default function SettingModify() {
     nickname: '',
     gender: '',
     work: '',
-    region: '',
+    region: '부산',
     interests: [],
   });
   const [birth, setBirth] = useState<string>('');
@@ -48,7 +48,7 @@ export default function SettingModify() {
   const router = useRouter();
 
   // todo : 전역 변수로 저장되어있는 social_id 가져오기
-  const socialId = '';
+  const socialId = '3715601705';
 
   const additionalItems = [
     {
@@ -156,8 +156,8 @@ export default function SettingModify() {
 
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="max-w-sm h-full relative w-full">
-        <Header text="설정" rightText="완료" onRightClick={submitClick} />
+      <Header text="설정" rightText="완료" onRightClick={submitClick} />
+      <div className="pt-[60px] max-w-sm h-full relative w-full">
         {/*프로필 사진*/}
         <input
           type="file"

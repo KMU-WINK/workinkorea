@@ -21,13 +21,6 @@ export default function DropDown({
     setIsOpen(!isOpen);
   };
 
-  // const getIcon = () => {
-  //   if (type === 'category') {
-  //     return <Character className="mr-1" />;
-  //   }
-  //   return <Map className="mr-2" />;
-  // };
-
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (
@@ -57,11 +50,11 @@ export default function DropDown({
     >
       <div className="mr-2">{icon}</div>
       <span>{selectedOption}</span>
-      <div className={`mx-2 transform  ${isOpen ? 'rotate-180' : ''}`}>
+      <div className={`ml-2 transform  ${isOpen ? 'rotate-180' : ''}`}>
         <Dropdown />
       </div>
       {isOpen && (
-        <ul className="absolute top-full left-0 pt-1 w-32 bg-white shadow-lg z-10">
+        <ul className="absolute top-full left-0 pt-1 bg-white shadow-lg z-10">
           {options.map(option => (
             <li
               key={option}
@@ -69,7 +62,7 @@ export default function DropDown({
                 setSelectedOption(option);
                 setIsOpen(false);
               }}
-              className="px-4 py-2 hover:bg-gray-1 cursor-pointer"
+              className="px-5 py-2 hover:bg-gray-1 cursor-pointer whitespace-nowrap"
             >
               {option}
             </li>

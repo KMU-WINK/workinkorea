@@ -29,7 +29,7 @@ export default function ModifyTour() {
   ];
 
   // todo : 전역 변수로 저장되어있는 social_id 가져오기
-  const socialId = '';
+  const socialId = '3715601705';
   const backClick = () => {
     router.back();
   };
@@ -58,8 +58,8 @@ export default function ModifyTour() {
   };
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="max-w-sm h-full overflow-hidden relative w-full">
-        <Header onLeftClick={backClick} />
+      <Header onLeftClick={backClick} />
+      <div className="pt-[60px] max-w-sm h-full overflow-hidden relative w-full">
         <div className="mt-4 mx-6">
           <p className="font-light text-xl">무엇을 하며 지내고 싶으신가요?</p>
           <div className="mt-4">
@@ -77,13 +77,11 @@ export default function ModifyTour() {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-0 bg-white max-w-sm">
-        <Button
-          text="완료하기"
-          isAllowed={selectedOptions.length > 0}
-          onClick={selectButtonClick}
-        />
-      </div>
+      <Button
+        text="완료하기"
+        isAllowed={selectedOptions.length > 0}
+        onClick={selectButtonClick}
+      />
     </div>
   );
 }
