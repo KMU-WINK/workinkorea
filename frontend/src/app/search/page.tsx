@@ -64,7 +64,7 @@ export default function Search() {
                   placeholder="검색어를 입력해주세요"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 text-gray-3 outline-none"
+                  className="w-full px-4 py-2 text-black outline-none placeholder:text-gray-3"
                 />
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function Search() {
             </div>
           </div>
         </div>
-        <div className="w-full px-4 py-4">
+        <div className="w-full fixed bottom-0 flex justify-center items-center sm:max-w-sm">
           <Button onClick={handleSearch} isAllowed text="검색하기" />
         </div>
       </div>
