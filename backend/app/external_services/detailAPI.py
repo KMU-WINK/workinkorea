@@ -51,7 +51,7 @@ def get_common(contentId, contentTypeId):
     #                         "modifiedtime": "20240724145559",
     #                         "tel": "",
     #                         "telname": "",
-    #                         "homepage": '<a href="https://royal.khs.go.kr/ROYAL/contents/menuInfo-gbg.do?grpCode=gbg" target="_blank" title="새창 : 경복궁 홈페이지로 이동">https://royal.khs.go.kr/</a>',
+    #                         "homepage": '<a href="http://royal.khs.go.kr/ROYAL/contents/menuInfo-gbg.do?grpCode=gbg" target="_blank" title="새창 : 경복궁 홈페이지로 이동">http://royal.khs.go.kr/</a>',
     #                         "booktour": "1",
     #                         "firstimage": "http://tong.visitkorea.or.kr/cms/resource/33/2678633_image2_1.jpg",
     #                         "firstimage2": "http://tong.visitkorea.or.kr/cms/resource/33/2678633_image3_1.jpg",
@@ -148,7 +148,7 @@ def get_intro(contentId, contentTypeId):
 
 
 # 12) [반복정보조회] 오퍼레이션조회	54
-info_ENDPOINT = "https://apis.data.go.kr/B551011/KorService1/detailInfo1"
+info_ENDPOINT = "http://apis.data.go.kr/B551011/KorService1/detailInfo1"
 
 
 def get_info(contentId, contentTypeId):
@@ -241,7 +241,7 @@ def get_info(contentId, contentTypeId):
 
 
 # 13) [이미지정보조회] 오퍼레이션명세	61
-image_ENDPOINT = "https://apis.data.go.kr/B551011/KorService1/detailImage1"
+image_ENDPOINT = "http://apis.data.go.kr/B551011/KorService1/detailImage1"
 
 
 def get_image(contentId):

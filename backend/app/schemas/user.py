@@ -19,13 +19,13 @@ class NicknameUpdate(BaseModel):
     nickname: str
 
 
-class UserRegionUpdate(UserBase):
+class RegionUpdate(BaseModel):
     regions: List[str]
 
 
-class UserInterestUpdate(UserBase):
+class InterestUpdate(BaseModel):
     interests: List[str]
 
 
-class UserWorkUpdate(UserBase):
+class WorkUpdate(BaseModel):
     works: List[str]

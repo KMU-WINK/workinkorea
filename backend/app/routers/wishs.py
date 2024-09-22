@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
+from ..db.session import get_db
 from ..models.User import User
 from ..models.Spot import Spot
 from ..models.Stay import Stay
 from ..models.Job import Job
-from ..db.session import get_db
+from ..models.Wish import WishBase
+from .auth import get_current_user
 
 router = APIRouter(
     prefix="/wishs",
@@ -14,14 +16,11 @@ router = APIRouter(
 
 @router.get("")
 async def get_spot_wish(
-    social_id: str,
+    request: Request,
     db: Session = Depends(get_db),
 ):
-    current_user = db.query(User.id).filter(User.social_id == social_id).first()
-    if not current_user:
-        raise HTTPException(
-            status_code=400, detail=f"user does not exist. social_id : {social_id}"
-        )
+    current_user = get_current_user(request, db)
+
     spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
     stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
     job_wish = db.query(Job).filter(Job.user_id == current_user.id).all()
@@ -45,24 +44,20 @@ async def get_spot_wish(
 
 @router.post("")
 async def add_spot_wish(
-    type: str,
-    social_id: str,
-    contentTypeId: str,
-    contentId: str,
+    request: Request,
+    payload: WishBase,
     db: Session = Depends(get_db),
 ):
-    if type not in ["spot", "stay", "job"]:
+    typeOfWish = payload.type
+    contentTypeId = payload.content
+    contentId = payload.contentId
+    if typeOfWish not in ["spot", "stay", "job"]:
         raise HTTPException(
             status_code=400, detail="type must be in [ spot, stay, job ]"
         )
-    current_user = db.query(User.id).filter(User.social_id == social_id).first()
+    current_user = get_current_user(request, db)
 
-    if not current_user:
-        raise HTTPException(
-            status_code=400, detail=f"user does not exist. social_id : {social_id}"
-        )
-
-    if type == "spot":
+    if typeOfWish == "spot":
         chk_wish = (
             db.query(Spot)
             .filter(
@@ -79,7 +74,7 @@ async def add_spot_wish(
             content_type_id=contentTypeId,
             content_id=contentId,
         )
-    elif type == "stay":
+    elif typeOfWish == "stay":
         chk_wish = (
             db.query(Stay)
             .filter(
@@ -96,7 +91,7 @@ async def add_spot_wish(
             content_type_id=contentTypeId,
             content_id=contentId,
         )
-    elif type == "job":
+    elif typeOfWish == "job":
         chk_wish = (
             db.query(Job)
             .filter(
@@ -124,23 +119,21 @@ async def add_spot_wish(
 
 @router.delete("")
 async def delete_spot_wish(
-    type: str,
-    social_id: str,
-    contentTypeId: str,
-    contentId: str,
+    request: Request,
+    payload: WishBase,
     db: Session = Depends(get_db),
 ):
-    if type not in ["spot", "stay", "job"]:
+    typeOfWish = payload.type
+    contentTypeId = payload.content
+    contentId = payload.contentId
+    if typeOfWish not in ["spot", "stay", "job"]:
         raise HTTPException(
             status_code=400, detail="type must be in [ spot, stay, job ]"
         )
 
-    current_user = db.query(User.id).filter(User.social_id == social_id).first()
-    if not current_user:
-        raise HTTPException(
-            status_code=400, detail=f"user does not exist. social_id : {social_id}"
-        )
-    if type == "spot":
+    current_user = get_current_user(request, db)
+
+    if typeOfWish == "spot":
         chk_wish = (
             db.query(Spot)
             .filter(
@@ -157,7 +150,7 @@ async def delete_spot_wish(
             Spot.content_type_id == contentTypeId,
             Spot.content_id == contentId,
         ).delete()
-    elif type == "stay":
+    elif typeOfWish == "stay":
         chk_wish = (
             db.query(Stay)
             .filter(
@@ -174,7 +167,7 @@ async def delete_spot_wish(
             Stay.content_type_id == contentTypeId,
             Stay.content_id == contentId,
         ).delete()
-    elif type == "job":
+    elif typeOfWish == "job":
         chk_wish = (
             db.query(Job)
             .filter(
@@ -197,9 +190,11 @@ async def delete_spot_wish(
     return {
         "result": "delete success",
         "data": {
-            "type": type,
-            "social_id": social_id,
-            "contentTypeId": contentTypeId,
-            "contentId": contentId,
+            "target_user_nickname": current_user.nickname,
+            "deleted_wish_item": {
+                "type": typeOfWish,
+                "contentTypeId": contentTypeId,
+                "contentId": contentId,
+            },
         },
     }
