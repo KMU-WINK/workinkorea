@@ -8,6 +8,7 @@ class Stay(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    content_type_id = Column(String)
     content_id = Column(String)
 
     # User와의 일대일 관계 설정

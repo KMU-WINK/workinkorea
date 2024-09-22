@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import SelectButton from '@/components//SelectButton';
 import Button from '@/components/Button';
 import Activity from 'public/svgs/emoji/paragliding.svg';
@@ -20,7 +20,7 @@ export default function Step3() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
-  const provider = searchParam.get('provider');
+  const router = useRouter();
 
   const handleNextClick = async () => {
     try {
@@ -28,11 +28,11 @@ export default function Step3() {
         social_id: socialId,
         interests: selectedOptions,
       });
-      // await PublicAxiosInstance.patch('/users/interest', {
-      //   social_id: socialId,
-      //   interests: selectedOptions,
-      // });
-      await PublicAxiosInstance.get(`/auth/token?social_id=${socialId}`);
+      const data = await PublicAxiosInstance.get(
+        `/auth/token?social_id=${socialId}`,
+      );
+      const redirectUrl = data.data.redirect_url;
+      router.push(redirectUrl);
     } catch (e) {
       if (axios.isAxiosError(e)) {
         if (e.response?.status === 422) {
@@ -62,8 +62,8 @@ export default function Step3() {
   ];
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between">
-      <div className="px-6">
+    <div className="flex justify-center min-h-screen">
+      <div className="w-full max-w-[393px] flex flex-col items-start px-6 mb-[90px]">
         <div className="py-3 min-h-14">
           {/* 백 버튼이 필요하다면 여기에 추가할 수 있음 */}
         </div>
@@ -75,11 +75,8 @@ export default function Step3() {
           <Badge number={5} isSelected />
         </div>
 
-        <div className="pt-6">
+        <div className="pt-6 w-full">
           <p className="font-light text-xl">어떤 일을 하고 싶으신가요?</p>
-          <p className="font-normal text-md text-gray-3 pt-3">
-            최대 0개까지 선택 가능하며 나중에 설정에서 변경할 수 있어요.
-          </p>
           <div className="pt-5">
             {options.map((option, index) => (
               <div className="pt-2" key={index}>
@@ -95,7 +92,7 @@ export default function Step3() {
           </div>
         </div>
       </div>
-      <div className="w-full fixed bottom-0 bg-white">
+      <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
           isAllowed={selectedOptions.length > 0}

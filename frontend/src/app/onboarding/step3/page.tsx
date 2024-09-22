@@ -21,7 +21,7 @@ export default function Step3() {
   const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
-  // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
+  // 서버에서 클라이언트로 전달하는 search param 을 로컬 변수에 저장
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
   const provider = searchParam.get('provider');
@@ -60,8 +60,8 @@ export default function Step3() {
   };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between">
-      <div className="px-6">
+    <div className="flex justify-center min-h-screen">
+      <div className="w-full max-w-[393px] flex flex-col items-start px-6 mb-[90px]">
         <div className="py-3 min-h-14">
           {/* 백 버튼이 필요하다면 여기에 추가할 수 있음 */}
         </div>
@@ -77,10 +77,10 @@ export default function Step3() {
           <p className="font-light text-xl">
             머무르고 싶은 장소 한 곳을 선택해주세요.
           </p>
-          <p className="font-normal text-md text-gray-3 pt-3">
+          <p className="font-normal text-[14px] text-gray-3 pt-3">
             1개만 선택할 수 있어요. 나중에 설정에서 변경할 수 있어요.
           </p>
-          <div className="pt-5 grid grid-cols-2 gap-2">
+          <div className="pt-5 grid grid-cols-2 gap-2 overflow-y-auto">
             {locations.map(location => (
               <ImageButton
                 key={location.name}
@@ -101,7 +101,7 @@ export default function Step3() {
           </div>
         </div>
       </div>
-      <div className="w-full fixed bottom-0 bg-white">
+      <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
           isAllowed={typeof selectedLocation === 'string'}
