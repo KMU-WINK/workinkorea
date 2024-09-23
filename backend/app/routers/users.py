@@ -88,7 +88,7 @@ async def read_user(request: Request, db: Session = Depends(get_db)):
     # current_user = db.query(User).filter(User.id == 1).first() #for test
 
     if current_user is None:
-        raise HTTPException(status_code=400, detail=f"user not found. request.header.Authorization: {request.headers.get("Authorization")}")
+        raise HTTPException(status_code=400, detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}")
 
     region_names = get_regions_by_id(current_user.id, db)
     interest_names = get_interests_by_id(current_user.id, db)

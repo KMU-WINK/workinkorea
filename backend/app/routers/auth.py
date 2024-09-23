@@ -50,7 +50,9 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/kakao")
-async def kakaoAuth(code: str, db: Session = Depends(get_db)):
+async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
+    is_dev_mode = request.client.host == '127.0.0.1'
+        
     client_id = os.getenv("KAKAO_REST_API_KEY")
     redirect_uri = os.getenv("KAKAO_REDIRECT_URI")
 
@@ -65,11 +67,12 @@ async def kakaoAuth(code: str, db: Session = Depends(get_db)):
         raise ValueError("Access token not found in response")
 
     # login 호출 시 await 추가
-    return await login(access_token=access_token, provider="kakao", db=db)
+    return await login(access_token=access_token, provider="kakao", db=db, is_dev_mode=is_dev_mode)
 
 
 @router.get("/naver")
-async def naverAuth(state: str, code: str, db: Session = Depends(get_db)):
+async def naverAuth(state: str, code: str, request: Request, db: Session = Depends(get_db)):
+    is_dev_mode = request.client.host == '127.0.0.1'
     client_id = os.getenv("NAVER_CLIENT_ID")
     client_secret = os.getenv("NAVER_CLIENT_SECRET")
     redirect_uri = os.getenv("NAVER_REDIRECT_URI")
@@ -88,11 +91,12 @@ async def naverAuth(state: str, code: str, db: Session = Depends(get_db)):
     if not access_token:
         raise ValueError("Access token not found in response")
 
-    return await login(access_token=access_token, provider="naver", db=db)
+    return await login(access_token=access_token, provider="naver", db=db, is_dev_mode=is_dev_mode)
 
 
 @router.get("/google")
-async def googleAuth(state: str, code: str, db: Session = Depends(get_db)):
+async def googleAuth(state: str, code: str, request: Request, db: Session = Depends(get_db)):
+    is_dev_mode = request.client.host == '127.0.0.1'
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
@@ -113,7 +117,7 @@ async def googleAuth(state: str, code: str, db: Session = Depends(get_db)):
     if not access_token:
         raise ValueError("Access token not found in response")
 
-    return await login(access_token=access_token, provider="google", db=db)
+    return await login(access_token=access_token, provider="google", db=db, is_dev_mode=is_dev_mode)
 
 
 # get_user는 비동기가 아니므로 async나 await가 필요하지 않음.
@@ -125,7 +129,7 @@ def get_user(social_id: str, provider: str, db: Session):
     )
 
 
-async def login(access_token: str, provider: str, db: Session):
+async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool):
     async with httpx.AsyncClient() as client:
         if provider == "kakao":
             user_info = (
@@ -159,6 +163,9 @@ async def login(access_token: str, provider: str, db: Session):
 
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
     client_url = os.getenv("WINK_CLIENT_URI")
+    
+    if (is_dev_mode):
+        client_url = 'http://127.0.0.1:3000'
 
     # 회원 가입이 되어있지 않은 유저
     if not user:
