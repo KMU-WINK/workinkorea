@@ -99,11 +99,13 @@ def get_info(contentId, contentTypeId):
 
     if response.headers.get("Content-Type") == "application/json":
         data = response.json()
-        return (
-            data["response"]["body"]["items"]["item"]
-            if data["response"]["body"]["items"]
-            else None
-        )
+        return {
+            "info": (
+                data["response"]["body"]["items"]["item"]
+                if data["response"]["body"]["items"]
+                else None
+            )
+        }
     else:
         raise Exception(
             "TOUR API ERROR : Limited number of service requests exceeds error in GET_INFO"
@@ -130,11 +132,13 @@ def get_image(contentId):
 
     if response.headers.get("Content-Type") == "application/json":
         data = response.json()
-        return (
-            data["response"]["body"]["items"]["item"]
-            if data["response"]["body"]["items"]
-            else None
-        )
+        return {
+            "images": (
+                data["response"]["body"]["items"]["item"]
+                if data["response"]["body"]["items"]
+                else None
+            )
+        }
     else:
         raise Exception(
             "TOUR API ERROR : Limited number of service requests exceeds error in GET_IMAGE"
