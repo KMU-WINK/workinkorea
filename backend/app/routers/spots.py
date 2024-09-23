@@ -49,9 +49,13 @@ async def spot_stay_detail(contentId: int, contentTypeId: int):
     combined_dict = {}
 
     # 딕셔너리들을 순차적으로 합치기
+    print("common", common)
     combined_dict.update(common)
+    print("intro", intro)
     combined_dict.update(intro)
+    print("info", info)
     combined_dict.update(info)
+    print("image", image)
     combined_dict.update(image)
 
     # 결과 확인
