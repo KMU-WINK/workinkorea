@@ -108,3 +108,12 @@ export interface JobInfo {
   corpoNm?: string; // 기업명 -> open
   corpoLogoFileUrl?: string; // 기업로고파일 URL -> open
 }
+
+export interface MapListInfo {
+  contentid: string;
+  title: string;
+  addr1: string;
+  firstImage: string;
+  mapx: string;
+  mapy: string;
+}

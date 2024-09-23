@@ -5,11 +5,13 @@ import Slider, { Settings } from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Card from '@/components/Card';
-import { FeedProps } from '@/types/type';
+import { FeedProps, MapListInfo } from '@/types/type';
 import styled from 'styled-components';
 import Input from '@/components/Input';
 import Back from '../../../public/svgs/back.svg';
 import Filter from '../../../public/svgs/filter.svg';
+import { useSearchParams } from 'next/navigation';
+import { getSpotLists } from '@/services/location';
 
 // kakao 라는 객체가 window에 존재하고 있다고 인식시켜주기 위함
 declare global {
@@ -22,6 +24,19 @@ type MarkersType = {
   [index: number]: any;
 };
 
+interface BoundsType {
+  ha: number;
+  oa: number;
+  pa: number;
+  qa: number;
+}
+
+interface FetchApiProps {
+  mapX: string;
+  mapY: string;
+  keyword: string | null;
+  radius?: number;
+}
 const testData: FeedProps[] = [
   {
     contentid: 1,
@@ -104,19 +119,37 @@ const SliderContainer = styled.div`
 `;
 
 export default function Map() {
+  // 지도 화면을 띄우기 위한 ref
   const mapRef = useRef<HTMLDivElement>(null);
+
+  // marker 관련 state
   const markerImageSrc = '/svgs/ping.svg';
   const activeMarkerImageSrc = '/svgs/ping-active.svg';
   const activeMarkerRef = useRef<any>(null);
-  const mapObjectRef = useRef<any>(null);
-  const sliderRef = useRef<Slider | null>(null);
-  const [markers, setMarkers] = useState<MarkersType>({});
+  const [markers, setMarkers] = useState<any[]>([]);
 
-  const [inputValue, setInputValue] = useState('');
+  // map object 관련 state
+  const mapObjectRef = useRef<any>(null);
+  const [bounds, setBounds] = useState<BoundsType>();
+  const centerLng = useRef({
+    latitude: 0,
+    longitude: 0,
+  });
+
+  const [mapList, setMapList] = useState<MapListInfo[]>([]);
+
+  const sliderRef = useRef<Slider | null>(null);
+
+  const searchParams = useSearchParams();
+
+  const type = searchParams.get('type');
+  const keyword = searchParams.get('keyword');
+  const contentId = searchParams.get('contentId');
+  const contentTypeId = searchParams.get('contentTypeId');
 
   // 카드 슬라이드시 이벤트 함수
   const onSlideChange = (index: number) => {
-    const currentMarker = markers[Math.round(index) + 1];
+    const currentMarker = markers[Math.round(index)];
     // 마커 이미지
     const markerImage = new window.kakao.maps.MarkerImage(
       markerImageSrc,
@@ -151,22 +184,112 @@ export default function Map() {
     },
   };
 
-  const onWishClick = (id: number) => {
+  const onWishClick = (id: string) => {
     console.log(id);
     // api 연동 예정
   };
 
+  const fetchLocationLists = async ({
+    mapX,
+    mapY,
+    keyword,
+    radius,
+  }: FetchApiProps) => {
+    if (true) {
+      // feed에서 지도로 이동했을 경우
+      const result = await getSpotLists({
+        mapX,
+        mapY,
+        keyword,
+        radius,
+      });
+      console.log(result);
+      setMapList(result.items.item);
+    } else if (contentId) {
+      // detail에서 지도로 이동했을 경우
+      // 얘는 근데 따로 빼도 될듯
+    } else {
+      // 정상적인 루트가 아닐 경우
+    }
+  };
+
   useEffect(() => {
+    // 중심좌표 저장하기
+    centerLng.current = {
+      latitude: 33.4759722639,
+      longitude: 126.5481687628,
+    };
+    fetchLocationLists({
+      mapX: '126.5481687628',
+      mapY: '33.4759722639',
+      radius: 1000,
+      keyword,
+    });
     window.kakao.maps.load(() => {
       const options = {
         // 지도 중심 좌표
-        center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+        center: new window.kakao.maps.LatLng(33.4759722639, 126.5481687628),
         level: 3,
       };
 
       const map = new window.kakao.maps.Map(mapRef.current, options);
       mapObjectRef.current = map;
+      // 스케일별로 그냥 비교하면서 레벨이랑 대충 때려 맞추자
 
+      // 지도 이동 이벤트 리스너
+      window.kakao.maps.event.addListener(map, 'zoom_changed', function () {
+        console.log(map.getLevel());
+      });
+
+      window.kakao.maps.event.addListener(map, 'dragend', async function () {
+        const newBounds: BoundsType = map.getBounds();
+
+        // 이전 중심좌표의 경도 > 우측좌표 OR 이전 중심좌표의 경도 < 좌측좌표
+        if (
+          centerLng.current.longitude > newBounds.oa ||
+          centerLng.current.longitude < newBounds.ha
+        ) {
+          // todo: 이부분 중복코드니까 함수로 만들까
+          const newCenter = map.getCenter();
+          // 새로운 중심좌표를 기준으로 하여 api 호출
+          // await fetchLocationLists({
+          //   mapX: newCenter.La,
+          //   mapY: newCenter.Ma,
+          //   keyword,
+          //   radius: 5000,
+          // });
+          // 중심좌표 업데이트
+          centerLng.current = {
+            latitude: newCenter.Ma,
+            longitude: newCenter.La,
+          };
+        }
+
+        // 이전 중심좌표의 위도 > 위쪽 좌표 OR 이전 중심좌표 위도 < 아래 좌표
+        if (
+          centerLng.current.latitude > newBounds.pa ||
+          centerLng.current.latitude < newBounds.qa
+        ) {
+          const newCenter = map.getCenter();
+          // 새로운 중심좌표를 기준으로 하여 api 호출
+          // await fetchLocationLists({
+          //   mapX: newCenter.La,
+          //   mapY: newCenter.Ma,
+          //   keyword,
+          //   radius: 5000,
+          // });
+          // 중심좌표 업데이트
+          centerLng.current = {
+            latitude: map.getCenter().Ma,
+            longitude: map.getCenter().La,
+          };
+        }
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    window.kakao.maps.load(() => {
       // 마커 이미지
       const markerImage = new window.kakao.maps.MarkerImage(
         markerImageSrc,
@@ -178,21 +301,21 @@ export default function Map() {
       );
 
       // 여러개 마커 생성
-      testData.forEach(list => {
+      mapList.forEach(list => {
         const marker = new window.kakao.maps.Marker({
-          map,
-          position: new window.kakao.maps.LatLng(list.mapx, list.mapy),
+          position: new window.kakao.maps.LatLng(list.mapy, list.mapx),
           id: list.contentid,
           title: list.title,
           image: markerImage,
           clickable: true,
         });
 
+        marker.setMap(mapObjectRef.current);
+
         // 마커 객체 저장
-        setMarkers(prevData => ({
-          ...prevData,
-          [list.contentid]: marker,
-        }));
+        setMarkers(prevData => [...prevData, marker]);
+
+        console.log(markers);
 
         // 마커 클릭 이벤트
         window.kakao.maps.event.addListener(marker, 'click', () => {
@@ -207,7 +330,7 @@ export default function Map() {
         });
       });
     });
-  }, []);
+  }, [mapList]);
 
   return (
     <div className="h-screen flex justify-center items-center">
@@ -229,16 +352,15 @@ export default function Map() {
             /* eslint-disable-next-line react/jsx-props-no-spreading */
             {...sliderSettings}
           >
-            {testData.map(list => (
+            {mapList?.map(list => (
               <Card
                 key={list.contentid}
                 id={list.contentid}
-                cardType={list.cardType}
-                serviceType={list.serviceType}
+                cardType="map"
+                serviceType="default"
                 title={list.title}
-                location={list.location}
-                image={list.image}
-                price={0}
+                location={list.addr1}
+                image={list.firstImage || '/svgs/job-default.svg'}
                 onCardClick={() => {}}
                 onWishListClick={onWishClick}
               />
