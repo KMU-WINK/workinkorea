@@ -173,11 +173,6 @@ export default function Card({
                 </Price>
               </>
             )}
-            {serviceType === 'default' && cardType === 'map' && (
-              <Price $cardType={cardType}>
-                {price?.toLocaleString('ko-KR')}원~
-              </Price>
-            )}
             {cardType === 'map' && (
               <WishButton
                 type="button"
