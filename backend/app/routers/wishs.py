@@ -21,61 +21,34 @@ async def get_wish(
 ):
     current_user = get_current_user(request, db)
 
-    spot_wish = await db.query(Spot).filter(Spot.user_id == current_user.id).all()
-    stay_wish = await db.query(Stay).filter(Stay.user_id == current_user.id).all()
-    job_wish = await db.query(Job).filter(Job.user_id == current_user.id).all()
+    spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
+    stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
+    job_wish = db.query(Job).filter(Job.user_id == current_user.id).all()
 
+    result = []
+
+    tmp = {}
     # id 필드를 제거
     for item in spot_wish:
-        del item.id
-        del item.user_id
-        item.type = "spot"
+        tmp["contenttypeid"] = item.content_type_id
+        tmp["contentid"] = item.content_id
+        tmp["type"] = "spot"
+        result.append(tmp)
+        tmp = {}
     for item in stay_wish:
-        del item.id
-        del item.user_id
-        item.type = "stay"
+        tmp["contenttypeid"] = item.content_type_id
+        tmp["contentid"] = item.content_id
+        tmp["type"] = "stay"
+        result.append(tmp)
+        tmp = {}
     for item in job_wish:
-        del item.id
-        del item.user_id
-        item.type = "job"
+        tmp["contenttypeid"] = item.content_type_id
+        tmp["contentid"] = item.content_id
+        tmp["type"] = "job"
+        result.append(tmp)
+        tmp = {}
 
-    return spot_wish + stay_wish + job_wish
-
-
-# check is in wish list
-async def get_spot_wish_by_type(
-    request: Request,
-    api_type: str,
-    db: Session = Depends(get_db),
-):
-    is_user = request.headers.get("Authorization")
-
-    if not is_user:
-        return False
-    else:
-        current_user = get_current_user(request, db)
-
-    if api_type == "job":
-        job_wish = await db.query(Job).filter(Job.user_id == current_user.id).all()
-        for item in job_wish:
-            del item.id
-            del item.user_id
-            item.type = "job"
-        return job_wish
-    elif api_type == "stay":
-        stay_wish = await db.query(Stay).filter(Stay.user_id == current_user.id).all()
-        for item in stay_wish:
-            del item.id
-            del item.user_id
-            item.type = "stay"
-        return stay_wish
-    elif api_type == "spot":
-        spot_wish = await db.query(Spot).filter(Spot.user_id == current_user.id).all()
-        for item in spot_wish:
-            del item.id
-            del item.user_id
-            item.type = "spot"
-        return spot_wish
+    return result
 
 
 @router.post("")

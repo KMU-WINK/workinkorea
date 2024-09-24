@@ -38,7 +38,7 @@ AREA_CODE = {
 ENDPOINT_region = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1"
 
 
-def get_spots_by_region(area: str, pageNo: int = 1):
+def get_spots_by_region(area: str, pageNo: int = 1, wishs=False):
 
     white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
     if area not in white_list:
@@ -64,12 +64,15 @@ def get_spots_by_region(area: str, pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
+        if wishs:
+            for item in data["response"]["body"]["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
         return data["response"]["body"]
     else:
         raise ValueError("No data found")
 
 
-def get_stays_by_region(area: str, pageNo: int = 1):
+def get_stays_by_region(area: str, pageNo: int = 1, wishs=False):
 
     white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
     if area not in white_list:
@@ -95,6 +98,9 @@ def get_stays_by_region(area: str, pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
+        if wishs:
+            for item in data["response"]["body"]["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
         return data["response"]["body"]
     else:
         raise ValueError("No data found")
@@ -104,7 +110,7 @@ def get_stays_by_region(area: str, pageNo: int = 1):
 ENDPOINT_keyword = "http://apis.data.go.kr/B551011/KorService1/searchKeyword1"
 
 
-def get_spots(keyword: str, pageNo: int = 1):
+def get_spots(keyword: str, pageNo: int = 1, wishs=False):
     if not len(keyword):
         raise ValueError("area or keyword is required")
 
@@ -133,12 +139,15 @@ def get_spots(keyword: str, pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
+        if wishs:
+            for item in data["response"]["body"]["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
         return data["response"]["body"]
     else:
         raise ValueError("No data found")
 
 
-def get_stays(keyword: str, pageNo: int = 1):
+def get_stays(keyword: str, pageNo: int = 1, wishs=False):
     if not len(keyword):
         raise ValueError("area or keyword is required")
 
@@ -163,13 +172,18 @@ def get_stays(keyword: str, pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
+        if wishs:
+            for item in data["response"]["body"]["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
         return data["response"]["body"]
     else:
         raise ValueError("No data found")
 
 
 # 둘 다 사용하기
-def get_stays_by_region_and_keyword(keyword: str, area: str, pageNo: int = 1):
+def get_stays_by_region_and_keyword(
+    keyword: str, area: str, pageNo: int = 1, wishs=False
+):
     if not len(keyword):
         raise ValueError("area or keyword is required")
 
@@ -200,12 +214,17 @@ def get_stays_by_region_and_keyword(keyword: str, area: str, pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
+        if wishs:
+            for item in data["response"]["body"]["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
         return data["response"]["body"]
     else:
         raise ValueError("No data found")
 
 
-def get_spots_by_region_and_keyword(keyword: str, area: str, pageNo: int = 1):
+def get_spots_by_region_and_keyword(
+    keyword: str, area: str, pageNo: int = 1, wishs=False
+):
     if not len(keyword):
         raise ValueError("area or keyword is required")
 
@@ -236,6 +255,9 @@ def get_spots_by_region_and_keyword(keyword: str, area: str, pageNo: int = 1):
     data = response.json()
 
     if data["response"]["body"]["items"]:
+        if wishs:
+            for item in data["response"]["body"]["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
         return data["response"]["body"]
     else:
         raise ValueError("No data found")

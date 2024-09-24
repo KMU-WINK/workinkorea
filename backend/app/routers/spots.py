@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Depends
 from ..external_services.areaBasedAPI import (
     get_spots,
     get_spots_by_region,
@@ -6,6 +6,11 @@ from ..external_services.areaBasedAPI import (
 )
 from ..external_services.detailAPI import get_common, get_intro, get_info, get_image
 from ..external_services.locationBaseAPI import get_location_based_list
+from sqlalchemy.orm import Session
+
+from ..db.session import get_db
+from .auth import get_current_user
+from ..models.Spot import Spot
 
 # from datetime import datetime
 
@@ -18,25 +23,41 @@ router = APIRouter(
 
 
 @router.get("")
-async def read_stays(area: str = "", keyword: str = "", pageNo: int = 1):
+async def read_stays(
+    request: Request,
+    area: str = "",
+    keyword: str = "",
+    pageNo: int = 1,
+    db: Session = Depends(get_db),
+):
     if len(area) == 0 and len(keyword) == 0:
         raise HTTPException(
             status_code=400, detail="Please provide either area or keyword"
         )
     try:
+        wishs = False
+        if request.headers.get("Authorization"):
+            current_user = get_current_user(request, db)
+            stay_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
+            wishs = [wish.content_id for wish in stay_wish]
         if len(area) > 0 and len(keyword) == 0:
-            data = get_spots_by_region(area, pageNo)
+            data = get_spots_by_region(area, pageNo, wishs)
         elif len(area) == 0 and len(keyword) > 0:
-            data = get_spots(keyword, pageNo)
+            data = get_spots(keyword, pageNo, wishs)
         else:  # both area and keyword are provided
-            data = get_spots_by_region_and_keyword(keyword, area, pageNo)
+            data = get_spots_by_region_and_keyword(keyword, area, pageNo, wishs)
         return data
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/detail")
-async def spot_stay_detail(contentId: int, contentTypeId: int):
+async def spot_stay_detail(
+    request: Request,
+    contentId: int,
+    contentTypeId: int,
+    db: Session = Depends(get_db),
+):
     try:
         common = get_common(contentId, contentTypeId)
         intro = get_intro(contentId, contentTypeId)
@@ -49,17 +70,18 @@ async def spot_stay_detail(contentId: int, contentTypeId: int):
     combined_dict = {}
 
     # 딕셔너리들을 순차적으로 합치기
-    print("common", common)
     combined_dict.update(common)
-    print("intro", intro)
     combined_dict.update(intro)
-    print("info", info)
     combined_dict.update(info)
-    print("image", image)
     combined_dict.update(image)
 
+    if request.headers.get("Authorization"):
+        current_user = get_current_user(request, db)
+        stay_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
+        wishs = [wish.content_id for wish in stay_wish]
+        combined_dict["inWish"] = combined_dict["contentid"] in wishs
     # 결과 확인
-    # print(combined_dict)
+    print(combined_dict["contentid"])
     return combined_dict
 
 
