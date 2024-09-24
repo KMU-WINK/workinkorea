@@ -20,6 +20,7 @@ import {
 import { formatSalary } from '../../../utils/stringUtils';
 import { JobInfo } from '@/types/type';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { getJobDetail } from '@/services/jobs';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -79,9 +80,7 @@ export default function Job() {
 
   const fetchData = async (contentId: string, contentTypeId: string) => {
     try {
-      const response = await PublicAxiosInstance.get(
-        `/jobs/detail?contentId=${contentId}&contentTypeId=${contentTypeId}`,
-      );
+      const response = await getJobDetail(contentId, contentTypeId);
       const data = response.data;
       setJobInfo({
         empmnTtl: data.empmnTtl,

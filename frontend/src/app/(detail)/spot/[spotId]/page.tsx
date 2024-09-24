@@ -22,7 +22,7 @@ import {
 } from '../../_components/InfoItem';
 import { formatString, extractLinkOrValue } from '../../_utils/stringUtils';
 import { SpotExtraInfo, SpotInfo } from '@/types/type';
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { getSpotDetail } from '@/services/spots';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -48,7 +48,12 @@ export default function Tour() {
     restDate: '',
     inTime: '',
     outTime: '',
+    mapx: 0,
+    mapy: 0,
+    inWishlist: false,
+    location: '',
   });
+
   const [extraInfo, setExtraInfo] = useState<SpotExtraInfo>({
     parking: '',
     expGuide: '',
@@ -80,10 +85,9 @@ export default function Tour() {
 
   const fetchData = async (contentId: number, contentTypeId: number) => {
     try {
-      const response = await PublicAxiosInstance.get(
-        `/spots/detail?contentId=${contentId}&contentTypeId=${contentTypeId}`,
-      );
+      const response = await getSpotDetail(contentId, contentTypeId);
       const data = response.data;
+      console.log('data : ', data);
       setSpotInfo({
         title: data.title,
         homepage: data.homepage || data.eventhomepage,
@@ -122,6 +126,10 @@ export default function Tour() {
           '정보 없음',
         inTime: data.checkintime || '',
         outTime: data.checkouttime || '',
+        mapx: data.mapx,
+        mapy: data.mapy,
+        inWishlist: data.inWishlist,
+        location: data.location,
       });
 
       setExtraInfo({

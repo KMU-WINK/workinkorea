@@ -9,6 +9,7 @@ import Card from '@/components/Card';
 import { FeedProps, WishItem, WishRes } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { getStays } from '@/services/stays';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
@@ -34,9 +35,7 @@ export default function Stay() {
     setLoading(true);
 
     try {
-      const response = await PublicAxiosInstance.get(
-        `/stays?area=${area}&keyword=${keyword}&pageNo=${page}`,
-      );
+      const response = await getStays(area, keyword, page);
       if (response.data.totalCount % 10 === 0) {
         setPageCount(response.data.totalCount / 10);
       } else {

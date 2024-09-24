@@ -7,7 +7,7 @@ import Card from '@/components/Card';
 
 import { FeedProps, WishItem, WishRes } from '@/types/type';
 
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { getSpots } from '@/services/spots';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
@@ -33,9 +33,7 @@ export default function Tour() {
     setLoading(true);
 
     try {
-      const response = await PublicAxiosInstance.get(
-        `/spots?area=${area}&keyword=${keyword}&pageNo=${page}`,
-      );
+      const response = await getSpots(area, keyword, page);
       if (response.data.totalCount % 10 === 0) {
         setPageCount(response.data.totalCount / 10);
       } else {

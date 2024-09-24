@@ -7,7 +7,7 @@ import Card from '@/components/Card';
 
 import { JobProps, WishItem, WishRes } from '@/types/type';
 
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { getJobs } from '@/services/jobs';
 import { formatSalary } from '../../utils/stringUtils';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
@@ -25,6 +25,8 @@ export default function Job() {
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
+  const [firstInfo, setFirstInfo] = useState({});
+
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
 
@@ -35,10 +37,7 @@ export default function Job() {
     setLoading(true);
 
     try {
-      const response = await PublicAxiosInstance.get(
-        `/jobs?area=${area}&keyword=${keyword}&pageNo=${page}`,
-      );
-      console.log('response.data : ', response.data);
+      const response = await getJobs(area, keyword, page);
       setPageCount(response.data.pageNo);
 
       const data = response.data.items.item.map((item: JobProps) => ({
@@ -181,6 +180,10 @@ export default function Job() {
       }
     }
   };
+
+  useEffect(() => {
+    console.log('feedList[0] : ', feedList[0]);
+  }, [feedList]);
 
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black relative">
