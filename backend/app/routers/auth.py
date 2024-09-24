@@ -51,7 +51,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.get("/kakao")
 async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
-    is_dev_mode = request.client.host == '127.0.0.1'
+    is_dev_mode = request.url.hostname != 'workinkorea.info'
         
     client_id = os.getenv("KAKAO_REST_API_KEY")
     redirect_uri = os.getenv("KAKAO_REDIRECT_URI")
@@ -72,7 +72,7 @@ async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
 
 @router.get("/naver")
 async def naverAuth(state: str, code: str, request: Request, db: Session = Depends(get_db)):
-    is_dev_mode = request.client.host == '127.0.0.1'
+    is_dev_mode = request.url.hostname != 'workinkorea.info'
     client_id = os.getenv("NAVER_CLIENT_ID")
     client_secret = os.getenv("NAVER_CLIENT_SECRET")
     redirect_uri = os.getenv("NAVER_REDIRECT_URI")
@@ -96,7 +96,7 @@ async def naverAuth(state: str, code: str, request: Request, db: Session = Depen
 
 @router.get("/google")
 async def googleAuth(state: str, code: str, request: Request, db: Session = Depends(get_db)):
-    is_dev_mode = request.client.host == '127.0.0.1'
+    is_dev_mode = request.url.hostname != 'workinkorea.info'
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
