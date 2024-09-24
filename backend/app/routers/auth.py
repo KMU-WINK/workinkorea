@@ -237,20 +237,29 @@ async def get_access_token(
         # RedirectResponse 사용 시, 클라이언트 측에서 CORS 에러가 발생하여 URL만 반환
         response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
 
+    if (is_dev_mode):
+        httponly = False
+        secure = False
+        domain = 'localhost'
+    else:
+        httponly = True
+        secure = True
+        domain = '.workinkorea.info'
+
     response.set_cookie(
         key="accessToken",
         value=jwt_token,
-        httponly=True,
+        httponly=httponly,
         samesite="none",
-        secure=True,
-        domain=".workinkorea.info",
+        secure=secure,
+        domain=domain,
     )
     response.set_cookie(
         key="social_id",
         value=social_id,
         samesite="none",
-        secure=True,
-        domain=".workinkorea.info",
+        secure=secure,
+        domain=domain,
     )
 
     return response
