@@ -13,6 +13,8 @@ import Hotel from 'public/svgs/emoji/hotel.svg';
 import Dice from 'public/svgs/emoji/dice.svg';
 import Sport from 'public/svgs/emoji/weight.svg';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { createUserWork } from '@/services/users';
+import axios from 'axios';
 
 export default function Step4() {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function Step4() {
 
   const handleNextClick = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/work', {
+      await createUserWork({
         social_id: socialId,
         works: selectedOptions,
       });
@@ -32,6 +34,11 @@ export default function Step4() {
         `/onboarding/step5?social_id=${socialId}&provider=${provider}`,
       );
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 422) {
+          // todo: social_id 가 없을 경우 예외처리
+        }
+      }
       console.error(e);
     }
   };

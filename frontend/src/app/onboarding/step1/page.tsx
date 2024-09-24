@@ -6,6 +6,8 @@ import Badge from '@/app/onboarding/_components/Badge';
 import Button from '@/components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { createUserNickname } from '@/services/users';
+import axios from 'axios';
 
 export default function Step1() {
   const [nickname, setNickname] = useState('');
@@ -21,12 +23,17 @@ export default function Step1() {
 
   const handleDuplicateCheck = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/nickname', {
+      await createUserNickname({
         social_id: socialId,
-        nickname: nickname,
+        nickname,
       });
       setIsNicknameUnique(true);
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 422) {
+          // todo: social_id가 없을 경우 예외처리
+        }
+      }
       console.error(e);
       setIsNicknameUnique(false);
       alert('중복된 닉네임입니다.');

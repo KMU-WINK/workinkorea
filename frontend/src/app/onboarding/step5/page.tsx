@@ -13,6 +13,8 @@ import Fire from 'public/svgs/emoji/fire.svg';
 import Moai from 'public/svgs/emoji/moai.svg';
 import Learning from 'public/svgs/emoji/learning.svg';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { createUserInterest } from '@/services/users';
+import axios from 'axios';
 
 export default function Step3() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -22,7 +24,7 @@ export default function Step3() {
 
   const handleNextClick = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/interest', {
+      await createUserInterest({
         social_id: socialId,
         interests: selectedOptions,
       });
@@ -32,6 +34,11 @@ export default function Step3() {
       const redirectUrl = data.data.redirect_url;
       router.push(redirectUrl);
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 422) {
+          // todo: social_id 가 없을 경우 예외처리
+        }
+      }
       console.error(e);
     }
   };
