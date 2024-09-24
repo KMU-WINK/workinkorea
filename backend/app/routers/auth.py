@@ -206,19 +206,21 @@ async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool
         )
 
     # 회원가입이 되어있는 유저
-    return await get_access_token(user.social_id, db, True)
+    return await get_access_token(user.social_id, is_dev_mode, db, True)
 
 
 # social_id 기반 토큰 발급
 @router.get("/token")
 async def get_access_token(
-    social_id: str, db: Session = Depends(get_db), isLogin: bool = False
+    social_id: str, is_dev_mode: bool, db: Session = Depends(get_db), isLogin: bool = False
 ):
 
-    print(social_id)
     # 사용자가 DB에 있는지 확인
     user = db.query(User).filter(User.social_id == social_id).first()
     client_url = os.getenv("WINK_CLIENT_URI")
+    
+    if (is_dev_mode):
+        client_url = 'http://127.0.0.1:3000'
 
     if not user:
         raise HTTPException(
