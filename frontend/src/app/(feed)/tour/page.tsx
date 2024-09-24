@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
 
-import { FeedProps } from '@/types/type';
+import { FeedProps, WishItem, WishRes } from '@/types/type';
 
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
+import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
 
 export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -21,6 +22,7 @@ export default function Tour() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
+  const [wishList, setWishList] = useState<WishRes[]>([]);
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
 
@@ -88,8 +90,14 @@ export default function Tour() {
     }
   }, []);
 
+  const fetchWishList = async () => {
+    const wishListData = await getWishList();
+    setWishList(wishListData);
+  };
+
   useEffect(() => {
     if (area) fetchData();
+    fetchWishList();
   }, [area]);
 
   useEffect(() => {
@@ -109,12 +117,63 @@ export default function Tour() {
     };
   }, [page, loading]);
 
+  useEffect(() => {
+    if (wishList.length > 0 && feedList.length > 0) {
+      const updatedFeedList = feedList.map(feedItem => {
+        const isInWishlist = wishList.some(
+          wishItem => wishItem.content_id === feedItem.contentid,
+        );
+
+        // 상태가 변경된 경우에만 업데이트
+        if (feedItem.inWishlist !== isInWishlist) {
+          return {
+            ...feedItem,
+            inWishlist: isInWishlist, // wishList에 있으면 true로 설정
+          };
+        }
+        return feedItem; // 상태가 변경되지 않았으면 기존 상태 유지
+      });
+
+      // 변경 사항이 있을 때만 feedList 업데이트
+      if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
+        setFeedList(updatedFeedList);
+      }
+    }
+  }, [wishList]);
+
   const cardClick = (id: string, contenttypeid?: string) => {
     router.push(`/spot/${id}?contenttypeid=${contenttypeid}`);
   };
-  const wishClick = () => {
-    if (!isLoggedIn) openModal();
-    console.log('wishClick');
+
+  const wishClick = async (item: FeedProps) => {
+    // if (!isLoggedIn) openModal();
+    let res;
+    const originState = item.inWishlist;
+    item.inWishlist = !item.inWishlist;
+
+    try {
+      const data: WishItem = {
+        type: 'spot',
+        contentTypeId: item.contenttypeid || '39',
+        contentId: item.contentid,
+      };
+
+      if (originState) {
+        item.inWishlist = false;
+        res = await deleteWishItem(data);
+      } else {
+        item.inWishlist = true;
+        res = await postWishItem(data);
+      }
+
+      await fetchWishList();
+    } catch (error) {
+      console.error('Error in wishClick:', error);
+      if (res.error) {
+        // 에러가 발생한 경우, 원래 상태로 되돌림
+        item.inWishlist = !item.inWishlist;
+      }
+    }
   };
 
   return (
@@ -151,7 +210,7 @@ export default function Tour() {
                 onCardClick={() =>
                   cardClick(item.contentid, item.contenttypeid)
                 }
-                onWishListClick={wishClick}
+                onWishListClick={() => wishClick(item)}
                 contenttypeid={item.contenttypeid}
               />
             ))}
