@@ -11,7 +11,9 @@ export default function Step1() {
   const [nickname, setNickname] = useState('');
   const [isNicknameUnique, setIsNicknameUnique] = useState<boolean | null>(
     null,
-  ); // 중복 여부 상태 추가
+  );
+  const [errorMessage, setErrorMessage] = useState('');
+  const [messageColor, setMessageColor] = useState('red'); // 메시지 색상 상태 추가
   const router = useRouter();
 
   // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
@@ -26,10 +28,18 @@ export default function Step1() {
         nickname: nickname,
       });
       setIsNicknameUnique(true);
-    } catch (e) {
-      console.error(e);
-      setIsNicknameUnique(false);
-      alert('중복된 닉네임입니다.');
+      setErrorMessage('사용 가능한 닉네임입니다.');
+      setMessageColor('blue');
+    } catch (e: any) {
+      if (e.response && e.response.status === 400) {
+        setIsNicknameUnique(false);
+        setErrorMessage('중복된 닉네임입니다.');
+        setMessageColor('red');
+      } else {
+        console.error(e);
+        setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
+        setMessageColor('red');
+      }
     }
   };
 
@@ -37,12 +47,16 @@ export default function Step1() {
     router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);
   };
 
-  // 닉네임 입력 시 6글자 초과 방지
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
-    if (newNickname.length <= 6) {
+
+    if (newNickname.length > 6) {
+      setErrorMessage('닉네임은 6글자를 넘을 수 없습니다.');
+      setMessageColor('red'); // 에러 메시지는 빨간색
+    } else {
+      setErrorMessage('');
+      setMessageColor(''); // 오류 메시지 초기화
       setNickname(newNickname);
-      // setIsNicknameUnique(null); // 닉네임이 변경되면 중복 검사 초기화
     }
   };
 
@@ -67,7 +81,7 @@ export default function Step1() {
             <Input
               placeholder="여섯글자이름"
               value={nickname}
-              onChange={handleNicknameChange} // 닉네임 변경 함수에 제한 적용
+              onChange={handleNicknameChange}
             />
             <div>
               <button
@@ -78,12 +92,23 @@ export default function Step1() {
               </button>
             </div>
           </div>
+          {errorMessage && (
+            <p
+              style={{
+                color: messageColor,
+                fontSize: '12px',
+                marginTop: '5px',
+              }}
+            >
+              {errorMessage}
+            </p>
+          )}
         </div>
       </div>
       <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isAllowed={nickname !== '' && isNicknameUnique == true} // 닉네임이 중복되지 않는 경우에만 버튼 활성화
+          isAllowed={nickname !== '' && isNicknameUnique === true}
           onClick={handleNextClick}
         />
       </div>
