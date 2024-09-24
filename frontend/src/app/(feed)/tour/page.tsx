@@ -140,7 +140,7 @@ export default function Tour() {
   }, [wishList]);
 
   const cardClick = (id: string, contenttypeid?: string) => {
-    router.push(`/spot/${id}?contenttypeid=${contenttypeid}`);
+    router.push(`/spot/${id}?contenttypeid=${contenttypeid}?type=spot`);
   };
 
   const wishClick = async (item: FeedProps) => {

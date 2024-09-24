@@ -67,15 +67,37 @@ export default function Tour() {
   const router = useRouter();
   const [contentId, setContentId] = useState<number>(0);
   const [contentTypeId, setContentTypeId] = useState<number>(0);
+  const [type, setType] = useState<string>('');
 
   useEffect(() => {
     const pathParts = window.location.pathname.split('/');
+    console.log(pathParts);
+
+    // 마지막 부분에서 contentId 추출
     const id = pathParts.pop() || pathParts.pop() || '';
     setContentId(parseInt(id) || 0);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    setContentTypeId(parseInt(searchParams.get('contenttypeid') || '0'));
+    // URL에서 contenttypeid와 type 추출
+    const search = window.location.search;
+
+    // "contenttypeid" 뒤의 값을 추출
+    const contentTypeIdMatch = search.match(/contenttypeid=([0-9]+)/);
+    if (contentTypeIdMatch) {
+      setContentTypeId(parseInt(contentTypeIdMatch[1]));
+    }
+
+    // "type" 뒤의 값을 추출
+    const typeMatch = search.match(/type=([^&]*)/);
+    if (typeMatch) {
+      setType(typeMatch[1]); // type 값을 설정
+    }
   }, []);
+
+  useEffect(() => {
+    console.log('contentId', contentId);
+    console.log('contentTypeId', contentTypeId);
+    console.log('type : ', type);
+  }, [type]);
 
   useEffect(() => {
     if (contentId && contentTypeId) {
@@ -159,6 +181,12 @@ export default function Tour() {
   const clickHeart = () => {
     setSelected(!selected);
     console.log('selected', selected);
+    const data = {
+      type: type,
+      contentTypeId: contentTypeId,
+      contentId: contentId,
+    };
+    console.log('data : ', data);
   };
 
   const backClick = () => {

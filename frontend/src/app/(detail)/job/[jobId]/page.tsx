@@ -108,6 +108,12 @@ export default function Job() {
   const clickHeart = () => {
     setSelected(!selected);
     console.log('selected', selected);
+    const data = {
+      type: 'job',
+      contentTypeId: contentTypeId,
+      contentId: contentId,
+    };
+    console.log('data : ', data);
   };
 
   const backClick = () => {

@@ -8,7 +8,6 @@ import Card from '@/components/Card';
 
 import { FeedProps, WishItem, WishRes } from '@/types/type';
 
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { getStays } from '@/services/stays';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
@@ -142,7 +141,7 @@ export default function Stay() {
   }, [wishList]);
 
   const cardClick = (id: string) => {
-    router.push(`/spot/${id}?contenttypeid=32`);
+    router.push(`/spot/${id}?contenttypeid=32?type=stay`);
   };
 
   const wishClick = async (item: FeedProps) => {
