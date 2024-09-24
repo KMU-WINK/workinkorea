@@ -14,6 +14,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+OPERATION_HOST_URL = "api.workinkorea.info"
 
 
 def create_jwt_token(user_social_id: str):
@@ -51,8 +52,8 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.get("/kakao")
 async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
-    is_dev_mode = request.url.hostname != 'workinkorea.info'
-        
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
+
     client_id = os.getenv("KAKAO_REST_API_KEY")
     redirect_uri = os.getenv("KAKAO_REDIRECT_URI")
 
@@ -67,12 +68,16 @@ async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
         raise ValueError("Access token not found in response")
 
     # login 호출 시 await 추가
-    return await login(access_token=access_token, provider="kakao", db=db, is_dev_mode=is_dev_mode)
+    return await login(
+        access_token=access_token, provider="kakao", db=db, is_dev_mode=is_dev_mode
+    )
 
 
 @router.get("/naver")
-async def naverAuth(state: str, code: str, request: Request, db: Session = Depends(get_db)):
-    is_dev_mode = request.url.hostname != 'workinkorea.info'
+async def naverAuth(
+    state: str, code: str, request: Request, db: Session = Depends(get_db)
+):
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
     client_id = os.getenv("NAVER_CLIENT_ID")
     client_secret = os.getenv("NAVER_CLIENT_SECRET")
     redirect_uri = os.getenv("NAVER_REDIRECT_URI")
@@ -91,12 +96,16 @@ async def naverAuth(state: str, code: str, request: Request, db: Session = Depen
     if not access_token:
         raise ValueError("Access token not found in response")
 
-    return await login(access_token=access_token, provider="naver", db=db, is_dev_mode=is_dev_mode)
+    return await login(
+        access_token=access_token, provider="naver", db=db, is_dev_mode=is_dev_mode
+    )
 
 
 @router.get("/google")
-async def googleAuth(state: str, code: str, request: Request, db: Session = Depends(get_db)):
-    is_dev_mode = request.url.hostname != 'workinkorea.info'
+async def googleAuth(
+    state: str, code: str, request: Request, db: Session = Depends(get_db)
+):
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
@@ -117,7 +126,9 @@ async def googleAuth(state: str, code: str, request: Request, db: Session = Depe
     if not access_token:
         raise ValueError("Access token not found in response")
 
-    return await login(access_token=access_token, provider="google", db=db, is_dev_mode=is_dev_mode)
+    return await login(
+        access_token=access_token, provider="google", db=db, is_dev_mode=is_dev_mode
+    )
 
 
 # get_user는 비동기가 아니므로 async나 await가 필요하지 않음.
@@ -163,9 +174,9 @@ async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool
 
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
     client_url = os.getenv("WINK_CLIENT_URI")
-    
-    if (is_dev_mode):
-        client_url = 'http://localhost:3000'
+
+    if is_dev_mode:
+        client_url = "http://localhost:3000"
 
     # 회원 가입이 되어있지 않은 유저
     if not user:
@@ -212,15 +223,18 @@ async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool
 # social_id 기반 토큰 발급
 @router.get("/token")
 async def get_access_token(
-    social_id: str, is_dev_mode: bool, db: Session = Depends(get_db), isLogin: bool = False
+    social_id: str,
+    is_dev_mode: bool,
+    db: Session = Depends(get_db),
+    isLogin: bool = False,
 ):
 
     # 사용자가 DB에 있는지 확인
     user = db.query(User).filter(User.social_id == social_id).first()
     client_url = os.getenv("WINK_CLIENT_URI")
-    
-    if (is_dev_mode):
-        client_url = 'http://localhost:3000'
+
+    if is_dev_mode:
+        client_url = "http://localhost:3000"
 
     if not user:
         raise HTTPException(
@@ -237,14 +251,14 @@ async def get_access_token(
         # RedirectResponse 사용 시, 클라이언트 측에서 CORS 에러가 발생하여 URL만 반환
         response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
 
-    if (is_dev_mode):
+    if is_dev_mode:
         httponly = False
         secure = False
-        domain = 'localhost'
+        domain = "localhost"
     else:
         httponly = True
         secure = True
-        domain = '.workinkorea.info'
+        domain = ".workinkorea.info"
 
     response.set_cookie(
         key="accessToken",

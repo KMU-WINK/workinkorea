@@ -65,7 +65,8 @@ current_year = datetime.now().year
 today = datetime.now().strftime("%Y-%m-%d")
 
 
-def get_jobs(area: str, keyword: str, pageNo: int = 1):
+def get_jobs(area: str, keyword: str, pageNo: int = 1, wishs=False):
+    print(wishs)
 
     if len(area):
         white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
