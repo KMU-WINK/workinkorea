@@ -165,7 +165,7 @@ async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool
     client_url = os.getenv("WINK_CLIENT_URI")
     
     if (is_dev_mode):
-        client_url = 'http://127.0.0.1:3000'
+        client_url = 'http://localhost:3000'
 
     # 회원 가입이 되어있지 않은 유저
     if not user:
@@ -220,7 +220,7 @@ async def get_access_token(
     client_url = os.getenv("WINK_CLIENT_URI")
     
     if (is_dev_mode):
-        client_url = 'http://127.0.0.1:3000'
+        client_url = 'http://localhost:3000'
 
     if not user:
         raise HTTPException(
