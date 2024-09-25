@@ -6,8 +6,6 @@ import styled from 'styled-components';
 
 import Heart from '../../../../../public/svgs/heart.svg';
 import HeartColor from '../../../../../public/svgs/heart-color.svg';
-import Location from '../../../../../public/svgs/location.svg';
-import GoSmall from '../../../../../public/svgs/go-small.svg';
 import BackWhite from '../../../../../public/svgs/back-white.svg';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
@@ -82,6 +80,7 @@ export default function Job() {
     try {
       const response = await getJobDetail(contentId, contentTypeId);
       const data = response.data;
+      console.log('data : ', response);
       setJobInfo({
         empmnTtl: data.empmnTtl,
         dtyCn: data.dtyCn,
@@ -125,15 +124,8 @@ export default function Job() {
     window.open(url, '_blank'); // 새 탭에서 링크 열기
   };
 
-  const addressClick = () => {
-    router.push(`/map?contentId=${contentId}&contentTypeId=${contentTypeId}`);
-  };
-
   return (
-    <div
-      className="flex flex-col justify-start items-center h-full w-screen bg-white text-black
-    "
-    >
+    <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
       <div
         className="flex flex-col justify-start items-center gap-3
         w-full bg-white sm:max-w-sm
@@ -171,16 +163,9 @@ export default function Job() {
                 <Heart className="cursor-pointer" onClick={clickHeart} />
               )}
             </div>
-            <div
-              className="w-fit flex items-center cursor-pointer"
-              onClick={addressClick}
-            >
-              <Location />
-              <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                {jobInfo.wrkpAdres}
-              </span>
-              <GoSmall />
-            </div>
+            <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+              {jobInfo.wrkpAdres}
+            </span>
             <span className="text-xs">{jobInfo.corpoNm}</span>
             <div className="w-full flex flex-col gap-2 text-xs">
               {jobInfo.wrkpAdres && (

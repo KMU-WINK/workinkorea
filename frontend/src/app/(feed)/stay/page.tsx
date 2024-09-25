@@ -24,6 +24,10 @@ export default function Stay() {
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
+  const [firstInfo, setFirstInfo] = useState({
+    mapx: 0,
+    mapy: 0,
+  });
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
 
@@ -35,6 +39,12 @@ export default function Stay() {
 
     try {
       const response = await getStays(area, keyword, page);
+      if (page === 1) {
+        setFirstInfo({
+          mapx: response.data.items.item[0].mapx,
+          mapy: response.data.items.item[0].mapy,
+        });
+      }
       if (response.data.totalCount % 10 === 0) {
         setPageCount(response.data.totalCount / 10);
       } else {
@@ -76,7 +86,9 @@ export default function Stay() {
   };
 
   const mapClick = () => {
-    router.push(`/map?type=${type}&location=${area}&keyword=${keyword}`);
+    router.push(
+      `/map?type=${type}&location=${area}&keyword=${keyword}&mapx=${firstInfo.mapx}&mapy=${firstInfo.mapy}`,
+    );
   };
 
   useEffect(() => {
@@ -149,8 +161,6 @@ export default function Stay() {
     let res;
     const originState = item.inWishlist;
     item.inWishlist = !item.inWishlist;
-    console.log('item : ', item);
-    console.log('item.inWishlist : ', item.inWishlist);
 
     try {
       const data: WishItem = {

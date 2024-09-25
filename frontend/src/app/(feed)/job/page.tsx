@@ -25,7 +25,6 @@ export default function Job() {
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
-  const [firstInfo, setFirstInfo] = useState({});
 
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
@@ -39,7 +38,6 @@ export default function Job() {
     try {
       const response = await getJobs(area, keyword, page);
       setPageCount(response.data.pageNo);
-
       const data = response.data.items.item.map((item: JobProps) => ({
         contentId: item.contentId,
         cardType: 'default',
@@ -74,10 +72,6 @@ export default function Job() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const mapClick = () => {
-    router.push(`/map?type=${type}&location=${area}&keyword=${keyword}`);
   };
 
   useEffect(() => {
@@ -181,53 +175,31 @@ export default function Job() {
     }
   };
 
-  useEffect(() => {
-    console.log('feedList[0] : ', feedList[0]);
-  }, [feedList]);
-
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black relative">
       {feedList.length > 0 ? (
-        <>
-          <div className="w-full pt-4 bg-white fixed z-20 flex items-center justify-center ">
-            <div
-              className="w-full h-20 relative rounded-xl px-6 max-w-sm"
-              onClick={mapClick}
-              role="button"
-              tabIndex={0}
-            >
-              <Image
-                src="/svgs/feed-banner.svg"
-                alt="banner"
-                layout="responsive"
-                width={0}
-                height={0}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 items-center w-full mb-10 mt-[120px]">
-            {feedList.map((item: JobProps) => (
-              <Card
-                id={item.contentId}
-                key={item.contentId}
-                cardType={item.cardType}
-                serviceType={item.serviceType}
-                title={item.title}
-                location={item.location}
-                price={item.price}
-                company={item.company}
-                image={item.image}
-                inWishlist={item.inWishlist}
-                onCardClick={() =>
-                  cardClick(item.contentId, item.contentTypeId, item.image)
-                }
-                onWishListClick={() => wishClick(item)}
-                contenttypeid={item.contentTypeId}
-                workType={formatSalary(item.workType)}
-              />
-            ))}
-          </div>
-        </>
+        <div className="flex flex-col gap-1 items-center w-full mb-10 mt-[20px]">
+          {feedList.map((item: JobProps) => (
+            <Card
+              id={item.contentId}
+              key={item.contentId}
+              cardType={item.cardType}
+              serviceType={item.serviceType}
+              title={item.title}
+              location={item.location}
+              price={item.price}
+              company={item.company}
+              image={item.image}
+              inWishlist={item.inWishlist}
+              onCardClick={() =>
+                cardClick(item.contentId, item.contentTypeId, item.image)
+              }
+              onWishListClick={() => wishClick(item)}
+              contenttypeid={item.contentTypeId}
+              workType={formatSalary(item.workType)}
+            />
+          ))}
+        </div>
       ) : (
         <div className="w-full flex flex-col items-center pt-20 gap-24">
           <span className="text-center">
