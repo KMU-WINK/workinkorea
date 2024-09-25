@@ -12,7 +12,7 @@ const getSpotLists = async ({
   mapY,
   keyword,
   radius,
-  numOfRows = 30,
+  numOfRows = 50,
 }: GetSpotListsProps) => {
   try {
     const response = await PublicAxiosInstance.get(
