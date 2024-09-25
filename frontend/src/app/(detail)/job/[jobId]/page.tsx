@@ -16,9 +16,9 @@ import {
   formatRecruitString,
 } from '../../_utils/stringUtils';
 import { formatSalary } from '../../../utils/stringUtils';
-import { JobInfo } from '@/types/type';
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { JobInfo, SpotInfo, WishRes } from '@/types/type';
 import { getJobDetail } from '@/services/jobs';
+import { getWishList } from '@/services/wishs';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -30,6 +30,7 @@ const ImageWrapper = styled.div`
 
 export default function Job() {
   const [selected, setSelected] = useState<boolean>(false);
+  const [wishList, setWishList] = useState<WishRes[]>([]);
   const [jobInfo, setJobInfo] = useState<JobInfo>({
     empmnTtl: '',
     dtyCn: '',
@@ -68,6 +69,7 @@ export default function Job() {
     const thumbnail = queryString.substring(thumbnailIndex);
     setContentTypeId(contentTypeId);
     setImage(thumbnail);
+    fetchWishList();
   }, []);
 
   useEffect(() => {
@@ -76,11 +78,36 @@ export default function Job() {
     }
   }, [contentId, contentTypeId]);
 
+  // useEffect(() => {
+  //   if (wishList.length > 0 && feedList.length > 0) {
+  //     const updatedFeedList = feedList.map(feedItem => {
+  //       const isInWishlist = wishList.some(
+  //         wishItem => wishItem.content_id === feedItem.contentId,
+  //       );
+  //
+  //       // 상태가 변경된 경우에만 업데이트
+  //       if (feedItem.inWishlist !== isInWishlist) {
+  //         return {
+  //           ...feedItem,
+  //           inWishlist: isInWishlist, // wishList에 있으면 true로 설정
+  //         };
+  //       }
+  //       return feedItem; // 상태가 변경되지 않았으면 기존 상태 유지
+  //     });
+  //
+  //     // 변경 사항이 있을 때만 feedList 업데이트
+  //     if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
+  //       setFeedList(updatedFeedList);
+  //     }
+  //   }
+  // }, [jobInfo, wishList]);
+
   const fetchData = async (contentId: string, contentTypeId: string) => {
     try {
       const response = await getJobDetail(contentId, contentTypeId);
       const data = response.data;
       console.log('data : ', response);
+
       setJobInfo({
         empmnTtl: data.empmnTtl,
         dtyCn: data.dtyCn,
@@ -102,6 +129,12 @@ export default function Job() {
       console.error('Error fetching data:', error);
     } finally {
     }
+  };
+
+  const fetchWishList = async () => {
+    const wishListData = await getWishList();
+    setWishList(wishListData);
+    console.log('wishListData : ', wishListData);
   };
 
   const clickHeart = () => {

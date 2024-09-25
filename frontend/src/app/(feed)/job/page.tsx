@@ -23,7 +23,6 @@ export default function Job() {
   const [loading, setLoading] = useState(false);
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
-  const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
 
   const { isLoggedIn } = useUserStore();
@@ -78,7 +77,6 @@ export default function Job() {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
     if (feedInfo.location) {
-      setType(feedInfo.type);
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }

@@ -1,7 +1,7 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { WishItem, WishRes } from '@/types/type';
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3MTk0MTI2fQ.oLqp-8wY78u4R7va1tobmoOr9wXltk8XyaZZe89Or2Y';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3MjY5NDMwfQ.J83bMTc4uHTCO-oQHRNrDS4Vr_337qqyYfokg998_zU';
 
 export const getWishList = async (): Promise<WishRes[]> => {
   try {
