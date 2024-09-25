@@ -23,6 +23,7 @@ export default function Job() {
   const [loading, setLoading] = useState(false);
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
+  const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
 
   const { isLoggedIn } = useUserStore();
@@ -37,8 +38,9 @@ export default function Job() {
     try {
       const response = await getJobs(area, keyword, page);
       setPageCount(response.data.pageNo);
+      console.log('response', response);
       const data = response.data.items.item.map((item: JobProps) => ({
-        contentId: item.contentId,
+        contentid: item.contentid,
         cardType: 'default',
         serviceType: 'work',
         title: item.empmnTtl,
@@ -47,7 +49,7 @@ export default function Job() {
         location: item.wrkpAdres,
         image: item.corpoLogoFileUrl || '/svgs/job-default.svg',
         inWishlist: false,
-        contentTypeId: item.contentTypeId,
+        contenttypeid: item.contenttypeid,
         workType: item.salStle,
       }));
 
@@ -56,7 +58,7 @@ export default function Job() {
         const newData = data.filter(
           (newItem: JobProps) =>
             !prevList.some(
-              prevItem => prevItem.contentId === newItem.contentId,
+              prevItem => prevItem.contentid === newItem.contentid,
             ),
         );
 
@@ -73,10 +75,15 @@ export default function Job() {
     }
   };
 
+  const mapClick = () => {
+    router.push(`/map?type=${type}&location=${area}&keyword=${keyword}`);
+  };
+
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
     if (feedInfo.location) {
+      setType(feedInfo.type);
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
@@ -113,7 +120,7 @@ export default function Job() {
     if (wishList.length > 0 && feedList.length > 0) {
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
-          wishItem => wishItem.content_id === feedItem.contentId,
+          wishItem => wishItem.contentid === feedItem.contentid,
         );
 
         // 상태가 변경된 경우에만 업데이트
@@ -133,6 +140,10 @@ export default function Job() {
     }
   }, [wishList]);
 
+  // useEffect(() => {
+  //
+  // }, []);
+
   const cardClick = (id: string, contentTypeId?: string, image?: string) => {
     const pushImage = image === '/svgs/job-default.svg' ? '' : image;
     router.push(
@@ -151,8 +162,8 @@ export default function Job() {
     try {
       const data: WishItem = {
         type: 'job',
-        contentTypeId: item.contentTypeId,
-        contentId: item.contentId,
+        contentTypeId: item.contenttypeid || '',
+        contentId: item.contentid || '',
       };
 
       if (originState) {
@@ -179,8 +190,8 @@ export default function Job() {
         <div className="flex flex-col gap-1 items-center w-full mb-10 mt-[20px]">
           {feedList.map((item: JobProps) => (
             <Card
-              id={item.contentId}
-              key={item.contentId}
+              id={item.contentid}
+              key={item.contentid}
               cardType={item.cardType}
               serviceType={item.serviceType}
               title={item.title}
@@ -190,10 +201,10 @@ export default function Job() {
               image={item.image}
               inWishlist={item.inWishlist}
               onCardClick={() =>
-                cardClick(item.contentId, item.contentTypeId, item.image)
+                cardClick(item.contentid, item.contenttypeid, item.image)
               }
               onWishListClick={() => wishClick(item)}
-              contenttypeid={item.contentTypeId}
+              contenttypeid={item.contenttypeid}
               workType={formatSalary(item.workType)}
             />
           ))}

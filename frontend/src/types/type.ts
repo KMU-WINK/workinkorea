@@ -80,7 +80,7 @@ export interface SpotExtraInfo {
 
 export interface JobProps extends CardProps {
   contentTypeId: string;
-  contentId: string;
+  contentid: string;
   cardType: CardType;
   serviceType: ServiceType;
   corpoNm: string;
@@ -118,5 +118,5 @@ export interface WishItem {
 
 export interface WishRes extends WishItem {
   // api get 호출 시 담기는 데이터
-  content_id: string;
+  contentid: string;
 }

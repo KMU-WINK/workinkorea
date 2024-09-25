@@ -131,7 +131,7 @@ export default function Tour() {
     if (wishList.length > 0 && feedList.length > 0) {
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
-          wishItem => wishItem.content_id === feedItem.contentid,
+          wishItem => wishItem.contentid === feedItem.contentid,
         );
 
         // 상태가 변경된 경우에만 업데이트
@@ -163,7 +163,7 @@ export default function Tour() {
 
     try {
       const data: WishItem = {
-        type: 'spot',
+        type: item.contenttypeid === '32' ? 'stay' : 'spot',
         contentTypeId: item.contenttypeid || '39',
         contentId: item.contentid,
       };
