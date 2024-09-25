@@ -10,22 +10,22 @@ class UserCreate(UserBase):
     social: str  # 생성 시 필수 입력
 
 
-class UserInfoUpdate(UserBase):
+class InfoUpdate(UserBase):
     birth: Optional[str]
     gender: Optional[str]
 
 
-class UserNicknameUpdate(UserBase):
+class NicknameUpdate(UserBase):
     nickname: str
 
 
-class UserRegionUpdate(UserBase):
+class RegionUpdate(UserBase):
     regions: List[str]
 
 
-class UserInterestUpdate(UserBase):
+class InterestUpdate(UserBase):
     interests: List[str]
 
 
-class UserWorkUpdate(UserBase):
+class WorkUpdate(UserBase):
     works: List[str]

@@ -6,6 +6,8 @@ import Badge from '@/app/onboarding/_components/Badge';
 import Button from '@/components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { createUserNickname } from '@/services/users';
+import axios from 'axios';
 
 export default function Step1() {
   const [nickname, setNickname] = useState('');
@@ -22,16 +24,17 @@ export default function Step1() {
   const provider = searchParam.get('provider');
 
   const handleDuplicateCheck = async () => {
-    try {
-      await PublicAxiosInstance.patch('/users/nickname', {
-        social_id: socialId,
-        nickname: nickname,
-      });
-      setIsNicknameUnique(true);
-      setErrorMessage('사용 가능한 닉네임입니다.');
-      setMessageColor('blue');
-    } catch (e: any) {
-      if (e.response && e.response.status === 400) {
+  try {
+    await createUserNickname({
+      social_id: socialId,
+      nickname,
+    });
+    setIsNicknameUnique(true);
+    setErrorMessage('사용 가능한 닉네임입니다.');
+    setMessageColor('blue');
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      if (e.response?.status === 400) {
         setIsNicknameUnique(false);
         setErrorMessage('중복된 닉네임입니다.');
         setMessageColor('red');
@@ -41,7 +44,8 @@ export default function Step1() {
         setMessageColor('red');
       }
     }
-  };
+  }
+};
 
   const handleNextClick = async () => {
     router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);

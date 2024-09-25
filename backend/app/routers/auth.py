@@ -1,17 +1,12 @@
+import requests, os, jwt, httpx
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from sqlalchemy.orm import Session
-from ..models.User import User
-from .users import create_user
-from ..db.session import get_db
-from fastapi.responses import RedirectResponse
-import requests
-import os
-import jwt
-from datetime import datetime, timedelta
-from ..schemas.user import UserCreate
-import httpx
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+from ..models.User import User
+from ..db.session import get_db
+from ..schemas.user import UserCreate
 
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
@@ -19,12 +14,13 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+OPERATION_HOST_URL = "api.workinkorea.info"
 
 
-def create_jwt_token(user_nickname: str):
+def create_jwt_token(user_social_id: str):
     # JWT 토큰 생성
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode = {"nickname": user_nickname, "exp": expire}
+    to_encode = {"social_id": user_social_id, "exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -32,8 +28,32 @@ def create_jwt_token(user_nickname: str):
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+@router.post("/create_user_dev")
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    chk_user = db.query(User).filter(User.social_id == user.social_id).first()
+    if chk_user:
+        raise HTTPException(
+            status_code=400,
+            detail=f"User already exists with the same social_id : {user.social_id}",
+        )
+    try:
+        # User 모델 인스턴스 생성 (id는 자동 생성)
+        new_user = User(social_id=user.social_id, social=user.social)
+        # 데이터베이스에 새로운 유저 추가
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return new_user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 @router.get("/kakao")
-async def kakaoAuth(code: str, db: Session = Depends(get_db)):
+async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
+
     client_id = os.getenv("KAKAO_REST_API_KEY")
     redirect_uri = os.getenv("KAKAO_REDIRECT_URI")
 
@@ -48,11 +68,16 @@ async def kakaoAuth(code: str, db: Session = Depends(get_db)):
         raise ValueError("Access token not found in response")
 
     # login 호출 시 await 추가
-    return await login(access_token=access_token, provider="kakao", db=db)
+    return await login(
+        access_token=access_token, provider="kakao", db=db, is_dev_mode=is_dev_mode
+    )
 
 
 @router.get("/naver")
-async def naverAuth(state: str, code: str, db: Session = Depends(get_db)):
+async def naverAuth(
+    state: str, code: str, request: Request, db: Session = Depends(get_db)
+):
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
     client_id = os.getenv("NAVER_CLIENT_ID")
     client_secret = os.getenv("NAVER_CLIENT_SECRET")
     redirect_uri = os.getenv("NAVER_REDIRECT_URI")
@@ -71,11 +96,16 @@ async def naverAuth(state: str, code: str, db: Session = Depends(get_db)):
     if not access_token:
         raise ValueError("Access token not found in response")
 
-    return await login(access_token=access_token, provider="naver", db=db)
+    return await login(
+        access_token=access_token, provider="naver", db=db, is_dev_mode=is_dev_mode
+    )
 
 
 @router.get("/google")
-async def googleAuth(state: str, code: str, db: Session = Depends(get_db)):
+async def googleAuth(
+    state: str, code: str, request: Request, db: Session = Depends(get_db)
+):
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
@@ -96,7 +126,9 @@ async def googleAuth(state: str, code: str, db: Session = Depends(get_db)):
     if not access_token:
         raise ValueError("Access token not found in response")
 
-    return await login(access_token=access_token, provider="google", db=db)
+    return await login(
+        access_token=access_token, provider="google", db=db, is_dev_mode=is_dev_mode
+    )
 
 
 # get_user는 비동기가 아니므로 async나 await가 필요하지 않음.
@@ -108,7 +140,7 @@ def get_user(social_id: str, provider: str, db: Session):
     )
 
 
-async def login(access_token: str, provider: str, db: Session):
+async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool):
     async with httpx.AsyncClient() as client:
         if provider == "kakao":
             user_info = (
@@ -142,6 +174,9 @@ async def login(access_token: str, provider: str, db: Session):
 
     # 신규 사용자의 경우, 회원가입 페이지로 redirect
     client_url = os.getenv("WINK_CLIENT_URI")
+
+    if is_dev_mode:
+        client_url = "http://localhost:3000"
 
     # 회원 가입이 되어있지 않은 유저
     if not user:
@@ -182,41 +217,65 @@ async def login(access_token: str, provider: str, db: Session):
         )
 
     # 회원가입이 되어있는 유저
-    return await get_access_token(user.social_id, db, True)
+    return await get_access_token(user.social_id, is_dev_mode, db, True)
 
 
-# username 기반 토큰 발급
+# social_id 기반 토큰 발급
 @router.get("/token")
-async def get_access_token(social_id: str, db: Session = Depends(get_db), isLogin: bool = False):
+async def get_access_token(
+    social_id: str,
+    is_dev_mode: bool,
+    db: Session = Depends(get_db),
+    isLogin: bool = False,
+):
+
     # 사용자가 DB에 있는지 확인
     user = db.query(User).filter(User.social_id == social_id).first()
     client_url = os.getenv("WINK_CLIENT_URI")
+
+    if is_dev_mode:
+        client_url = "http://localhost:3000"
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="사용자가 존재하지 않습니다.",
         )
-
+    print(user.social_id)
     # JWT 토큰 생성
-    jwt_token = create_jwt_token(user.nickname)
+    jwt_token = create_jwt_token(user.social_id)
 
-    if (isLogin):
+    if isLogin:
         response = RedirectResponse(url=f"{client_url}/main")
     else:
         # RedirectResponse 사용 시, 클라이언트 측에서 CORS 에러가 발생하여 URL만 반환
         response = JSONResponse(content={"redirect_url": f"{client_url}/main"})
-        
+
+    if is_dev_mode:
+        httponly = False
+        secure = False
+        domain = "localhost"
+    else:
+        httponly = True
+        secure = True
+        domain = ".workinkorea.info"
+
     response.set_cookie(
         key="accessToken",
         value=jwt_token,
-        httponly=True,
-        samesite="lax"
+        httponly=httponly,
+        samesite="none",
+        secure=secure,
+        domain=domain,
     )
     response.set_cookie(
         key="social_id",
         value=social_id,
+        samesite="none",
+        secure=secure,
+        domain=domain,
     )
+
     return response
 
 
@@ -226,14 +285,17 @@ def verify_jwt_token(token: str):
         # JWT 토큰을 검증하고 payload 반환
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         # payload에서 닉네임 추출
-        nickname = payload.get("nickname")
-        if nickname is None:
+        print(payload)
+        social_id = payload.get("social_id")
+        print(token)
+        print(social_id)
+        if social_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token: no subject",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        return nickname
+        return social_id
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -277,10 +339,11 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    nickname: str = verify_jwt_token(token, credentials_exception)
+    social_id: str = verify_jwt_token(token)
 
     # 사용자 조회 로직
-    user = db.query(User).filter(User.nickname == nickname).first()
+    user = db.query(User).filter(User.social_id == social_id).first()
+
     if user is None:
         raise credentials_exception
 

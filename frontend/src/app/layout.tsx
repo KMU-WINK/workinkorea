@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
 import StyledJsxRegistry from './registry';
-import KakaoScriptLoader from '@/components/KakaoScriptLoader';
+import KakaoMapLoader from '@/components/KakaoScriptLoader/map';
+import KakaoSDKLoader from '@/components/KakaoScriptLoader/sdk';
 import GoogleAnalytics from '@/lib/GoogleAnalytics';
 import LoginModal from '@/components/Modals/LoginModal';
 
@@ -58,8 +59,9 @@ export default function RootLayout({
     <html lang="ko" className="bg-white">
       <body className={myFont.className}>
         <StyledJsxRegistry>{children}</StyledJsxRegistry>
+        <KakaoSDKLoader />
+        <KakaoMapLoader />
         <GoogleAnalytics />
-        <KakaoScriptLoader />
         <LoginModal />
       </body>
     </html>

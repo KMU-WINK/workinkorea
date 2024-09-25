@@ -34,13 +34,13 @@ async def read_stays(area: str = "", keyword: str = "", pageNo: int = 1):
 
 @router.get("/detail")
 async def spot_stay_detail(contentId: int, contentTypeId: int):
-    common = get_common(contentId, contentTypeId)
-
-    intro = get_intro(contentId, contentTypeId)
-
-    info = get_info(contentId, contentTypeId)
-
-    image = get_image(contentId)
+    try:
+        common = get_common(contentId, contentTypeId)
+        intro = get_intro(contentId, contentTypeId)
+        info = get_info(contentId, contentTypeId)
+        image = get_image(contentId)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     # 빈 딕셔너리 생성
     combined_dict = {}
@@ -60,8 +60,25 @@ async def spot_stay_detail(contentId: int, contentTypeId: int):
 async def spot_stay_location(
     mapX: str,
     mapY: str,
+    keyword: str = "",
     radius: int = 20000,
     numOfRows: int = 3000,
 ):
-    data = get_location_based_list(mapX, mapY, radius, numOfRows, contentTypeId=32)
-    return data
+    if not (
+        (33.100000 <= float(mapY) <= 38.620000)
+        and (124.600000 <= float(mapX) <= 131.872000)
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Please provide valid mapX(124.600000 ~ 131.872000) and mapY(33.100000 ~ 38.620000)",
+        )
+
+    try:
+        data = get_location_based_list(mapX, mapY, radius, numOfRows, contentTypeId=32)
+        if len(keyword) >= 1:
+            data["items"]["item"] = list(
+                filter(lambda x: keyword in x["title"], data["items"]["item"])
+            )
+        return data
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

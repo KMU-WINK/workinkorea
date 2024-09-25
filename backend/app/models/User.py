@@ -1,14 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+import re
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, Text
 from sqlalchemy.orm import validates, relationship
 from ..db.connection import Base
-import re
-from .Region import Region  # Region 모델을 임포트
-from .Interest import Interest  # Interest 모델을 임포트
-from .Work import Work  # Work 모델을 임포트
-from .Stay import Stay  # Stay 모델을 임포트
-from .Spot import Spot  # Spot 모델을 임포트
-from .Job import Job  # Job 모델을 임포트
-from sqlalchemy.ext.declarative import declarative_base
 
 # 다대다 관계 테이블 매핑
 User_Region = Table(
@@ -44,6 +37,9 @@ class User(Base):
     birth = Column(String)
     gender = Column(String)
 
+    # 프로필 사진 Base64 필드 추가
+    profile_picture_base64 = Column(Text, nullable=True)
+
     # on Boarding
     regions = relationship("Region", secondary=User_Region, back_populates="users")
     interests = relationship(
@@ -57,6 +53,12 @@ class User(Base):
     jobs = relationship("Job", back_populates="user")
 
     # column validation
+    @validates("nickname")
+    def validate_nickname(self, key, value):
+        if len(value) > 6:
+            raise ValueError("nickname must be less than 6 characters")
+        return value
+
     @validates("social")
     def validate_name(self, key, value):
         login_list = ["kakao", "naver", "google"]

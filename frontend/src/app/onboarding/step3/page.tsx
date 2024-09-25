@@ -14,6 +14,8 @@ import ChuncheonImage from 'public/images/location/춘천.png';
 import ImageButton from '@/app/onboarding/_components/ImageButton';
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import Image from 'next/image';
+import { createUserRegion } from '@/services/users';
+import axios from 'axios';
 
 export default function Step3() {
   const router = useRouter();
@@ -26,7 +28,7 @@ export default function Step3() {
 
   const handleNextClick = async () => {
     try {
-      await PublicAxiosInstance.patch('/users/region', {
+      await createUserRegion({
         social_id: socialId,
         regions: [selectedLocation],
       });
@@ -34,6 +36,11 @@ export default function Step3() {
         `/onboarding/step4?social_id=${socialId}&provider=${provider}`,
       );
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 422) {
+          // todo: social_id 가 없을 경우 예외처리
+        }
+      }
       console.error(e);
     }
   };
