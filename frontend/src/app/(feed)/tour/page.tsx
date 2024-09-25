@@ -156,7 +156,10 @@ export default function Tour() {
   };
 
   const wishClick = async (item: FeedProps) => {
-    // if (!isLoggedIn) openModal();
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
     let res;
     const originState = item.inWishlist;
     item.inWishlist = !item.inWishlist;

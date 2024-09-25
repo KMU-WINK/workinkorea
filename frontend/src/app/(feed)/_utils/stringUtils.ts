@@ -1,5 +1,5 @@
 export const parseUrl = (url: string) => {
-  const urlObj = new URL(url); // URL 객체 생성
+  const urlObj = new URL(url);
   const pathParts = urlObj.pathname.split('/'); // 경로에서 'job, stay, tour' 추출
   const type = pathParts[1]; // 'job' 경로 추출
 

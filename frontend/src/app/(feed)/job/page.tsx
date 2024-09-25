@@ -38,7 +38,6 @@ export default function Job() {
     try {
       const response = await getJobs(area, keyword, page);
       setPageCount(response.data.pageNo);
-      console.log('response', response);
       const data = response.data.items.item.map((item: JobProps) => ({
         contentid: item.contentid,
         cardType: 'default',
@@ -140,10 +139,6 @@ export default function Job() {
     }
   }, [wishList]);
 
-  // useEffect(() => {
-  //
-  // }, []);
-
   const cardClick = (id: string, contentTypeId?: string, image?: string) => {
     const pushImage = image === '/svgs/job-default.svg' ? '' : image;
     router.push(
@@ -154,7 +149,10 @@ export default function Job() {
   // fetchDataAndWishList 함수를 통해서만 wish icon 업데이트를 하면 클라이언트 측에서 조금 느리게 반영되어 보임
   // 따라서 우선 상태를 바꾸고 에러가 발생했을 경우, 원래 상태로 되돌리는 방향으로 진행
   const wishClick = async (item: JobProps) => {
-    // if (!isLoggedIn) openModal();
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
     let res;
     const originState = item.inWishlist;
     item.inWishlist = !item.inWishlist;

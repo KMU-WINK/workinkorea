@@ -1,7 +1,7 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { WishItem, WishRes } from '@/types/type';
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3MjczMjQwfQ.V00TtHlLOXudmeJ-HrbG5Id8ied4RVG2XjHTp94Xmg8';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3Mjc2OTQ1fQ.jKJPBCl4khjP7RBsoC1xZNeuWMFalDyS7R9VpDn7dAg';
 
 export const getWishList = async (): Promise<WishRes[]> => {
   try {
@@ -10,7 +10,6 @@ export const getWishList = async (): Promise<WishRes[]> => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('getWishList response.data : ', response.data);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -25,7 +24,6 @@ export const postWishItem = async (postData: WishItem) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('postWishItem response.data : ', response.data);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -41,7 +39,6 @@ export const deleteWishItem = async (deleteData: WishItem) => {
       },
       data: deleteData,
     });
-    console.log('deleteWishItem response.data : ', response.data);
     return response.data;
   } catch (error) {
     console.error('Error:', error);

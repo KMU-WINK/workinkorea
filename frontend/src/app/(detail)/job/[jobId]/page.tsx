@@ -16,9 +16,11 @@ import {
   formatRecruitString,
 } from '../../_utils/stringUtils';
 import { formatSalary } from '../../../utils/stringUtils';
-import { JobInfo, SpotInfo, WishRes } from '@/types/type';
+import { JobInfo, SpotInfo, WishItem, WishRes } from '@/types/type';
 import { getJobDetail } from '@/services/jobs';
-import { getWishList } from '@/services/wishs';
+import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -29,8 +31,12 @@ const ImageWrapper = styled.div`
 `;
 
 export default function Job() {
-  const [selected, setSelected] = useState<boolean>(false);
+  const [inWish, setInWish] = useState<boolean>(false);
   const [wishList, setWishList] = useState<WishRes[]>([]);
+
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
+
   const [jobInfo, setJobInfo] = useState<JobInfo>({
     empmnTtl: '',
     dtyCn: '',
@@ -78,35 +84,10 @@ export default function Job() {
     }
   }, [contentId, contentTypeId]);
 
-  // useEffect(() => {
-  //   if (wishList.length > 0 && feedList.length > 0) {
-  //     const updatedFeedList = feedList.map(feedItem => {
-  //       const isInWishlist = wishList.some(
-  //         wishItem => wishItem.content_id === feedItem.contentId,
-  //       );
-  //
-  //       // 상태가 변경된 경우에만 업데이트
-  //       if (feedItem.inWishlist !== isInWishlist) {
-  //         return {
-  //           ...feedItem,
-  //           inWishlist: isInWishlist, // wishList에 있으면 true로 설정
-  //         };
-  //       }
-  //       return feedItem; // 상태가 변경되지 않았으면 기존 상태 유지
-  //     });
-  //
-  //     // 변경 사항이 있을 때만 feedList 업데이트
-  //     if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
-  //       setFeedList(updatedFeedList);
-  //     }
-  //   }
-  // }, [jobInfo, wishList]);
-
   const fetchData = async (contentId: string, contentTypeId: string) => {
     try {
       const response = await getJobDetail(contentId, contentTypeId);
       const data = response.data;
-      console.log('data : ', response);
 
       setJobInfo({
         empmnTtl: data.empmnTtl,
@@ -134,18 +115,38 @@ export default function Job() {
   const fetchWishList = async () => {
     const wishListData = await getWishList();
     setWishList(wishListData);
-    console.log('wishListData : ', wishListData);
   };
 
-  const clickHeart = () => {
-    setSelected(!selected);
-    console.log('selected', selected);
-    const data = {
-      type: 'job',
-      contentTypeId: contentTypeId,
-      contentId: contentId,
-    };
-    console.log('data : ', data);
+  const wishClick = async () => {
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
+    let res;
+    const originState = inWish;
+    setInWish(!inWish);
+
+    try {
+      const data: WishItem = {
+        type: 'job',
+        contentTypeId: contentTypeId,
+        contentId: contentId,
+      };
+      if (originState) {
+        setInWish(false);
+        res = await deleteWishItem(data);
+      } else {
+        setInWish(true);
+        res = await postWishItem(data);
+      }
+      await fetchWishList();
+    } catch (error) {
+      console.error('Error in wishClick:', error);
+      if (res.error) {
+        // 에러가 발생한 경우, 원래 상태로 되돌림
+        setInWish(!inWish);
+      }
+    }
   };
 
   const backClick = () => {
@@ -156,6 +157,13 @@ export default function Job() {
     const url = extractLinkOrValue(link);
     window.open(url, '_blank'); // 새 탭에서 링크 열기
   };
+
+  useEffect(() => {
+    const isInWishList = wishList.some(item => item.contentid === contentId);
+    if (isInWishList) {
+      setInWish(true);
+    }
+  }, [jobInfo]);
 
   return (
     <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
@@ -190,10 +198,10 @@ export default function Job() {
               >
                 {jobInfo.empmnTtl}
               </span>
-              {selected ? (
-                <HeartColor className="cursor-pointer" onClick={clickHeart} />
+              {inWish ? (
+                <HeartColor className="cursor-pointer" onClick={wishClick} />
               ) : (
-                <Heart className="cursor-pointer" onClick={clickHeart} />
+                <Heart className="cursor-pointer" onClick={wishClick} />
               )}
             </div>
             <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
