@@ -24,28 +24,30 @@ export default function Step1() {
   const provider = searchParam.get('provider');
 
   const handleDuplicateCheck = async () => {
-  try {
-    await createUserNickname({
-      social_id: socialId,
-      nickname,
-    });
-    setIsNicknameUnique(true);
-    setErrorMessage('사용 가능한 닉네임입니다.');
-    setMessageColor('blue');
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      if (e.response?.status === 400) {
-        setIsNicknameUnique(false);
-        setErrorMessage('중복된 닉네임입니다.');
-        setMessageColor('red');
-      } else {
-        console.error(e);
-        setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
-        setMessageColor('red');
+    try {
+      await createUserNickname({
+        social_id: socialId,
+        nickname,
+      });
+      setIsNicknameUnique(true);
+      setErrorMessage('사용 가능한 닉네임입니다.');
+      setMessageColor('blue');
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 400) {
+          setIsNicknameUnique(false);
+          setErrorMessage('중복된 닉네임입니다.');
+          setMessageColor('red');
+        } else {
+          alert(
+            '닉네임 확인 중 오류가 발생했습니다. 메인 화면으로 이동합니다.',
+          );
+          router.push('/main');
+          console.error(e);
+        }
       }
     }
-  }
-};
+  };
 
   const handleNextClick = async () => {
     router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);

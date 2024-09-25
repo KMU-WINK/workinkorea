@@ -29,7 +29,7 @@ export default function Step3() {
         interests: selectedOptions,
       });
       const data = await PublicAxiosInstance.get(
-        `/auth/token?social_id=${socialId}`,
+        `/auth/token?social_id=${socialId}&is_dev_mode=true`,
       );
       const redirectUrl = data.data.redirect_url;
       router.push(redirectUrl);
