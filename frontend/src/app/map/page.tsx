@@ -130,11 +130,11 @@ export default function Map() {
 
   // map object 관련 state
   const mapObjectRef = useRef<any>(null);
-  const [bounds, setBounds] = useState<BoundsType>();
-  const centerLng = useRef({
+  const centerLngRef = useRef({
     latitude: 0,
     longitude: 0,
   });
+  const isMarkerClickRef = useRef(false);
 
   const [mapList, setMapList] = useState<MapListInfo[]>([]);
 
@@ -149,26 +149,35 @@ export default function Map() {
 
   // 카드 슬라이드시 이벤트 함수
   const onSlideChange = (index: number) => {
-    const currentMarker = markers[Math.round(index)];
-    // 마커 이미지
-    const markerImage = new window.kakao.maps.MarkerImage(
-      markerImageSrc,
-      new window.kakao.maps.Size(20, 20),
-    );
-    const activeMarkerImage = new window.kakao.maps.MarkerImage(
-      activeMarkerImageSrc,
-      new window.kakao.maps.Size(36, 43),
-    );
+    console.log(isMarkerClickRef);
+    // 카드를 직접 슬라이드 할 경우에만 마커 이미지를 변경
+    // 마커를 클릭했을 때는 마커 클릭 이벤트 함수에서 해당 기능을 수행하기 때문
+    if (!isMarkerClickRef.current) {
+      const currentMarker = markers[Math.round(index)];
+      console.log(currentMarker);
+      // 마커 이미지
+      const markerImage = new window.kakao.maps.MarkerImage(
+        markerImageSrc,
+        new window.kakao.maps.Size(20, 20),
+      );
+      const activeMarkerImage = new window.kakao.maps.MarkerImage(
+        activeMarkerImageSrc,
+        new window.kakao.maps.Size(36, 43),
+      );
 
-    // 그 전 마커 비활성화
-    if (activeMarkerRef.current) activeMarkerRef.current.setImage(markerImage);
+      // 그 전 마커 비활성화
+      if (activeMarkerRef.current)
+        activeMarkerRef.current.setImage(markerImage);
 
-    // 현재 마커 좌표로 중심 이동
-    mapObjectRef.current.setCenter(currentMarker.getPosition());
+      // 현재 마커 좌표로 중심 이동
+      mapObjectRef.current.setCenter(currentMarker.getPosition());
 
-    // 현재 마커 활성화
-    currentMarker.setImage(activeMarkerImage);
-    activeMarkerRef.current = currentMarker;
+      // 현재 마커 활성화
+      currentMarker.setImage(activeMarkerImage);
+      activeMarkerRef.current = currentMarker;
+    }
+    // 마커 선택 여부 초기화
+    isMarkerClickRef.current = false;
   };
 
   // 슬라이드 설정
@@ -213,28 +222,39 @@ export default function Map() {
     }
   };
 
+  const getMapScale = (level: number) => {
+    if (level > 4) {
+      return level * Math.floor(level / 3) + 200;
+    } else if (level > 2) {
+    } else {
+    }
+  };
+
   useEffect(() => {
+    const radius = 400;
     // 중심좌표 저장하기
-    centerLng.current = {
-      latitude: 33.4759722639,
-      longitude: 126.5481687628,
+    centerLngRef.current = {
+      latitude: 35.165731905600005,
+      longitude: 129.15838566290198,
     };
     fetchLocationLists({
-      mapX: '126.5481687628',
-      mapY: '33.4759722639',
-      radius: 1000,
+      mapX: '129.15838566290198',
+      mapY: '35.165731905600005',
+      radius,
       keyword,
     });
     window.kakao.maps.load(() => {
       const options = {
         // 지도 중심 좌표
-        center: new window.kakao.maps.LatLng(33.4759722639, 126.5481687628),
-        level: 3,
+        center: new window.kakao.maps.LatLng(
+          35.165731905600005,
+          129.15838566290198,
+        ),
+        level: 4,
       };
 
       const map = new window.kakao.maps.Map(mapRef.current, options);
       mapObjectRef.current = map;
-      // 스케일별로 그냥 비교하면서 레벨이랑 대충 때려 맞추자
 
       // 지도 이동 이벤트 리스너
       window.kakao.maps.event.addListener(map, 'zoom_changed', function () {
@@ -246,20 +266,21 @@ export default function Map() {
 
         // 이전 중심좌표의 경도 > 우측좌표 OR 이전 중심좌표의 경도 < 좌측좌표
         if (
-          centerLng.current.longitude > newBounds.oa ||
-          centerLng.current.longitude < newBounds.ha
+          centerLngRef.current.longitude > newBounds.oa ||
+          centerLngRef.current.longitude < newBounds.ha
         ) {
           // todo: 이부분 중복코드니까 함수로 만들까
           const newCenter = map.getCenter();
+          console.log(newCenter);
           // 새로운 중심좌표를 기준으로 하여 api 호출
-          // await fetchLocationLists({
-          //   mapX: newCenter.La,
-          //   mapY: newCenter.Ma,
-          //   keyword,
-          //   radius: 5000,
-          // });
+          await fetchLocationLists({
+            mapX: newCenter.La,
+            mapY: newCenter.Ma,
+            keyword,
+            radius,
+          });
           // 중심좌표 업데이트
-          centerLng.current = {
+          centerLngRef.current = {
             latitude: newCenter.Ma,
             longitude: newCenter.La,
           };
@@ -267,8 +288,8 @@ export default function Map() {
 
         // 이전 중심좌표의 위도 > 위쪽 좌표 OR 이전 중심좌표 위도 < 아래 좌표
         if (
-          centerLng.current.latitude > newBounds.pa ||
-          centerLng.current.latitude < newBounds.qa
+          centerLngRef.current.latitude > newBounds.pa ||
+          centerLngRef.current.latitude < newBounds.qa
         ) {
           const newCenter = map.getCenter();
           // 새로운 중심좌표를 기준으로 하여 api 호출
@@ -279,7 +300,7 @@ export default function Map() {
           //   radius: 5000,
           // });
           // 중심좌표 업데이트
-          centerLng.current = {
+          centerLngRef.current = {
             latitude: map.getCenter().Ma,
             longitude: map.getCenter().La,
           };
@@ -290,6 +311,12 @@ export default function Map() {
 
   useEffect(() => {
     window.kakao.maps.load(() => {
+      if (markers) {
+        markers.forEach(marker => {
+          marker.setMap(null);
+        });
+        setMarkers([]);
+      }
       // 마커 이미지
       const markerImage = new window.kakao.maps.MarkerImage(
         markerImageSrc,
@@ -301,7 +328,7 @@ export default function Map() {
       );
 
       // 여러개 마커 생성
-      mapList.forEach(list => {
+      mapList.forEach((list, index) => {
         const marker = new window.kakao.maps.Marker({
           position: new window.kakao.maps.LatLng(list.mapy, list.mapx),
           id: list.contentid,
@@ -315,16 +342,17 @@ export default function Map() {
         // 마커 객체 저장
         setMarkers(prevData => [...prevData, marker]);
 
-        console.log(markers);
-
         // 마커 클릭 이벤트
         window.kakao.maps.event.addListener(marker, 'click', () => {
+          isMarkerClickRef.current = true; // card slide로 인한 마커 이미지 변경을 막기 위함
+          console.log(marker.getPosition());
           if (!activeMarkerRef.current || activeMarkerRef.current !== marker) {
             // 활성화 되어있는 마커가 없거나 클릭한 마커와 활성화된 마커가 다를 경우
             if (activeMarkerRef.current)
               activeMarkerRef.current.setImage(markerImage); // 그 전 마커 비활성화
+            mapObjectRef.current.setCenter(marker.getPosition()); // 클릭된 마커로 중심좌표 이동
             marker.setImage(activeMarkerImage); // 클릭된 마커 활성화
-            sliderRef.current?.slickGoTo(list.contentid - 1);
+            sliderRef.current?.slickGoTo(index);
           }
           activeMarkerRef.current = marker;
         });
@@ -334,7 +362,7 @@ export default function Map() {
 
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="max-w-sm h-full overflow-hidden relative">
+      <div className="max-w-sm h-full overflow-hidden relative w-full">
         <div className="z-10 absolute top-[54px] w-full px-6">
           <Input
             leftIcon={<Back />}
@@ -343,7 +371,7 @@ export default function Map() {
             // onChange={setInputValue}
           />
         </div>
-        <div ref={mapRef} className="h-screen" />
+        <div ref={mapRef} className="h-screen w-full" />
         <SliderContainer>
           <Slider
             ref={(slider: Slider | null) => {
