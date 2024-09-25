@@ -241,7 +241,7 @@ async def get_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="사용자가 존재하지 않습니다.",
         )
-    print(user.social_id)
+
     # JWT 토큰 생성
     jwt_token = create_jwt_token(user.social_id)
 
@@ -285,10 +285,9 @@ def verify_jwt_token(token: str):
         # JWT 토큰을 검증하고 payload 반환
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         # payload에서 닉네임 추출
-        print(payload)
+
         social_id = payload.get("social_id")
-        print(token)
-        print(social_id)
+
         if social_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

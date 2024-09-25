@@ -66,7 +66,6 @@ today = datetime.now().strftime("%Y-%m-%d")
 
 
 def get_jobs(area: str, keyword: str, pageNo: int = 1, wishs=False):
-    print(wishs)
 
     if len(area):
         white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
@@ -108,7 +107,7 @@ def get_jobs(area: str, keyword: str, pageNo: int = 1, wishs=False):
             data_rows = data["response"]["body"]["items"]["item"]
             for d in data_rows:
                 tmp = dict()
-                tmp["contentTypeId"] = "tour"  # 백엔드 확인용
+                tmp["contenttypeid"] = "tour"  # 백엔드 확인용
                 for key, value in d.items():
                     if key in [
                         "empmnInfoNo",
@@ -120,16 +119,20 @@ def get_jobs(area: str, keyword: str, pageNo: int = 1, wishs=False):
                         "salStleCd",
                     ]:
                         if key == "empmnInfoNo":
-                            tmp["contentId"] = value
+                            tmp["contentid"] = value
                         elif key == "salStleCd":
                             tmp["salStle"] = TOUR_salStleCd[value] if value else ""
                         else:
                             tmp[key] = value
+                # Wish 여부 추가
+                if wishs:
+                    tmp["inWish"] = True if tmp["contentid"] in wishs else False
 
                 result["items"]["item"].append(tmp)
             result["numOfRows"] += data["response"]["body"]["numOfRows"]
             result["totalCount"] += data["response"]["body"]["totalCount"]
-    # 공공기관 채용정보 API/
+
+    # 공공기관 채용정보 API
     params = {
         "serviceKey": API_KEY,
         "numOfRows": "10",
@@ -151,7 +154,7 @@ def get_jobs(area: str, keyword: str, pageNo: int = 1, wishs=False):
         for d in data_rows:
             # 아이템 가공
             tmp = dict()
-            tmp["contentTypeId"] = "open"  # 백엔드 확인용
+            tmp["contenttypeid"] = "open"  # 백엔드 확인용
             for key, value in d.items():
                 if key == "instNm":
                     tmp["corpoNm"] = value
@@ -160,7 +163,10 @@ def get_jobs(area: str, keyword: str, pageNo: int = 1, wishs=False):
                 elif key == "workRgnNmLst":
                     tmp["wrkpAdres"] = value
                 elif key == "recrutPblntSn":
-                    tmp["contentId"] = str(value)
+                    tmp["contentid"] = str(value)
+            # Wish 여부 추가
+            if wishs:
+                tmp["inWish"] = True if tmp["contentid"] in wishs else False
             # 아이템 추가
             result["items"]["item"].append(tmp)
         # 리스트 정보 갱신
@@ -203,7 +209,7 @@ TOUR_eplmtStleCd = {
 }
 
 
-def get_job(contentId: str, contentTypeId: str):
+def get_job(contentId: str, contentTypeId: str, wishs=False):
     result = dict()
     # 관광공사 API
     if contentTypeId == "tour":
@@ -219,10 +225,11 @@ def get_job(contentId: str, contentTypeId: str):
         # API 호출
         response = requests.get(ENDPOINT_tour_datail, params=params)
         data = response.json()
+
         if data["response"]["body"]["items"]:
             data_row = data["response"]["body"]["items"]["item"][0]
-            result["contentTypeId"] = contentTypeId
-            result["contendId"] = contentId
+            result["contenttypeid"] = contentTypeId
+            result["contentid"] = contentId
             for key, value in data_row.items():
                 if key in [
                     "corpoNm",
@@ -249,6 +256,9 @@ def get_job(contentId: str, contentTypeId: str):
                         result["eplmtStleN2"] = TOUR_eplmtStleCd[value] if value else ""
                     else:
                         result[key] = value
+            # Wish 여부 추가
+            if wishs:
+                result["inWish"] = True if result["contentid"] in wishs else False
             return result
         else:
             raise ValueError("No data found")
@@ -263,8 +273,8 @@ def get_job(contentId: str, contentTypeId: str):
         data = response.json()
         if data["resultCode"] == 200:
             data_row = data["result"]
-            result["contentTypeId"] = contentTypeId
-            result["contentId"] = contentId
+            result["contenttypeid"] = contentTypeId
+            result["contentid"] = contentId
             for key, value in data_row.items():
                 if key == "instNm":
                     result["corpoNm"] = value
@@ -292,8 +302,11 @@ def get_job(contentId: str, contentTypeId: str):
                 "ordtmEmpmnYn",
             ]:
                 result[key] = ""
+            # Wish 여부 추가
+            if wishs:
+                result["inWish"] = True if result["contentid"] in wishs else False
             return result
         else:
             raise ValueError("No data found")
     else:
-        raise ValueError("contentTypeId is not in valid list [open, tour]")
+        raise ValueError("contenttypeid is not in valid list [open, tour]")
