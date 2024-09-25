@@ -85,11 +85,13 @@ async def spot_stay_detail(
 
 @router.get("/location")
 async def spot_stay_location(
+    request: Request,
     mapX: str,
     mapY: str,
     keyword: str = "",
     radius: int = 20000,
     numOfRows: int = 3000,
+    db: Session = Depends(get_db),
 ):
     if not (
         (33.100000 <= float(mapY) <= 38.620000)
@@ -102,10 +104,22 @@ async def spot_stay_location(
 
     try:
         data = get_location_based_list(mapX, mapY, radius, numOfRows, contentTypeId=32)
+
+        wishs = False
+        if request.headers.get("Authorization"):
+            current_user = get_current_user(request, db)
+            stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
+            wishs = [wish.content_id for wish in stay_wish]
+
         if len(keyword) >= 1:
             data["items"]["item"] = list(
                 filter(lambda x: keyword in x["title"], data["items"]["item"])
             )
+
+        if wishs:
+            for item in data["items"]["item"]:
+                item["inWish"] = item["contentid"] in wishs
+
         return data
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
