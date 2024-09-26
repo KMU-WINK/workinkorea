@@ -253,10 +253,11 @@ async def get_access_token(
 
     if is_dev_mode:
         httponly = False
+        samesite = "Lax"
         secure = False
-        domain = "localhost"
     else:
         httponly = True
+        samesite = "none"
         secure = True
         domain = ".workinkorea.info"
 
@@ -264,16 +265,16 @@ async def get_access_token(
         key="accessToken",
         value=jwt_token,
         httponly=httponly,
-        samesite="none",
+        samesite=samesite,
         secure=secure,
-        domain=domain,
+        domain=domain if not is_dev_mode else None,
     )
     response.set_cookie(
         key="social_id",
         value=social_id,
-        samesite="none",
+        samesite=samesite,
         secure=secure,
-        domain=domain,
+        domain=domain if not is_dev_mode else None,
     )
 
     return response
