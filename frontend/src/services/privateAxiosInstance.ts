@@ -1,16 +1,19 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
 const PrivateAxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URI,
-  timeout: 1000,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
-PrivateAxiosInstance.interceptors.request
-  .use
-  // config => {
-  //     // request 시 토큰 붙여주는 로직 추가 예정
-  // }
-  ();
+PrivateAxiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    config.withCredentials = true;
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  },
+);
 
 export default PrivateAxiosInstance;

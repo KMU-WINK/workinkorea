@@ -9,13 +9,11 @@ import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/services/users';
 import { UserDetail } from '@/types/user';
 import { formatDateWithDots } from '@/utils/dateUtils';
+import axios from 'axios';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const router = useRouter();
-
-  // todo: social_id 받기
-  const socialId = '';
   const backButtonClick = () => {
     router.back();
   };
@@ -25,8 +23,12 @@ export default function Setting() {
   const logoutClick = () => {};
 
   const fetchUserInfo = async () => {
-    const result = await getUserDetail(socialId);
-    setUserDetail(result);
+    // const result = await getUserDetail();
+    const token = await axios.get('/api/token', {
+      withCredentials: true,
+    });
+    console.log(token);
+    // setUserDetail(result);
   };
 
   useEffect(() => {
