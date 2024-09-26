@@ -265,14 +265,14 @@ async def get_access_token(
         value=jwt_token,
         httponly=httponly,
         samesite="none",
-        secure=secure,
+        # secure=secure,
         domain=domain,
     )
     response.set_cookie(
         key="social_id",
         value=social_id,
         samesite="none",
-        secure=secure,
+        # secure=secure,
         domain=domain,
     )
 

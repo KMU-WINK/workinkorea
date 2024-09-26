@@ -6,7 +6,7 @@ from ..schemas.user import (
     RegionUpdate,
     InterestUpdate,
     WorkUpdate,
-    NicknameUpdate
+    NicknameUpdate,
 )
 from ..models.Interest import Interest
 from ..models.Region import Region
@@ -88,7 +88,10 @@ async def read_user(request: Request, db: Session = Depends(get_db)):
     # current_user = db.query(User).filter(User.id == 1).first() #for test
 
     if current_user is None:
-        raise HTTPException(status_code=400, detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}",
+        )
 
     region_names = get_regions_by_id(current_user.id, db)
     interest_names = get_interests_by_id(current_user.id, db)
@@ -102,7 +105,7 @@ async def read_user(request: Request, db: Session = Depends(get_db)):
 
 
 @router.patch("/nickname")
-async def update_user_nickname(user:NicknameUpdate, db: Session = Depends(get_db)):
+async def update_user_nickname(user: NicknameUpdate, db: Session = Depends(get_db)):
     user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
     nickname = user.nickname
 
@@ -142,11 +145,11 @@ async def update_user_info(user: InfoUpdate, db: Session = Depends(get_db)):
 
 
 @router.patch("/region")
-async def update_user_region(user:RegionUpdate, db: Session = Depends(get_db)):
+async def update_user_region(user: RegionUpdate, db: Session = Depends(get_db)):
     user_to_update = db.query(User).filter(User.social_id == user.social_id).first()
 
     white_list = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]
-    
+
     # 지역 예외처리
     for region in user.regions:
         if region not in white_list:
@@ -156,9 +159,7 @@ async def update_user_region(user:RegionUpdate, db: Session = Depends(get_db)):
             )
 
     # 기존의 User_Region 데이터를 삭제
-    delete_stmt = delete(User_Region).where(
-        User_Region.c.user_id == user_to_update.id
-    )
+    delete_stmt = delete(User_Region).where(User_Region.c.user_id == user_to_update.id)
     db.execute(delete_stmt)
     db.commit()
 
@@ -168,7 +169,6 @@ async def update_user_region(user:RegionUpdate, db: Session = Depends(get_db)):
         stmt = insert(User_Region).values(
             user_id=user_to_update.id, region_id=region_id
         )
-        # print(region_id)
         db.execute(stmt)
         db.commit()
     db.refresh(user_to_update)
@@ -214,13 +214,10 @@ async def update_user_interest(user: InterestUpdate, db: Session = Depends(get_d
 
     # 유저 정보 업데이트
     for interest in user.interests:
-        interest_id = (
-            db.query(Interest).filter(Interest.name == interest).first().id
-        )
+        interest_id = db.query(Interest).filter(Interest.name == interest).first().id
         stmt = insert(User_Interest).values(
             user_id=user_to_update.id, interest_id=interest_id
         )
-        # print(region_id)
         db.execute(stmt)
         db.commit()
     db.refresh(user_to_update)
@@ -276,27 +273,29 @@ async def update_user_work(user: WorkUpdate, db: Session = Depends(get_db)):
         "works": work_names,
     }
 
+
 @router.patch("/profile")
 async def update_user_profile(request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
     # current_user = db.query(User).filter(User.id == 1).first() #for test
-    form = await request.form() 
+    form = await request.form()
     profile: UploadFile = form.get("profile")
     if not profile:
         raise HTTPException(status_code=400, detail="Profile is required")
-    
+
     # 프로필 사진을 Base64로 인코딩
     profile_data = await profile.read()
-    profile_base64 = base64.b64encode(profile_data).decode('utf-8')
-    
+    profile_base64 = base64.b64encode(profile_data).decode("utf-8")
+
     # Base64 인코딩된 데이터를 데이터베이스에 저장
     current_user.profile_picture_base64 = profile_base64
-    
+
     db.add(current_user)
     db.commit()
     db.refresh(current_user)
 
-    return "Profile updated successfully"  
+    return "Profile updated successfully"
+
 
 @router.delete("")
 async def delete_user(id: int):

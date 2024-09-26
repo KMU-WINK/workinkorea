@@ -7,6 +7,8 @@ from ..models.Stay import Stay
 from ..models.Job import Job
 from ..models.Wish import WishBase
 from .auth import get_current_user
+from .spots import spot_stay_detail
+from .jobs import read_job
 
 router = APIRouter(
     prefix="/wishs",
@@ -33,19 +35,57 @@ async def get_wish(
         tmp["contenttypeid"] = item.content_type_id
         tmp["contentid"] = item.content_id
         tmp["type"] = "spot"
+        data = await spot_stay_detail(
+            request=request,
+            contentId=item.content_id,
+            contentTypeId=item.content_type_id,
+            db=db,
+        )
+        field_list = ["title", "addr1", "addr2", "firstimage", "firstimage2", "inWish"]
+        for field in field_list:
+            if field in data.keys():
+                tmp[field] = data[field]
         result.append(tmp)
         tmp = {}
     for item in stay_wish:
         tmp["contenttypeid"] = item.content_type_id
         tmp["contentid"] = item.content_id
         tmp["type"] = "stay"
+
+        data = await spot_stay_detail(
+            request=request,
+            contentId=item.content_id,
+            contentTypeId=item.content_type_id,
+            db=db,
+        )
+        field_list = ["title", "addr1", "addr2", "firstimage", "firstimage2", "inWish"]
+        for field in field_list:
+            if field in data.keys():
+                tmp[field] = data[field]
         result.append(tmp)
         tmp = {}
     for item in job_wish:
         tmp["contenttypeid"] = item.content_type_id
         tmp["contentid"] = item.content_id
         tmp["type"] = "job"
-        result.append(tmp)
+        data = await read_job(
+            request=request,
+            contentId=item.content_id,
+            contentTypeId=item.content_type_id,
+            db=db,
+        )
+        field_list = [
+            "corpoNm",
+            "empmnTtl",
+            "wageAmt",
+            "wrkpAdres",
+            "corpoLogoFileUrl",
+            "inWish",
+            "salStle",
+        ]
+        for field in field_list:
+            if field in data.keys():
+                tmp[field] = data[field]
         tmp = {}
 
     return result
