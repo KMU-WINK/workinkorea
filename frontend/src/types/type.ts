@@ -120,3 +120,20 @@ export interface WishRes extends WishItem {
   // api get 호출 시 담기는 데이터
   contentid: string;
 }
+
+export interface MapListInfo {
+  contentid: string;
+  title: string;
+  addr1: string;
+  firstImage: string;
+  mapx: string;
+  mapy: string;
+}
+
+export interface GetSpotListsProps {
+  mapX: string;
+  mapY: string;
+  keyword: string | null;
+  radius?: number;
+  numOfRows?: number;
+}
