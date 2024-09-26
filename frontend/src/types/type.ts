@@ -117,3 +117,11 @@ export interface MapListInfo {
   mapx: string;
   mapy: string;
 }
+
+export interface GetSpotListsProps {
+  mapX: string;
+  mapY: string;
+  keyword: string | null;
+  radius?: number;
+  numOfRows?: number;
+}

@@ -5,7 +5,7 @@ import Slider, { Settings } from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Card from '@/components/Card';
-import { FeedProps, MapListInfo } from '@/types/type';
+import { FeedProps, GetSpotListsProps, MapListInfo } from '@/types/type';
 import styled from 'styled-components';
 import Input from '@/components/Input';
 import Back from '../../../public/svgs/back.svg';
@@ -30,83 +30,6 @@ interface BoundsType {
   pa: number;
   qa: number;
 }
-
-interface FetchApiProps {
-  mapX: string;
-  mapY: string;
-  keyword: string | null;
-  radius?: number;
-}
-const testData: FeedProps[] = [
-  {
-    contentid: 1,
-    cardType: 'map',
-    serviceType: 'default',
-    title: '파주 풀빌라',
-    firstimage:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    firstimage2:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    addr1: '서울특별시 종로구 사직로 161',
-    addr2: '',
-    image: 'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    inWishlist: false,
-    location: '서울특별시 종로구 사직로 161',
-    mapx: 33.450705,
-    mapy: 126.570677,
-  },
-  {
-    contentid: 2,
-    cardType: 'map',
-    serviceType: 'default',
-    title: '파주 풀빌라',
-    firstimage:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    firstimage2:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    addr1: '서울특별시 종로구 사직로 161',
-    addr2: '',
-    image: 'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    inWishlist: false,
-    location: '서울특별시 종로구 사직로 161',
-    mapx: 33.450936,
-    mapy: 126.569477,
-  },
-  {
-    contentid: 3,
-    cardType: 'map',
-    serviceType: 'default',
-    title: '파주 풀빌라',
-    firstimage:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    firstimage2:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    addr1: '서울특별시 종로구 사직로 161',
-    addr2: '',
-    image: 'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    inWishlist: false,
-    location: '서울특별시 종로구 사직로 161',
-    mapx: 33.450879,
-    mapy: 126.56994,
-  },
-  {
-    contentid: 4,
-    cardType: 'map',
-    serviceType: 'default',
-    title: '파주 풀빌라',
-    firstimage:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    firstimage2:
-      'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    addr1: '서울특별시 종로구 사직로 161',
-    addr2: '',
-    image: 'http://tong.visitkorea.or.kr/cms/resource/93/2571393_image2_1.PNG',
-    inWishlist: false,
-    location: '서울특별시 종로구 사직로 161',
-    mapx: 33.451393,
-    mapy: 126.570738,
-  },
-];
 
 const SliderContainer = styled.div`
   position: relative;
@@ -134,6 +57,7 @@ export default function Map() {
     latitude: 0,
     longitude: 0,
   });
+  const levelRef = useRef(3);
   const isMarkerClickRef = useRef(false);
 
   const [mapList, setMapList] = useState<MapListInfo[]>([]);
@@ -203,7 +127,8 @@ export default function Map() {
     mapY,
     keyword,
     radius,
-  }: FetchApiProps) => {
+    numOfRows,
+  }: GetSpotListsProps) => {
     if (true) {
       // feed에서 지도로 이동했을 경우
       const result = await getSpotLists({
@@ -211,9 +136,13 @@ export default function Map() {
         mapY,
         keyword,
         radius,
+        numOfRows,
       });
-      console.log(result);
-      setMapList(result.items.item);
+      if (result === 'no data') {
+        setMapList([]);
+      } else {
+        setMapList(result.items.item);
+      }
     } else if (contentId) {
       // detail에서 지도로 이동했을 경우
       // 얘는 근데 따로 빼도 될듯
@@ -222,16 +151,17 @@ export default function Map() {
     }
   };
 
-  const getMapScale = (level: number) => {
+  const getMapRadius = (level: number) => {
     if (level > 4) {
-      return level * Math.floor(level / 3) + 200;
-    } else if (level > 2) {
+      console.log(level * 100 * Math.floor(level / 3) + 200);
+      return level * 100 * Math.floor(level / 3) + 200;
     } else {
+      console.log(100 * Math.floor(level / 3) + 200);
+      return 100 * Math.floor(level / 3) + 200;
     }
   };
 
   useEffect(() => {
-    const radius = 400;
     // 중심좌표 저장하기
     centerLngRef.current = {
       latitude: 35.165731905600005,
@@ -240,8 +170,9 @@ export default function Map() {
     fetchLocationLists({
       mapX: '129.15838566290198',
       mapY: '35.165731905600005',
-      radius,
+      radius: getMapRadius(levelRef.current),
       keyword,
+      numOfRows: 50,
     });
     window.kakao.maps.load(() => {
       const options = {
@@ -256,20 +187,34 @@ export default function Map() {
       const map = new window.kakao.maps.Map(mapRef.current, options);
       mapObjectRef.current = map;
 
-      // 지도 이동 이벤트 리스너
+      // 지도 줌 아웃 리스너
       window.kakao.maps.event.addListener(map, 'zoom_changed', function () {
-        console.log(map.getLevel());
+        const newLevel = map.getLevel();
+        const newCenter = map.getCenter();
+        if (newLevel > levelRef.current) {
+          // 새로운 레벨과 현재 중심좌표를 기준으로 api 호출
+          fetchLocationLists({
+            mapX: newCenter.La,
+            mapY: newCenter.Ma,
+            radius: getMapRadius(newLevel),
+            numOfRows: newLevel === 3 || newLevel === 4 ? 50 : 30, // level이 3 또는 4일 경우에만 최대 item 50개 설정
+            keyword,
+          });
+        }
+        // 레벨 업데이트
+        levelRef.current = newLevel;
       });
 
+      // 지도 드래그 리스너
       window.kakao.maps.event.addListener(map, 'dragend', async function () {
         const newBounds: BoundsType = map.getBounds();
 
-        // 이전 중심좌표의 경도 > 우측좌표 OR 이전 중심좌표의 경도 < 좌측좌표
+        // 양 옆으로 드래그 할 때
+        // [이전 중심좌표의 경도 > 우측좌표 OR 이전 중심좌표의 경도 < 좌측좌표] 일때만 api 호출
         if (
           centerLngRef.current.longitude > newBounds.oa ||
           centerLngRef.current.longitude < newBounds.ha
         ) {
-          // todo: 이부분 중복코드니까 함수로 만들까
           const newCenter = map.getCenter();
           console.log(newCenter);
           // 새로운 중심좌표를 기준으로 하여 api 호출
@@ -277,7 +222,7 @@ export default function Map() {
             mapX: newCenter.La,
             mapY: newCenter.Ma,
             keyword,
-            radius,
+            radius: getMapRadius(levelRef.current),
           });
           // 중심좌표 업데이트
           centerLngRef.current = {
@@ -286,19 +231,20 @@ export default function Map() {
           };
         }
 
-        // 이전 중심좌표의 위도 > 위쪽 좌표 OR 이전 중심좌표 위도 < 아래 좌표
+        // 위 아래로 드래그 할 때
+        // [이전 중심좌표의 위도 > 위쪽 좌표 OR 이전 중심좌표 위도 < 아래 좌표] 일때만 api 호출
         if (
           centerLngRef.current.latitude > newBounds.pa ||
           centerLngRef.current.latitude < newBounds.qa
         ) {
           const newCenter = map.getCenter();
           // 새로운 중심좌표를 기준으로 하여 api 호출
-          // await fetchLocationLists({
-          //   mapX: newCenter.La,
-          //   mapY: newCenter.Ma,
-          //   keyword,
-          //   radius: 5000,
-          // });
+          await fetchLocationLists({
+            mapX: newCenter.La,
+            mapY: newCenter.Ma,
+            keyword,
+            radius: getMapRadius(levelRef.current),
+          });
           // 중심좌표 업데이트
           centerLngRef.current = {
             latitude: map.getCenter().Ma,
@@ -309,6 +255,7 @@ export default function Map() {
     });
   }, []);
 
+  // 마커 생성
   useEffect(() => {
     window.kakao.maps.load(() => {
       if (markers) {
@@ -368,7 +315,6 @@ export default function Map() {
             leftIcon={<Back />}
             rightIcon={<Filter />}
             placeholder="검색어"
-            // onChange={setInputValue}
           />
         </div>
         <div ref={mapRef} className="h-screen w-full" />
