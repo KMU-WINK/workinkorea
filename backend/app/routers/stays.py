@@ -75,11 +75,8 @@ async def spot_stay_detail(
         current_user = get_current_user(request, db)
         stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
         wishs = [wish.content_id for wish in stay_wish]
-        print(wishs)
         combined_dict["inWish"] = combined_dict["contentid"] in wishs
 
-    # 결과 확인
-    print(combined_dict["contentid"])
     return combined_dict
 
 
