@@ -1,12 +1,7 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { GetSpotListsProps } from '@/types/type';
+import axios from 'axios';
 
-interface GetSpotListsProps {
-  mapX: string;
-  mapY: string;
-  keyword: string | null;
-  radius?: number;
-  numOfRows?: number;
-}
 const getSpotLists = async ({
   mapX,
   mapY,
@@ -22,7 +17,11 @@ const getSpotLists = async ({
     );
     return response.data;
   } catch (e) {
-    console.log(e);
+    if (axios.isAxiosError(e)) {
+      if (e.response?.status === 400) {
+        return 'no data';
+      }
+    }
   }
 };
 
