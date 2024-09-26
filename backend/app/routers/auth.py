@@ -69,11 +69,7 @@ async def kakaoAuth(code: str, request: Request, db: Session = Depends(get_db)):
 
     # login 호출 시 await 추가
     return await login(
-        request=request,
-        access_token=access_token,
-        provider="kakao",
-        db=db,
-        # is_dev_mode=is_dev_mode,
+        access_token=access_token, provider="kakao", db=db, is_dev_mode=is_dev_mode
     )
 
 
@@ -101,11 +97,7 @@ async def naverAuth(
         raise ValueError("Access token not found in response")
 
     return await login(
-        request=request,
-        access_token=access_token,
-        provider="naver",
-        db=db,
-        # is_dev_mode=is_dev_mode,
+        access_token=access_token, provider="naver", db=db, is_dev_mode=is_dev_mode
     )
 
 
@@ -113,7 +105,7 @@ async def naverAuth(
 async def googleAuth(
     state: str, code: str, request: Request, db: Session = Depends(get_db)
 ):
-    # is_dev_mode = request.url.hostname != OPERATION_HOST_URL
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
@@ -135,11 +127,7 @@ async def googleAuth(
         raise ValueError("Access token not found in response")
 
     return await login(
-        request=request,
-        access_token=access_token,
-        provider="google",
-        db=db,
-        # is_dev_mode=is_dev_mode
+        access_token=access_token, provider="google", db=db, is_dev_mode=is_dev_mode
     )
 
 
@@ -152,13 +140,7 @@ def get_user(social_id: str, provider: str, db: Session):
     )
 
 
-async def login(
-    request: Request,
-    access_token: str,
-    provider: str,
-    db: Session,
-    # is_dev_mode: bool
-):
+async def login(access_token: str, provider: str, db: Session, is_dev_mode: bool):
     async with httpx.AsyncClient() as client:
         if provider == "kakao":
             user_info = (
@@ -235,19 +217,12 @@ async def login(
         )
 
     # 회원가입이 되어있는 유저
-    return await get_access_token(
-        request,
-        user.social_id,
-        #   is_dev_mode,
-        db,
-        True,
-    )
+    return await get_access_token(user.social_id, is_dev_mode, db, True)
 
 
 # social_id 기반 토큰 발급
 @router.get("/token")
 async def get_access_token(
-    request: Request,
     social_id: str,
     is_dev_mode: bool,
     db: Session = Depends(get_db),
@@ -258,9 +233,8 @@ async def get_access_token(
     user = db.query(User).filter(User.social_id == social_id).first()
     client_url = os.getenv("WINK_CLIENT_URI")
 
-    # if is_dev_mode:
-    #     client_url = "http://localhost:3000"
-    is_dev_mode = request.headers.get("X-Environment") == "development"
+    if is_dev_mode:
+        client_url = "http://localhost:3000"
 
     if not user:
         raise HTTPException(
