@@ -16,6 +16,16 @@ router = APIRouter(
 )
 
 
+AREA_SCALE_UP = {
+    "강원": ["강릉", "춘천"],
+    "부산": ["부산"],
+    "제주": ["제주"],
+    "경남": ["경주"],
+    "전남": ["여수"],
+    "전북": ["전주"],
+}
+
+
 @router.get("")
 async def get_wish(
     request: Request,
@@ -27,11 +37,19 @@ async def get_wish(
     stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
     job_wish = db.query(Job).filter(Job.user_id == current_user.id).all()
 
-    result = []
+    result = {
+        "강릉": [],
+        "경주": [],
+        "부산": [],
+        "여수": [],
+        "전주": [],
+        "제주": [],
+        "춘천": [],
+    }
 
-    tmp = {}
     # id 필드를 제거
     for item in spot_wish:
+        tmp = {}
         tmp["contenttypeid"] = item.content_type_id
         tmp["contentid"] = item.content_id
         tmp["type"] = "spot"
@@ -41,13 +59,20 @@ async def get_wish(
             contentTypeId=item.content_type_id,
             db=db,
         )
+
         field_list = ["title", "addr1", "addr2", "firstimage", "firstimage2", "inWish"]
+        # 필드 선별
         for field in field_list:
             if field in data.keys():
                 tmp[field] = data[field]
-        result.append(tmp)
-        tmp = {}
+        # 지역 분류
+        for key in result.keys():
+            if key in tmp["addr1"]:
+                result[key].append(tmp)
+                continue
+
     for item in stay_wish:
+        tmp = {}
         tmp["contenttypeid"] = item.content_type_id
         tmp["contentid"] = item.content_id
         tmp["type"] = "stay"
@@ -58,13 +83,22 @@ async def get_wish(
             contentTypeId=item.content_type_id,
             db=db,
         )
+
         field_list = ["title", "addr1", "addr2", "firstimage", "firstimage2", "inWish"]
+
+        # 필드 선별
         for field in field_list:
             if field in data.keys():
                 tmp[field] = data[field]
-        result.append(tmp)
-        tmp = {}
+
+        # 지역 분류
+        for key in result.keys():
+            if key in tmp["addr1"]:
+                result[key].append(tmp)
+                continue
+
     for item in job_wish:
+        tmp = {}
         tmp["contenttypeid"] = item.content_type_id
         tmp["contentid"] = item.content_id
         tmp["type"] = "job"
@@ -83,10 +117,25 @@ async def get_wish(
             "inWish",
             "salStle",
         ]
+        # 필드 선별
         for field in field_list:
             if field in data.keys():
                 tmp[field] = data[field]
-        tmp = {}
+
+        # 지역 분류
+        if tmp["contenttypeid"] == "open":
+            for key in AREA_SCALE_UP.keys():
+                if key in tmp["wrkpAdres"]:
+                    if len(AREA_SCALE_UP[key]) > 1:
+                        for area in AREA_SCALE_UP[key]:
+                            result[area].append(tmp)
+                    else:
+                        result[AREA_SCALE_UP[key][0]].append(tmp)
+        else:  # is tour
+            for key in result.keys():
+                if key in tmp["wrkpAdres"]:
+                    result[key].append(tmp)
+                    continue
 
     return result
 
