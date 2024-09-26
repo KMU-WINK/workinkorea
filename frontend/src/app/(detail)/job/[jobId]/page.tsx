@@ -6,8 +6,6 @@ import styled from 'styled-components';
 
 import Heart from '../../../../../public/svgs/heart.svg';
 import HeartColor from '../../../../../public/svgs/heart-color.svg';
-import Location from '../../../../../public/svgs/location.svg';
-import GoSmall from '../../../../../public/svgs/go-small.svg';
 import BackWhite from '../../../../../public/svgs/back-white.svg';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
@@ -18,8 +16,11 @@ import {
   formatRecruitString,
 } from '../../_utils/stringUtils';
 import { formatSalary } from '../../../utils/stringUtils';
-import { JobInfo } from '@/types/type';
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { JobInfo, SpotInfo, WishItem, WishRes } from '@/types/type';
+import { getJobDetail } from '@/services/jobs';
+import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -30,7 +31,12 @@ const ImageWrapper = styled.div`
 `;
 
 export default function Job() {
-  const [selected, setSelected] = useState<boolean>(false);
+  const [inWish, setInWish] = useState<boolean>(false);
+  const [wishList, setWishList] = useState<WishRes[]>([]);
+
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
+
   const [jobInfo, setJobInfo] = useState<JobInfo>({
     empmnTtl: '',
     dtyCn: '',
@@ -69,6 +75,7 @@ export default function Job() {
     const thumbnail = queryString.substring(thumbnailIndex);
     setContentTypeId(contentTypeId);
     setImage(thumbnail);
+    fetchWishList();
   }, []);
 
   useEffect(() => {
@@ -79,10 +86,9 @@ export default function Job() {
 
   const fetchData = async (contentId: string, contentTypeId: string) => {
     try {
-      const response = await PublicAxiosInstance.get(
-        `/jobs/detail?contentId=${contentId}&contentTypeId=${contentTypeId}`,
-      );
+      const response = await getJobDetail(contentId, contentTypeId);
       const data = response.data;
+
       setJobInfo({
         empmnTtl: data.empmnTtl,
         dtyCn: data.dtyCn,
@@ -106,9 +112,41 @@ export default function Job() {
     }
   };
 
-  const clickHeart = () => {
-    setSelected(!selected);
-    console.log('selected', selected);
+  const fetchWishList = async () => {
+    const wishListData = await getWishList();
+    setWishList(wishListData);
+  };
+
+  const wishClick = async () => {
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
+    let res;
+    const originState = inWish;
+    setInWish(!inWish);
+
+    try {
+      const data: WishItem = {
+        type: 'job',
+        contentTypeId: contentTypeId,
+        contentId: contentId,
+      };
+      if (originState) {
+        setInWish(false);
+        res = await deleteWishItem(data);
+      } else {
+        setInWish(true);
+        res = await postWishItem(data);
+      }
+      await fetchWishList();
+    } catch (error) {
+      console.error('Error in wishClick:', error);
+      if (res.error) {
+        // 에러가 발생한 경우, 원래 상태로 되돌림
+        setInWish(!inWish);
+      }
+    }
   };
 
   const backClick = () => {
@@ -120,15 +158,15 @@ export default function Job() {
     window.open(url, '_blank'); // 새 탭에서 링크 열기
   };
 
-  const addressClick = () => {
-    router.push(`/map?contentId=${contentId}&contentTypeId=${contentTypeId}`);
-  };
+  useEffect(() => {
+    const isInWishList = wishList.some(item => item.contentid === contentId);
+    if (isInWishList) {
+      setInWish(true);
+    }
+  }, [jobInfo]);
 
   return (
-    <div
-      className="flex flex-col justify-start items-center h-full w-screen bg-white text-black
-    "
-    >
+    <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
       <div
         className="flex flex-col justify-start items-center gap-3
         w-full bg-white sm:max-w-sm
@@ -160,22 +198,15 @@ export default function Job() {
               >
                 {jobInfo.empmnTtl}
               </span>
-              {selected ? (
-                <HeartColor className="cursor-pointer" onClick={clickHeart} />
+              {inWish ? (
+                <HeartColor className="cursor-pointer" onClick={wishClick} />
               ) : (
-                <Heart className="cursor-pointer" onClick={clickHeart} />
+                <Heart className="cursor-pointer" onClick={wishClick} />
               )}
             </div>
-            <div
-              className="w-fit flex items-center cursor-pointer"
-              onClick={addressClick}
-            >
-              <Location />
-              <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                {jobInfo.wrkpAdres}
-              </span>
-              <GoSmall />
-            </div>
+            <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+              {jobInfo.wrkpAdres}
+            </span>
             <span className="text-xs">{jobInfo.corpoNm}</span>
             <div className="w-full flex flex-col gap-2 text-xs">
               {jobInfo.wrkpAdres && (

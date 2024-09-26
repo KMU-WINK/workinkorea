@@ -21,8 +21,11 @@ import {
   InfoRowType39,
 } from '../../_components/InfoItem';
 import { formatString, extractLinkOrValue } from '../../_utils/stringUtils';
-import { SpotExtraInfo, SpotInfo } from '@/types/type';
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
+import { SpotExtraInfo, SpotInfo, WishItem, WishRes } from '@/types/type';
+import { getSpotDetail } from '@/services/spots';
+import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -33,7 +36,11 @@ const ImageWrapper = styled.div`
 `;
 
 export default function Tour() {
-  const [selected, setSelected] = useState<boolean>(false);
+  const [inWish, setInWish] = useState<boolean>(false);
+  const [wishList, setWishList] = useState<WishRes[]>([]);
+
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const [spotInfo, setSpotInfo] = useState<SpotInfo>({
     title: '',
@@ -48,7 +55,12 @@ export default function Tour() {
     restDate: '',
     inTime: '',
     outTime: '',
+    mapx: 0,
+    mapy: 0,
+    inWishlist: false,
+    location: '',
   });
+
   const [extraInfo, setExtraInfo] = useState<SpotExtraInfo>({
     parking: '',
     expGuide: '',
@@ -62,14 +74,26 @@ export default function Tour() {
   const router = useRouter();
   const [contentId, setContentId] = useState<number>(0);
   const [contentTypeId, setContentTypeId] = useState<number>(0);
+  const [type, setType] = useState<string>('');
 
   useEffect(() => {
     const pathParts = window.location.pathname.split('/');
+
     const id = pathParts.pop() || pathParts.pop() || '';
     setContentId(parseInt(id) || 0);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    setContentTypeId(parseInt(searchParams.get('contenttypeid') || '0'));
+    const search = window.location.search;
+
+    const contentTypeIdMatch = search.match(/contenttypeid=([0-9]+)/);
+    if (contentTypeIdMatch) {
+      setContentTypeId(parseInt(contentTypeIdMatch[1]));
+    }
+
+    const typeMatch = search.match(/type=([^&]*)/);
+    if (typeMatch) {
+      setType(typeMatch[1]);
+    }
+    fetchWishList();
   }, []);
 
   useEffect(() => {
@@ -80,9 +104,7 @@ export default function Tour() {
 
   const fetchData = async (contentId: number, contentTypeId: number) => {
     try {
-      const response = await PublicAxiosInstance.get(
-        `/spots/detail?contentId=${contentId}&contentTypeId=${contentTypeId}`,
-      );
+      const response = await getSpotDetail(contentId, contentTypeId);
       const data = response.data;
       setSpotInfo({
         title: data.title,
@@ -122,6 +144,10 @@ export default function Tour() {
           '정보 없음',
         inTime: data.checkintime || '',
         outTime: data.checkouttime || '',
+        mapx: data.mapx,
+        mapy: data.mapy,
+        inWishlist: data.inWishlist,
+        location: data.location,
       });
 
       setExtraInfo({
@@ -148,9 +174,42 @@ export default function Tour() {
     }
   };
 
-  const clickHeart = () => {
-    setSelected(!selected);
-    console.log('selected', selected);
+  const fetchWishList = async () => {
+    const wishListData = await getWishList();
+    setWishList(wishListData);
+  };
+
+  const wishClick = async () => {
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
+
+    let res;
+    const originState = inWish;
+    setInWish(!inWish);
+
+    try {
+      const data: WishItem = {
+        type: type,
+        contentTypeId: String(contentTypeId),
+        contentId: String(contentId),
+      };
+      if (originState) {
+        setInWish(false);
+        res = await deleteWishItem(data);
+      } else {
+        setInWish(true);
+        res = await postWishItem(data);
+      }
+      await fetchWishList();
+    } catch (error) {
+      console.error('Error in wishClick:', error);
+      if (res.error) {
+        // 에러가 발생한 경우, 원래 상태로 되돌림
+        setInWish(!inWish);
+      }
+    }
   };
 
   const backClick = () => {
@@ -165,6 +224,15 @@ export default function Tour() {
   const addressClick = () => {
     router.push(`/map?contentId=${contentId}&contentTypeId=${contentTypeId}`);
   };
+
+  useEffect(() => {
+    const isInWishList = wishList.some(
+      item => item.contentid === String(contentId),
+    );
+    if (isInWishList) {
+      setInWish(true);
+    }
+  }, [spotInfo]);
 
   return (
     <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
@@ -197,10 +265,10 @@ export default function Tour() {
               >
                 {spotInfo.title}
               </span>
-              {selected ? (
-                <HeartColor className="cursor-pointer" onClick={clickHeart} />
+              {inWish ? (
+                <HeartColor className="cursor-pointer" onClick={wishClick} />
               ) : (
-                <Heart className="cursor-pointer" onClick={clickHeart} />
+                <Heart className="cursor-pointer" onClick={wishClick} />
               )}
             </div>
             <div

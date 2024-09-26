@@ -80,7 +80,7 @@ export interface SpotExtraInfo {
 
 export interface JobProps extends CardProps {
   contentTypeId: string;
-  contentId: string;
+  contentid: string;
   cardType: CardType;
   serviceType: ServiceType;
   corpoNm: string;
@@ -107,4 +107,16 @@ export interface JobInfo {
   rcritPnum?: string; // 모집인원수 -> tour
   corpoNm?: string; // 기업명 -> open
   corpoLogoFileUrl?: string; // 기업로고파일 URL -> open
+}
+
+export interface WishItem {
+  // api post, delete 시 사용되는 데이터
+  contentId: string;
+  contentTypeId: string;
+  type: string;
+}
+
+export interface WishRes extends WishItem {
+  // api get 호출 시 담기는 데이터
+  contentid: string;
 }
