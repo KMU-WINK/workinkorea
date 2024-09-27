@@ -8,11 +8,9 @@ import {
 } from '@/types/user';
 import PrivateAxiosInstance from '@/services/privateAxiosInstance';
 
-const getUserDetail = async (socialId: string) => {
+const getUserDetail = async () => {
   try {
-    const response = await PrivateAxiosInstance.get(
-      `/users/detail/${socialId}`,
-    );
+    const response = await PrivateAxiosInstance.get('/users/detail');
     return response.data;
   } catch (e) {
     console.log(e);

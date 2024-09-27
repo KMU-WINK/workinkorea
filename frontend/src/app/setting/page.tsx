@@ -9,12 +9,10 @@ import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/services/users';
 import { UserDetail } from '@/types/user';
 import { formatDateWithDots } from '@/utils/dateUtils';
-import useUserStore from '../stores/loginStore';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const router = useRouter();
-  const { socialId } = useUserStore();
 
   const backButtonClick = () => {
     router.back();
@@ -25,14 +23,13 @@ export default function Setting() {
   const logoutClick = () => {};
 
   const fetchUserInfo = async () => {
-    if (!socialId) return;
-    const result = await getUserDetail(socialId);
+    const result = await getUserDetail();
     setUserDetail(result);
   };
 
   useEffect(() => {
     fetchUserInfo();
-  }, [socialId]);
+  }, []);
   return (
     <div className="h-screen flex justify-center items-center">
       <Header

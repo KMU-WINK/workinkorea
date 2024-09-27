@@ -136,8 +136,7 @@ export default function SettingModify() {
   };
 
   const fetchUserInfo = async () => {
-    if (!socialId) return;
-    const result: UserDetail = await getUserDetail(socialId);
+    const result: UserDetail = await getUserDetail();
     // todo: profileImg api 연결
     setUserInfo({
       profileImg: null,
@@ -153,7 +152,7 @@ export default function SettingModify() {
 
   useEffect(() => {
     fetchUserInfo();
-  }, [socialId]);
+  }, []);
 
   return (
     <div className="h-screen flex justify-center items-center">
