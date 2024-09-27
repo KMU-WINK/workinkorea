@@ -9,13 +9,13 @@ import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/services/users';
 import { UserDetail } from '@/types/user';
 import { formatDateWithDots } from '@/utils/dateUtils';
+import useUserStore from '../stores/loginStore';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const router = useRouter();
+  const { socialId } = useUserStore();
 
-  // todo: social_id 받기
-  const socialId = '';
   const backButtonClick = () => {
     router.back();
   };
@@ -25,6 +25,7 @@ export default function Setting() {
   const logoutClick = () => {};
 
   const fetchUserInfo = async () => {
+    if (!socialId) return;
     const result = await getUserDetail(socialId);
     setUserDetail(result);
   };
