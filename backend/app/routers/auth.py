@@ -311,40 +311,36 @@ def verify_jwt_token(token: str):
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
-    # Authorization 헤더에서 토큰 가져오기
-    auth_header = request.headers.get("Authorization")
+    # 쿠키에서 accessToken 가져오기
+    token = request.cookies.get("accessToken")
 
-    if auth_header is None:
-        # Authorization 헤더가 없을 때
+    # 요청에서 Access token이 넘어오지 않았을 때
+    if token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authorization header is missing",
+            detail="Access token is missing",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    if not auth_header.startswith("Bearer "):
-        # 올바른 토큰의 형태가 주어지지 않았을 때, 토큰이 존재하지 않을 때
+        
+    # 토큰 검증 로직 (verify_token 함수 호출)
+    try:
+        social_id: str = verify_jwt_token(token)
+    except:
+        # 토큰 검증 실패 시 예외 발생
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authorization format",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    token = auth_header.split(" ")[1]
-
-    # 토큰 검증 로직 (verify_token 함수 호출 등)
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-    social_id: str = verify_jwt_token(token)
 
     # 사용자 조회 로직
     user = db.query(User).filter(User.social_id == social_id).first()
 
     if user is None:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     return user
