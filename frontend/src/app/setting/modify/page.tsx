@@ -21,6 +21,7 @@ import {
 } from '@/services/users';
 import axios from 'axios';
 import { UserDetail } from '@/types/user';
+import useUserStore from '@/app/stores/loginStore';
 
 interface UserInfo {
   profileImg: File | null;
@@ -47,8 +48,7 @@ export default function SettingModify() {
 
   const router = useRouter();
 
-  // todo : 전역 변수로 저장되어있는 social_id 가져오기
-  const socialId = '3715601705';
+  const { socialId } = useUserStore();
 
   const additionalItems = [
     {
@@ -136,6 +136,7 @@ export default function SettingModify() {
   };
 
   const fetchUserInfo = async () => {
+    if (!socialId) return;
     const result: UserDetail = await getUserDetail(socialId);
     // todo: profileImg api 연결
     setUserInfo({
