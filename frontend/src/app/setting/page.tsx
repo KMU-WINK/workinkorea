@@ -32,7 +32,7 @@ export default function Setting() {
 
   useEffect(() => {
     fetchUserInfo();
-  }, []);
+  }, [socialId]);
   return (
     <div className="h-screen flex justify-center items-center">
       <Header
