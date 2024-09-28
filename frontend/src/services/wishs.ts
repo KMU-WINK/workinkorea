@@ -1,7 +1,8 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { WishItem, WishRes } from '@/types/type';
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3Mjc2OTQ1fQ.jKJPBCl4khjP7RBsoC1xZNeuWMFalDyS7R9VpDn7dAg';
+const cookies = document.cookie.split('; ');
+const tokenCookie = cookies.find(cookie => cookie.startsWith('accessToken='));
+const token = tokenCookie?.split('=')[1];
 
 export const getWishList = async (): Promise<WishRes[]> => {
   try {
