@@ -1,4 +1,6 @@
 import PublicAxiosInstance from './publicAxiosInstance';
+import { GetLocationProps } from '@/types/type';
+import axios from 'axios';
 
 export const getSpots = async (area: string, keyword: string, page: number) => {
   const response = await PublicAxiosInstance.get(
@@ -15,4 +17,27 @@ export const getSpotDetail = async (
     `/spots/detail?contentId=${contentId}&contentTypeId=${contentTypeId}`,
   );
   return response;
+};
+
+export const getSpotLocations = async ({
+  mapX,
+  mapY,
+  keyword,
+  radius,
+  numOfRows = 50,
+}: GetLocationProps) => {
+  try {
+    const response = await PublicAxiosInstance.get(
+      keyword
+        ? `/spots/location?mapX=${mapX}&mapY=${mapY}&keyword=${keyword}&radius=${radius}&numOfRows=${numOfRows}`
+        : `/spots/location?mapX=${mapX}&mapY=${mapY}&radius=${radius}&numOfRows=${numOfRows}`,
+    );
+    return response.data;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      if (e.response?.status === 400) {
+        return 'no data';
+      }
+    }
+  }
 };
