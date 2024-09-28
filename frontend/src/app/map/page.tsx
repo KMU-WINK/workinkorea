@@ -85,12 +85,10 @@ export default function Map() {
 
   // 카드 슬라이드시 이벤트 함수
   const onSlideChange = (index: number) => {
-    console.log(isMarkerClickRef);
     // 카드를 직접 슬라이드 할 경우에만 마커 이미지를 변경
     // 마커를 클릭했을 때는 마커 클릭 이벤트 함수에서 해당 기능을 수행하기 때문
     if (!isMarkerClickRef.current) {
       const currentMarker = markers[Math.round(index)];
-      console.log(currentMarker);
       // 마커 이미지
       const markerImage = new window.kakao.maps.MarkerImage(
         markerImageSrc,
@@ -358,6 +356,10 @@ export default function Map() {
           image: index !== 0 ? markerImage : activeMarkerImage,
           clickable: true,
         });
+
+        if (index === 0) {
+          activeMarkerRef.current = marker;
+        }
 
         marker.setMap(mapObjectRef.current);
 
