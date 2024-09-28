@@ -16,7 +16,7 @@ import {
   formatRecruitString,
 } from '../../_utils/stringUtils';
 import { formatSalary } from '../../../utils/stringUtils';
-import { JobInfo, SpotInfo, WishItem, WishRes } from '@/types/type';
+import { JobInfo, WishItem, WishRes } from '@/types/type';
 import { getJobDetail } from '@/services/jobs';
 import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
 import useUserStore from '@/app/stores/loginStore';
