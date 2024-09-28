@@ -1,6 +1,7 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 
 export const getJobs = async (area: string, keyword: string, page: number) => {
+  console.log('getJobs', area, keyword, page);
   const response = await PublicAxiosInstance.get(
     `/jobs?area=${area}&keyword=${keyword}&pageNo=${page}`,
   );

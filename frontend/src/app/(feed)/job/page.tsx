@@ -25,7 +25,7 @@ export default function Job() {
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
-
+  const [isFirst, setIsFirst] = useState(true);
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
 
@@ -67,6 +67,7 @@ export default function Job() {
         }
         return [...prevList, ...newData];
       });
+      await fetchWishList();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -89,13 +90,17 @@ export default function Job() {
   }, []);
 
   const fetchWishList = async () => {
-    const wishListData = await getWishList();
-    setWishList(wishListData);
+    if (feedList.length > 0) {
+      const wishListData = await getWishList();
+      setWishList(wishListData);
+      await setIsFirst(false);
+    }
   };
 
   useEffect(() => {
-    if (area) fetchData();
-    fetchWishList();
+    if (area) {
+      fetchData();
+    }
   }, [area]);
 
   useEffect(() => {
@@ -153,32 +158,41 @@ export default function Job() {
       openModal();
       return;
     }
-    let res;
-    const originState = item.inWishlist;
-    item.inWishlist = !item.inWishlist;
 
+    const originState = item.inWishlist;
+    setFeedList(prevList =>
+      prevList.map(feedItem =>
+        feedItem.contentid === item.contentid
+          ? { ...feedItem, inWishlist: !feedItem.inWishlist }
+          : feedItem,
+      ),
+    );
     try {
       const data: WishItem = {
         type: 'job',
         contentTypeId: item.contenttypeid || '',
-        contentId: item.contentid || '',
+        contentId: item.contentid,
       };
 
       if (originState) {
-        item.inWishlist = false;
-        res = await deleteWishItem(data);
+        await deleteWishItem(data);
       } else {
-        item.inWishlist = true;
-        res = await postWishItem(data);
+        await postWishItem(data);
       }
 
+      // 위 작업이 성공적으로 이루어졌다면, WishList를 다시 불러옴
       await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
-      if (res.error) {
-        // 에러가 발생한 경우, 원래 상태로 되돌림
-        item.inWishlist = !item.inWishlist;
-      }
+
+      // 에러가 발생한 경우 원래 상태로 되돌림
+      setFeedList(prevList =>
+        prevList.map(feedItem =>
+          feedItem.contentid === item.contentid
+            ? { ...feedItem, inWishlist: originState }
+            : feedItem,
+        ),
+      );
     }
   };
 
@@ -209,11 +223,15 @@ export default function Job() {
         </div>
       ) : (
         <div className="w-full flex flex-col items-center pt-20 gap-24">
-          <span className="text-center">
-            검색 결과가 없습니다.
-            <br />
-            다른 검색어를 입력해주세요.
-          </span>
+          {isFirst ? (
+            <span className="text-center">잠시만 기다려주세요.</span>
+          ) : (
+            <span className="text-center">
+              검색 결과가 없습니다.
+              <br />
+              다른 검색어를 입력해주세요.
+            </span>
+          )}
           <div className="w-full flex flex-col gap-2.5 items-center">
             <Image
               src="/svgs/no-feed-bubble.svg"

@@ -1,9 +1,10 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { WishInfo, WishItem, WishRes } from '@/types/type';
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3NTA2NzMyfQ.czqliClUXXmeATWd4IkWBfCcT2wbpYB5dqvTQv1M0kk';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3NTMxMzEyfQ.MzpWI4xRamNZyFhoHEhM9ebEx0OqMuqr7VoZbrV0OPE';
 
 export const getWishList = async (): Promise<WishRes[]> => {
+  console.log('getWishList 실행');
   try {
     const response = await PublicAxiosInstance.get('/wishs', {
       headers: {
@@ -39,6 +40,7 @@ export const postWishItem = async (postData: WishItem) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log('post response : ', response);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -54,6 +56,8 @@ export const deleteWishItem = async (deleteData: WishItem) => {
       },
       data: deleteData,
     });
+    console.log('delete response : ', response);
+
     return response.data;
   } catch (error) {
     console.error('Error:', error);

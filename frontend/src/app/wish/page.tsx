@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Back from 'public/svgs/back.svg';
 import Go from 'public/svgs/go.svg';
+import { useRouter } from 'next/navigation';
 
 interface WishType {
   id: number;
@@ -12,6 +13,7 @@ interface WishType {
 }
 
 export default function Wish() {
+  const router = useRouter();
   const [wishList, setWishList] = useState<WishType[]>([]);
 
   useEffect(() => {
@@ -55,11 +57,18 @@ export default function Wish() {
     ]);
   }, []);
 
+  const backClick = () => {
+    router.back();
+  };
+
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
       <div className="max-w-sm w-full h-full flex flex-col items-center gap-2 py-4">
         <div className="w-full relative text-center py-3">
-          <Back className="absolute top-3 left-6 cursor-pointer" />
+          <Back
+            className="absolute top-3 left-6 cursor-pointer"
+            onClick={backClick}
+          />
           <span>위시리스트</span>
         </div>
         <div className="w-full flex flex-col px-6 items-center">

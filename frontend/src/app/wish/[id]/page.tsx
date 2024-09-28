@@ -1,23 +1,15 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import Card from '@/components/Card';
 
-import {
-  CardProps,
-  CardType,
-  FeedProps,
-  JobProps,
-  ServiceType,
-  WishInfo,
-} from '@/types/type';
+import { CardType, ServiceType, WishInfo } from '@/types/type';
 
 import Back from 'public/svgs/back.svg';
 import { getWishFeed } from '@/services/wishs';
-import { router } from 'next/client';
 import Image from 'next/image';
 
 interface WishType {
@@ -66,6 +58,7 @@ const wishData: WishType[] = [
 ];
 
 export default function WishDetail() {
+  const router = useRouter();
   const pathname = usePathname();
   const [wishItem, setWishItem] = useState<WishType>();
   const [feedList, setFeedList] = useState<WishInfo[]>([]);
@@ -76,15 +69,17 @@ export default function WishDetail() {
     contentTypeId?: string,
     image?: string,
   ) => {
-    router.push(
-      `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image}`,
-    );
+    if (contentTypeId === 'open' || contentTypeId === 'tour') {
+      router.push(
+        `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image}`,
+      );
+    } else {
+      router.push(`/spot/${id}?contenttypeid=${contentTypeId}?type=${type}`);
+    }
   };
 
   const wishClick = async (item: WishInfo) => {
     console.log('wishClick', item);
-
-    // console.log('id : ', id);
   };
 
   const fetchData = async () => {
