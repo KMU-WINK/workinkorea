@@ -85,7 +85,6 @@ export default function WishDetail() {
   const fetchData = async () => {
     try {
       const response = await getWishFeed();
-      console.log('response : ', response);
 
       const data = response.map((item: WishInfo) => ({
         contentid: item.contentid,
