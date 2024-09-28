@@ -153,8 +153,6 @@ export default function Stay() {
       if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
         setFeedList(updatedFeedList);
       }
-    } else {
-      console.log('안걸림');
     }
   }, [wishList]);
 

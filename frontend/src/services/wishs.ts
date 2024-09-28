@@ -31,20 +31,6 @@ export const getWishFeed = async (): Promise<WishInfo[]> => {
     return [];
   }
 };
-export const getWishFeed = async (): Promise<WishInfo[]> => {
-  try {
-    const response = await PublicAxiosInstance.get('/wishs', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response);
-    return response.data;
-  } catch (error) {
-    console.error('Error:', error);
-    return [];
-  }
-};
 
 export const postWishItem = async (postData: WishItem) => {
   try {
