@@ -76,10 +76,6 @@ export default function Job() {
     }
   };
 
-  const mapClick = () => {
-    router.push(`/map?type=${type}&location=${area}&keyword=${keyword}`);
-  };
-
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
