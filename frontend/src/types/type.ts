@@ -137,3 +137,17 @@ export interface GetSpotListsProps {
   radius?: number;
   numOfRows?: number;
 }
+
+export interface WishInfo {
+  contenttypeid: string;
+  contentid: string;
+  cardType: CardType;
+  serviceType: ServiceType;
+  title: string;
+  addr1: string;
+  addr2: string;
+  firstimage: string;
+  firstimage2: string;
+  type: string;
+  inWish: boolean;
+}

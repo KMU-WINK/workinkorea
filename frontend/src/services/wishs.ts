@@ -1,7 +1,7 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
-import { WishItem, WishRes } from '@/types/type';
+import { WishInfo, WishItem, WishRes } from '@/types/type';
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3Mjc2OTQ1fQ.jKJPBCl4khjP7RBsoC1xZNeuWMFalDyS7R9VpDn7dAg';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3NTA2NzMyfQ.czqliClUXXmeATWd4IkWBfCcT2wbpYB5dqvTQv1M0kk';
 
 export const getWishList = async (): Promise<WishRes[]> => {
   try {
@@ -10,6 +10,21 @@ export const getWishList = async (): Promise<WishRes[]> => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log('getWishList response : ', response);
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+export const getWishFeed = async (): Promise<WishInfo[]> => {
+  try {
+    const response = await PublicAxiosInstance.get('/wishs', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response);
     return response.data;
   } catch (error) {
     console.error('Error:', error);

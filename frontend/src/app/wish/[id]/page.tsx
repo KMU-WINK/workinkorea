@@ -1,14 +1,24 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import Card from '@/components/Card';
 
-import { CardProps } from '@/types/type';
+import {
+  CardProps,
+  CardType,
+  FeedProps,
+  JobProps,
+  ServiceType,
+  WishInfo,
+} from '@/types/type';
 
 import Back from 'public/svgs/back.svg';
+import { getWishFeed } from '@/services/wishs';
+import { router } from 'next/client';
+import Image from 'next/image';
 
 interface WishType {
   id: number;
@@ -57,117 +67,52 @@ const wishData: WishType[] = [
 
 export default function WishDetail() {
   const pathname = usePathname();
-
   const [wishItem, setWishItem] = useState<WishType>();
+  const [feedList, setFeedList] = useState<WishInfo[]>([]);
 
-  const [feedList, setFeedList] = useState<CardProps[]>([]);
+  const cardClick = (
+    type: string,
+    id: string,
+    contentTypeId?: string,
+    image?: string,
+  ) => {
+    router.push(
+      `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image}`,
+    );
+  };
+
+  const wishClick = async (item: WishInfo) => {
+    console.log('wishClick', item);
+
+    // console.log('id : ', id);
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await getWishFeed();
+      console.log('response : ', response);
+
+      const data = response.map((item: WishInfo) => ({
+        contentid: item.contentid,
+        cardType: 'default' as CardType,
+        serviceType: 'default' as ServiceType,
+        type: item.type,
+        title: item.title,
+        addr1: item.addr1,
+        addr2: item.addr2,
+        firstimage: item.firstimage,
+        firstimage2: item.firstimage2,
+        inWish: item.inWish,
+        contenttypeid: item.contenttypeid,
+      }));
+      setFeedList(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
-    setFeedList([
-      {
-        id: '1',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: false,
-      },
-      {
-        id: '2',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: true,
-      },
-      {
-        id: '3',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: true,
-      },
-      {
-        id: '4',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: true,
-      },
-      {
-        id: '5',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: false,
-      },
-      {
-        id: '6',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: true,
-      },
-      {
-        id: '7',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: true,
-      },
-      {
-        id: '8',
-        onCardClick: () => {},
-        onWishListClick: () => {},
-        cardType: 'default',
-        serviceType: 'work',
-        title: '홍익돈까스 주6일 주방 정직원 모집 시간 협의 가능',
-        location: '파주시 중앙로 70 A동',
-        image: '/svgs/feed-test.svg',
-        price: 10000,
-        company: '홍익돈까스 파주금릉점',
-        inWishlist: true,
-      },
-    ]);
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -190,22 +135,53 @@ export default function WishDetail() {
             <span>{wishItem.location}</span>
           </div>
           <div className="w-full flex flex-col px-6 items-center gap-2">
-            {feedList.map(item => (
-              <Card
-                id={item.id}
-                key={item.id}
-                cardType={item.cardType}
-                serviceType={item.serviceType}
-                title={item.title}
-                location={item.location}
-                image={item.image}
-                price={item.price}
-                company={item.company}
-                inWishlist={item.inWishlist}
-                onCardClick={item.onCardClick}
-                onWishListClick={item.onWishListClick}
-              />
-            ))}
+            {feedList.length > 0 ? (
+              <>
+                {feedList.map(item => (
+                  <Card
+                    id={item.contentid}
+                    key={item.contentid}
+                    cardType={item.cardType}
+                    serviceType={item.serviceType}
+                    title={item.title}
+                    location={`${item.addr1} ${item.addr2}`}
+                    image={
+                      item.firstimage ||
+                      item.firstimage2 ||
+                      '/svgs/job-default.svg'
+                    }
+                    inWishlist={item.inWish}
+                    onCardClick={() =>
+                      cardClick(
+                        item.type,
+                        item.contentid,
+                        item.contenttypeid,
+                        item.firstimage || item.firstimage2,
+                      )
+                    }
+                    onWishListClick={() => wishClick(item)}
+                  />
+                ))}
+              </>
+            ) : (
+              <div className="w-full flex flex-col items-center pt-20 gap-24">
+                <span className="text-center">결과가 없습니다.</span>
+                <div className="w-full flex flex-col gap-2.5 items-center">
+                  <Image
+                    src="/svgs/no-feed-bubble.svg"
+                    alt="no-feed-bubble"
+                    width={50}
+                    height={0}
+                  />
+                  <Image
+                    src="/svgs/no-feed-logo.svg"
+                    alt="no-feed-logo"
+                    width={100}
+                    height={0}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
