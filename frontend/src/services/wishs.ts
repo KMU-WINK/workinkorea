@@ -1,17 +1,16 @@
 import PublicAxiosInstance from '@/services/publicAxiosInstance';
-import { WishInfo, WishItem, WishRes } from '@/types/type';
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxfaWQiOiIzNzE1NjAxNzA1IiwiZXhwIjoxNzI3NTMxMzEyfQ.MzpWI4xRamNZyFhoHEhM9ebEx0OqMuqr7VoZbrV0OPE';
+import { WishItem, WishRes,WishInfo } from '@/types/type';
+const cookies = document.cookie.split('; ');
+const tokenCookie = cookies.find(cookie => cookie.startsWith('accessToken='));
+const token = tokenCookie?.split('=')[1];
 
 export const getWishList = async (): Promise<WishRes[]> => {
-  console.log('getWishList 실행');
   try {
     const response = await PublicAxiosInstance.get('/wishs', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('getWishList response : ', response);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -25,7 +24,6 @@ export const getWishFeed = async (): Promise<WishInfo[]> => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -40,7 +38,6 @@ export const postWishItem = async (postData: WishItem) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('post response : ', response);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -56,8 +53,6 @@ export const deleteWishItem = async (deleteData: WishItem) => {
       },
       data: deleteData,
     });
-    console.log('delete response : ', response);
-
     return response.data;
   } catch (error) {
     console.error('Error:', error);

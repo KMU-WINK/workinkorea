@@ -70,6 +70,7 @@ export default function Job() {
       await fetchWishList();
     } catch (error) {
       console.error('Error fetching data:', error);
+      router.push('/not-found');
     } finally {
       setLoading(false);
     }
