@@ -5,6 +5,7 @@ const tokenCookie = cookies.find(cookie => cookie.startsWith('accessToken='));
 const token = tokenCookie?.split('=')[1];
 
 export const getWishList = async (): Promise<WishRes[]> => {
+  console.log('getWishList 실행');
   try {
     const response = await PublicAxiosInstance.get('/wishs', {
       headers: {
@@ -53,6 +54,7 @@ export const postWishItem = async (postData: WishItem) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log('post response : ', response);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
@@ -68,6 +70,8 @@ export const deleteWishItem = async (deleteData: WishItem) => {
       },
       data: deleteData,
     });
+    console.log('delete response : ', response);
+
     return response.data;
   } catch (error) {
     console.error('Error:', error);
