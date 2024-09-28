@@ -106,7 +106,6 @@ export default function Tour() {
   const fetchData = async (contentId: number, contentTypeId: number) => {
     try {
       const response = await getSpotDetail(contentId, contentTypeId);
-      console.log('response.data : ', response.data);
       const data = response.data;
       setSpotInfo({
         title: data.title,
