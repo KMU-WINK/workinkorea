@@ -22,7 +22,7 @@ def create_jwt_token(user_social_id: str):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"social_id": user_social_id, "exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return encoded_jwt if isinstance(encoded_jwt, str) else encoded_jwt.decode('utf-8')
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -93,6 +93,8 @@ async def naverAuth(
     _result = _res.json()
 
     access_token = _result.get("access_token")
+    
+    print(_result)
     if not access_token:
         raise ValueError("Access token not found in response")
 
@@ -279,35 +281,29 @@ async def get_access_token(
 
     return response
 
+def pad_base64_token(token: str) -> str:
+    # Base64 패딩을 추가해 4의 배수로 만듦
+    return token + "=" * (4 - len(token) % 4)
+
 
 # access token(jwt token) 검증
 def verify_jwt_token(token: str):
     try:
-        # JWT 토큰을 검증하고 payload 반환
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        # payload에서 닉네임 추출
-
+        # 쿠키에서 가져온 JWT가 base64 padding이 맞지 않을 수 있으니 패딩을 보정
+        padded_token = pad_base64_token(token)
+        # 디코드
+        payload = jwt.decode(padded_token, SECRET_KEY, algorithms=[ALGORITHM])
         social_id = payload.get("social_id")
-
+            
         if social_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: no subject",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            raise ValueError("social_id not found in token")        
         return social_id
+    
     except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except jwt.InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise ValueError("Token has expired")
+    # except jwt.InvalidTokenError:
+    #     raise ValueError("Invalid token")
+
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
@@ -321,17 +317,8 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
             detail="Access token is missing",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        
-    # 토큰 검증 로직 (verify_token 함수 호출)
-    try:
-        social_id: str = verify_jwt_token(token)
-    except:
-        # 토큰 검증 실패 시 예외 발생
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+            
+    social_id: str = verify_jwt_token(token)
 
     # 사용자 조회 로직
     user = db.query(User).filter(User.social_id == social_id).first()
