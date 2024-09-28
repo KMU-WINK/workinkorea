@@ -133,9 +133,7 @@ export default function Stay() {
   }, [page, loading]);
 
   useEffect(() => {
-    console.log('wishList : ', wishList);
     if (wishList.length > 0 && feedList.length > 0) {
-      console.log('걸림');
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
           wishItem => wishItem.contentid === feedItem.contentid,
@@ -190,8 +188,6 @@ export default function Stay() {
         await postWishItem(data);
       }
 
-      // 위 작업이 성공적으로 이루어졌다면, WishList를 다시 불러옴
-      // await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
 

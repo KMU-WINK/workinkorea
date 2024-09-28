@@ -114,7 +114,6 @@ export default function Job() {
   }, [page, loading]);
 
   useEffect(() => {
-    console.log('wishList : ', wishList);
     if (wishList.length > 0 && feedList.length > 0) {
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
@@ -165,7 +164,7 @@ export default function Job() {
       const data: WishItem = {
         type: 'job',
         contentTypeId: item.contenttypeid || '',
-        contentId: item.contentid,
+        contentId: item.contentid || '',
       };
 
       if (originState) {
