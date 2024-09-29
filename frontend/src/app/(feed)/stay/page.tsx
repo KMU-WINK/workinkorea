@@ -28,6 +28,8 @@ export default function Stay() {
     mapx: 0,
     mapy: 0,
   });
+  const [isFirst, setIsFirst] = useState(true);
+
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
 
@@ -95,6 +97,7 @@ export default function Stay() {
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
+    fetchWishList();
     if (feedInfo.location) {
       setType(feedInfo.type);
       setArea(feedInfo.location);
@@ -105,11 +108,11 @@ export default function Stay() {
   const fetchWishList = async () => {
     const wishListData = await getWishList();
     setWishList(wishListData);
+    await setIsFirst(false);
   };
 
   useEffect(() => {
     if (area) fetchData();
-    fetchWishList();
   }, [area]);
 
   useEffect(() => {
@@ -130,7 +133,9 @@ export default function Stay() {
   }, [page, loading]);
 
   useEffect(() => {
+    console.log('wishList : ', wishList);
     if (wishList.length > 0 && feedList.length > 0) {
+      console.log('걸림');
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
           wishItem => wishItem.contentid === feedItem.contentid,
@@ -150,6 +155,8 @@ export default function Stay() {
       if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
         setFeedList(updatedFeedList);
       }
+    } else {
+      console.log('안걸림');
     }
   }, [wishList]);
 
@@ -184,7 +191,7 @@ export default function Stay() {
       }
 
       // 위 작업이 성공적으로 이루어졌다면, WishList를 다시 불러옴
-      await fetchWishList();
+      // await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
 
@@ -239,11 +246,15 @@ export default function Stay() {
         </>
       ) : (
         <div className="w-full flex flex-col items-center pt-20 gap-24">
-          <span className="text-center">
-            검색 결과가 없습니다.
-            <br />
-            다른 검색어를 입력해주세요.
-          </span>
+          {isFirst ? (
+            <span className="text-center">잠시만 기다려주세요.</span>
+          ) : (
+            <span className="text-center">
+              검색 결과가 없습니다.
+              <br />
+              다른 검색어를 입력해주세요.
+            </span>
+          )}
           <div className="w-full flex flex-col gap-2.5 items-center">
             <Image
               src="/svgs/no-feed-bubble.svg"

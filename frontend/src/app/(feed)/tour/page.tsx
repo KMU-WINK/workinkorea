@@ -95,6 +95,8 @@ export default function Tour() {
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
+    fetchWishList();
+
     if (feedInfo.location) {
       setType(feedInfo.type);
       setArea(feedInfo.location);
@@ -110,7 +112,6 @@ export default function Tour() {
 
   useEffect(() => {
     if (area) fetchData();
-    fetchWishList();
   }, [area]);
 
   useEffect(() => {
@@ -131,6 +132,7 @@ export default function Tour() {
   }, [page, loading]);
 
   useEffect(() => {
+    console.log('wishList : ', wishList);
     if (wishList.length > 0 && feedList.length > 0) {
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(

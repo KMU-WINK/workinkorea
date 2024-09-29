@@ -23,7 +23,6 @@ export default function Job() {
   const [loading, setLoading] = useState(false);
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
-  const [type, setType] = useState<string>('');
   const [wishList, setWishList] = useState<WishRes[]>([]);
   const [isFirst, setIsFirst] = useState(true);
   const { isLoggedIn } = useUserStore();
@@ -67,7 +66,6 @@ export default function Job() {
         }
         return [...prevList, ...newData];
       });
-      await fetchWishList();
     } catch (error) {
       console.error('Error fetching data:', error);
       router.push('/not-found');
@@ -79,19 +77,17 @@ export default function Job() {
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
+    fetchWishList();
     if (feedInfo.location) {
-      setType(feedInfo.type);
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
   }, []);
 
   const fetchWishList = async () => {
-    if (feedList.length > 0) {
-      const wishListData = await getWishList();
-      setWishList(wishListData);
-      await setIsFirst(false);
-    }
+    const wishListData = await getWishList();
+    setWishList(wishListData);
+    await setIsFirst(false);
   };
 
   useEffect(() => {
@@ -118,6 +114,7 @@ export default function Job() {
   }, [page, loading]);
 
   useEffect(() => {
+    console.log('wishList : ', wishList);
     if (wishList.length > 0 && feedList.length > 0) {
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
@@ -178,7 +175,7 @@ export default function Job() {
       }
 
       // 위 작업이 성공적으로 이루어졌다면, WishList를 다시 불러옴
-      await fetchWishList();
+      // await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
 

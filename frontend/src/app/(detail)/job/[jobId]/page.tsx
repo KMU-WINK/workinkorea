@@ -59,9 +59,13 @@ export default function Job() {
   const [contentId, setContentId] = useState<string>('');
   const [contentTypeId, setContentTypeId] = useState<string>('');
   const [image, setImage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    fetchWishList();
+
     const pathParts = window.location.pathname.split('/');
+
     const contentId = pathParts.pop() || pathParts.pop() || '';
     setContentId(contentId);
 
@@ -75,7 +79,6 @@ export default function Job() {
     const thumbnail = queryString.substring(thumbnailIndex);
     setContentTypeId(contentTypeId);
     setImage(thumbnail);
-    fetchWishList();
   }, []);
 
   useEffect(() => {
@@ -116,6 +119,7 @@ export default function Job() {
   const fetchWishList = async () => {
     const wishListData = await getWishList();
     setWishList(wishListData);
+    setIsLoading(false);
   };
 
   const wishClick = async () => {
@@ -140,7 +144,6 @@ export default function Job() {
         setInWish(true);
         res = await postWishItem(data);
       }
-      await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
       if (res.error) {
@@ -190,121 +193,146 @@ export default function Job() {
           <div className="absolute inset-0 h-1/4 bg-gradient-to-b from-[#00000080] to-transparent"></div>
         </ImageWrapper>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
-          <div className="w-full flex flex-col gap-4 px-4 py-2 bg-white">
-            <div className="w-full flex justify-between items-center">
-              <span
-                className="text-xl font-medium
+          {isLoading ? (
+            <div className="w-full flex flex-col items-center pt-20 gap-24 bg-white">
+              <span className="text-center">잠시만 기다려주세요.</span>
+              <div className="w-full flex flex-col gap-2.5 items-center">
+                <Image
+                  src="/svgs/no-feed-bubble.svg"
+                  alt="no-feed-bubble"
+                  width={50}
+                  height={0}
+                />
+                <Image
+                  src="/svgs/no-feed-logo.svg"
+                  alt="no-feed-logo"
+                  width={100}
+                  height={0}
+                />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="w-full flex flex-col gap-4 px-4 py-2 bg-white">
+                <div className="w-full flex justify-between items-center">
+                  <span
+                    className="text-xl font-medium
               whitespace-pre-wrap break-keep
               max-w-[92%]"
-              >
-                {jobInfo.empmnTtl}
-              </span>
-              {inWish ? (
-                <HeartColor className="cursor-pointer" onClick={wishClick} />
-              ) : (
-                <Heart className="cursor-pointer" onClick={wishClick} />
-              )}
-            </div>
-            <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-              {jobInfo.wrkpAdres}
-            </span>
-            <span className="text-xs">{jobInfo.corpoNm}</span>
-            <div className="w-full flex flex-col gap-2 text-xs">
-              {jobInfo.wrkpAdres && (
-                <InfoRow>
-                  <span>근무 위치</span>
-                  <pre>{jobInfo.wrkpAdres}</pre>
-                </InfoRow>
-              )}
-              {jobInfo.salStle && jobInfo.wageAmt && (
-                <InfoRow>
-                  <span>근로 수당</span>
-                  <pre>
-                    {formatSalary(jobInfo.salStle)}{' '}
-                    {parseInt(jobInfo.wageAmt).toLocaleString('ko-KR')} 원
-                  </pre>
-                </InfoRow>
-              )}
-              {jobInfo.labrTimeCn && (
-                <InfoRow>
-                  <span>근무 시간</span>
-                  <pre>주 {jobInfo.labrTimeCn} 시간</pre>
-                </InfoRow>
-              )}
-              {(jobInfo.ordtmEmpmnYn || jobInfo.rcptDdlnDe) && (
-                <InfoRow>
-                  <span>모집 마감</span>
-                  <pre>
-                    {jobInfo.ordtmEmpmnYn
-                      ? '상시 채용'
-                      : formatDateString(jobInfo.rcptDdlnDe)}
-                  </pre>
-                </InfoRow>
-              )}
-            </div>
-          </div>
-          <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
-            <span className="font-bold text-sm">모집 조건</span>
-            {(jobInfo.ordtmEmpmnYn || jobInfo.rcptDdlnDe) && (
-              <InfoRow>
-                <span>모집 마감</span>
-                <pre>
-                  {jobInfo.ordtmEmpmnYn
-                    ? '상시 채용'
-                    : formatDateString(jobInfo.rcptDdlnDe)}
+                  >
+                    {jobInfo.empmnTtl}
+                  </span>
+                  {inWish ? (
+                    <HeartColor
+                      className="cursor-pointer"
+                      onClick={wishClick}
+                    />
+                  ) : (
+                    <Heart className="cursor-pointer" onClick={wishClick} />
+                  )}
+                </div>
+                <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                  {jobInfo.wrkpAdres}
+                </span>
+                <span className="text-xs">{jobInfo.corpoNm}</span>
+                <div className="w-full flex flex-col gap-2 text-xs">
+                  {jobInfo.wrkpAdres && (
+                    <InfoRow>
+                      <span>근무 위치</span>
+                      <pre>{jobInfo.wrkpAdres}</pre>
+                    </InfoRow>
+                  )}
+                  {jobInfo.salStle && jobInfo.wageAmt && (
+                    <InfoRow>
+                      <span>근로 수당</span>
+                      <pre>
+                        {formatSalary(jobInfo.salStle)}{' '}
+                        {parseInt(jobInfo.wageAmt).toLocaleString('ko-KR')} 원
+                      </pre>
+                    </InfoRow>
+                  )}
+                  {jobInfo.labrTimeCn && (
+                    <InfoRow>
+                      <span>근무 시간</span>
+                      <pre>주 {jobInfo.labrTimeCn} 시간</pre>
+                    </InfoRow>
+                  )}
+                  {(jobInfo.ordtmEmpmnYn || jobInfo.rcptDdlnDe) && (
+                    <InfoRow>
+                      <span>모집 마감</span>
+                      <pre>
+                        {jobInfo.ordtmEmpmnYn
+                          ? '상시 채용'
+                          : formatDateString(jobInfo.rcptDdlnDe)}
+                      </pre>
+                    </InfoRow>
+                  )}
+                </div>
+              </div>
+              <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
+                <span className="font-bold text-sm">모집 조건</span>
+                {(jobInfo.ordtmEmpmnYn || jobInfo.rcptDdlnDe) && (
+                  <InfoRow>
+                    <span>모집 마감</span>
+                    <pre>
+                      {jobInfo.ordtmEmpmnYn
+                        ? '상시 채용'
+                        : formatDateString(jobInfo.rcptDdlnDe)}
+                    </pre>
+                  </InfoRow>
+                )}
+                {jobInfo.rcritPnum && (
+                  <InfoRow>
+                    <span>모집 인원</span>
+                    <pre>{formatRecruitString(jobInfo.rcritPnum)}</pre>
+                  </InfoRow>
+                )}
+                {jobInfo.pvltrt && (
+                  <InfoRow>
+                    <span>우대 사항</span>
+                    <pre>{jobInfo.pvltrt.trim()}</pre>
+                  </InfoRow>
+                )}
+              </div>
+              <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
+                <span className="font-bold text-sm">근무 조건</span>
+                {jobInfo.wrkpAdres && (
+                  <InfoRow>
+                    <span>근무 위치</span>
+                    <pre>{jobInfo.wrkpAdres}</pre>
+                  </InfoRow>
+                )}
+                {jobInfo.salStle && jobInfo.wageAmt && (
+                  <InfoRow>
+                    <span>근로 수당</span>
+                    <pre>
+                      {jobInfo.salStle} {jobInfo.wageAmt}
+                    </pre>
+                  </InfoRow>
+                )}
+                {jobInfo.labrTimeCn && (
+                  <InfoRow>
+                    <span>근무 시간</span>
+                    <pre>주 {jobInfo.labrTimeCn} 시간</pre>
+                  </InfoRow>
+                )}
+                {(jobInfo.eplmtStleN1 || jobInfo.eplmtStleN2) && (
+                  <InfoRow>
+                    <span>고용 형태</span>
+                    <pre>
+                      {jobInfo.eplmtStleN1} {jobInfo.eplmtStleN2}
+                    </pre>
+                  </InfoRow>
+                )}
+              </div>
+              <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
+                <span className="font-bold">업무 내용</span>
+                <pre className="whitespace-pre-wrap break-words">
+                  {jobInfo.dtyCn}
                 </pre>
-              </InfoRow>
-            )}
-            {jobInfo.rcritPnum && (
-              <InfoRow>
-                <span>모집 인원</span>
-                <pre>{formatRecruitString(jobInfo.rcritPnum)}</pre>
-              </InfoRow>
-            )}
-            {jobInfo.pvltrt && (
-              <InfoRow>
-                <span>우대 사항</span>
-                <pre>{jobInfo.pvltrt.trim()}</pre>
-              </InfoRow>
-            )}
-          </div>
-          <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
-            <span className="font-bold text-sm">근무 조건</span>
-            {jobInfo.wrkpAdres && (
-              <InfoRow>
-                <span>근무 위치</span>
-                <pre>{jobInfo.wrkpAdres}</pre>
-              </InfoRow>
-            )}
-            {jobInfo.salStle && jobInfo.wageAmt && (
-              <InfoRow>
-                <span>근로 수당</span>
-                <pre>
-                  {jobInfo.salStle} {jobInfo.wageAmt}
-                </pre>
-              </InfoRow>
-            )}
-            {jobInfo.labrTimeCn && (
-              <InfoRow>
-                <span>근무 시간</span>
-                <pre>주 {jobInfo.labrTimeCn} 시간</pre>
-              </InfoRow>
-            )}
-            {(jobInfo.eplmtStleN1 || jobInfo.eplmtStleN2) && (
-              <InfoRow>
-                <span>고용 형태</span>
-                <pre>
-                  {jobInfo.eplmtStleN1} {jobInfo.eplmtStleN2}
-                </pre>
-              </InfoRow>
-            )}
-          </div>
-          <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
-            <span className="font-bold">업무 내용</span>
-            <pre className="whitespace-pre-wrap break-words">
-              {jobInfo.dtyCn}
-            </pre>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <div className="w-full fixed bottom-0 flex justify-center items-center sm:max-w-sm">
