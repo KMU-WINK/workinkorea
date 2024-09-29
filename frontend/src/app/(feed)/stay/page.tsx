@@ -80,6 +80,7 @@ export default function Stay() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
+      router.push('/not-found');
     } finally {
       setLoading(false);
     }

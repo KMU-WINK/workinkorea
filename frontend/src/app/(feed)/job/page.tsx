@@ -69,13 +69,10 @@ export default function Job() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
+      router.push('/not-found');
     } finally {
       setLoading(false);
     }
-  };
-
-  const mapClick = () => {
-    router.push(`/map?type=${type}&location=${area}&keyword=${keyword}`);
   };
 
   useEffect(() => {
