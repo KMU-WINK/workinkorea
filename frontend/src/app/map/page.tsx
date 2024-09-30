@@ -9,7 +9,6 @@ import { GetLocationProps, MapListInfo } from '@/types/type';
 import styled from 'styled-components';
 import Input from '@/components/Input';
 import Back from '../../../public/svgs/back.svg';
-import Filter from '../../../public/svgs/filter.svg';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSpotDetail, getSpotLocations } from '@/services/spots';
 import { getStayLocations } from '@/services/stays';
@@ -201,10 +200,8 @@ export default function Map() {
 
   const getMapRadius = (level: number) => {
     if (level > 4) {
-      console.log(level * 100 * Math.floor(level / 3) + 200);
       return level * 100 * Math.floor(level / 3) + 200;
     } else {
-      console.log(100 * Math.floor(level / 3) + 200);
       return 100 * Math.floor(level / 3) + 200;
     }
   };
@@ -266,7 +263,6 @@ export default function Map() {
             centerLngRef.current.longitude < newBounds.ha
           ) {
             const newCenter = map.getCenter();
-            console.log(newCenter);
             // 새로운 중심좌표를 기준으로 하여 api 호출
             await fetchLocationLists({
               mapX: newCenter.La,
@@ -308,7 +304,6 @@ export default function Map() {
 
   // 마커 생성
   useEffect(() => {
-    console.log(mapList);
     window.kakao.maps.load(() => {
       if (contentId && contentTypeId && mapList.length > 0) {
         console.log(mapList[0].mapx);
@@ -390,11 +385,12 @@ export default function Map() {
         <div className="z-10 absolute top-[54px] w-full px-6">
           <Input
             leftIcon={<Back />}
-            rightIcon={<Filter />}
             onClick={() => {
               router.back();
             }}
+            value={''}
             placeholder={(keyword ? keyword : location) || ''}
+            readOnly
           />
         </div>
         <div ref={mapRef} className="h-screen w-full" />
