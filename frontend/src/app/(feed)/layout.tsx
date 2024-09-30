@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 
 import { parseUrl } from './_utils/stringUtils';
 import Input from '@/components/Input';
-import Spinner from '@/components/Spinner'; // 로딩 스피너 컴포넌트 추가
 
 import Back from 'public/svgs/back.svg';
 

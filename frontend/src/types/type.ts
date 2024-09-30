@@ -25,6 +25,7 @@ export interface BannerProps {
   title: string;
   description: string;
   backgroundImage: React.ReactNode;
+  onClick: React.MouseEventHandler<HTMLDivElement>;
 }
 
 export interface FeedProps extends CardProps {
