@@ -13,10 +13,12 @@ import PrivateAxiosInstance from '@/services/privateAxiosInstance';
 import useUserStore from '../stores/loginStore';
 import { AxiosError } from 'axios';
 import { base64ToFile } from '@/utils/imageUtil';
+import Spinner from '@/components/Spinner';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const [profileFile, setProfileFile] = useState<File | undefined>();
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const router = useRouter();
   const { logout } = useUserStore();
 
@@ -37,23 +39,38 @@ export default function Setting() {
   };
 
   const fetchUserInfo = async () => {
-    const result = await getUserDetail();
-    if (result instanceof AxiosError) {
-      throw result;
-    } else {
-      setUserDetail(result);
-      setProfileFile(
-        base64ToFile({
-          base64String: result?.user.profile_picture_base64,
-          fileName: 'image',
-        }),
-      );
+    try {
+      const result = await getUserDetail();
+      if (result instanceof AxiosError) {
+        throw result;
+      } else {
+        setUserDetail(result);
+        setProfileFile(
+          base64ToFile({
+            base64String: result?.user.profile_picture_base64,
+            fileName: 'image',
+          }),
+        );
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    } finally {
+      setLoading(false); // 로딩 완료
     }
   };
 
   useEffect(() => {
     fetchUserInfo();
   }, []);
+
+  if (loading) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex justify-center items-center">
       <Header

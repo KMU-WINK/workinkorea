@@ -9,7 +9,7 @@ import ProfileDefault from '../../../../public/images/profile-default.jpg';
 import Camera from '../../../../public/svgs/camera.svg';
 import SmallButton from '@/components/SmallButton';
 import DatePicker from '@/components/DatePicker';
-import Arrow from '../.././../../public/svgs/dropdown.svg';
+import Arrow from '../../../../public/svgs/dropdown.svg';
 import { useRouter } from 'next/navigation';
 import DropDown from '@/components/DropDown';
 import {
@@ -25,6 +25,7 @@ import { UserDetail } from '@/types/user';
 import useUserStore from '@/app/stores/loginStore';
 import { base64ToFile } from '@/utils/imageUtil';
 import useUserInfoStore from '@/app/stores/userInfoStore';
+import Spinner from '@/components/Spinner';
 
 interface UserInfo {
   profileImg?: File;
@@ -33,8 +34,8 @@ interface UserInfo {
   work: string;
   region: string;
 }
+
 export default function SettingModify() {
-  // birth 를 제외한 유저 정보 (birth는 DatePicker 컴포넌트 특성상 따로 뻈습니다.)
   const [userInfo, setUserInfo] = useState<UserInfo>({
     nickname: '',
     gender: '',
@@ -42,21 +43,14 @@ export default function SettingModify() {
     region: '부산',
   });
   const [birth, setBirth] = useState<string>('');
-
-  // interest 카테고리는 별도의 페이지에서 보여줘야 하므로 전역 변수로 관리
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const { interests, setInterests } = useUserInfoStore();
-
   const imageRef = useRef<HTMLInputElement>(null);
   const [nicknameCheckMessage, setNicknameCheckMessage] = useState('');
-  // 수정된 닉네임만 중복확인할 수 있도록 하는 ref
   const nicknameRef = useRef('');
-  // profile이 수정되었는지 확인하는 ref
   const isProfileChangeRef = useRef(false);
-
   const router = useRouter();
-
   const formdata = new FormData();
-
   const { socialId } = useUserStore();
 
   const additionalItems = [
@@ -96,7 +90,6 @@ export default function SettingModify() {
     setUserInfo({ ...userInfo, nickname: e.target.value });
   };
 
-  // 닉네임 중복확인 버튼 클릭
   const duplicateCheck = async () => {
     try {
       await createUserNickname({
@@ -105,10 +98,8 @@ export default function SettingModify() {
       });
       setNicknameCheckMessage('사용 가능한 닉네임 입니다.');
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        if (e.response?.status === 400) {
-          alert('이미 존재하는 닉네임 입니다.');
-        }
+      if (axios.isAxiosError(e) && e.response?.status === 400) {
+        alert('이미 존재하는 닉네임 입니다.');
       }
       console.log(e);
     }
@@ -143,43 +134,49 @@ export default function SettingModify() {
       });
       router.push('/setting');
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        if (e.response?.status === 400) {
-          // todo: social_id가 없을 경우 예외처리
-        }
+      if (axios.isAxiosError(e) && e.response?.status === 400) {
+        // 예외 처리 로직 추가 가능
       }
       console.log(e);
     }
   };
 
   const fetchUserInfo = async () => {
-    const result: UserDetail = await getUserDetail();
-    console.log(result);
-    // todo: profileImg api 연결
-    setUserInfo({
-      profileImg: base64ToFile({
-        base64String: result.user.profile_picture_base64,
-        fileName: 'profile',
-      }),
-      nickname: result.user.nickname,
-      gender: result.user.gender,
-      region: (result.regions && result.regions[0]) || '부산',
-      work: (result.works && result.works[0]) || '마케팅',
-    });
-    setInterests(result.interests || []);
-    setBirth(result.user.birth);
-    nicknameRef.current = result.user.nickname;
+    try {
+      const result: UserDetail = await getUserDetail();
+      setUserInfo({
+        profileImg: base64ToFile({
+          base64String: result.user.profile_picture_base64,
+          fileName: 'profile',
+        }),
+        nickname: result.user.nickname,
+        gender: result.user.gender,
+        region: (result.regions && result.regions[0]) || '부산',
+        work: (result.works && result.works[0]) || '마케팅',
+      });
+      setInterests(result.interests || []);
+      setBirth(result.user.birth);
+      nicknameRef.current = result.user.nickname;
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    } finally {
+      setLoading(false); // 로딩 완료
+    }
   };
 
   useEffect(() => {
     fetchUserInfo();
   }, []);
 
+  if (loading) {
+    return <Spinner />;
+  }
+
   return (
     <div className="h-screen flex justify-center items-center">
       <Header text="설정" rightText="완료" onRightClick={submitClick} />
       <div className="pt-[60px] max-w-sm h-full relative w-full">
-        {/*프로필 사진*/}
+        {/* 프로필 사진 */}
         <input
           type="file"
           accept="image/*"
@@ -210,7 +207,7 @@ export default function SettingModify() {
             <Camera />
           </span>
         </div>
-        {/*유저 정보*/}
+        {/* 유저 정보 */}
         <div className="px-6 flex flex-col gap-4">
           <div>
             <p className="pb-4">닉네임</p>
@@ -251,7 +248,7 @@ export default function SettingModify() {
           </div>
         </div>
         <hr className="mt-8 border-gray-2" />
-        {/*추가 정보*/}
+        {/* 추가 정보 */}
         <div className="flex flex-col gap-7 p-6 font-light">
           {additionalItems.map((item, index) => (
             <div key={index} className="flex justify-between items-center">
