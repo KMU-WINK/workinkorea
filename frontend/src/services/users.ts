@@ -7,12 +7,16 @@ import {
   CreateUserWorkProps,
 } from '@/types/user';
 import PrivateAxiosInstance from '@/services/privateAxiosInstance';
+import axios from 'axios';
 
 const getUserDetail = async () => {
   try {
     const response = await PrivateAxiosInstance.get('/users/detail');
     return response.data;
   } catch (e) {
+    if (axios.isAxiosError(e)) {
+      return e;
+    }
     console.log(e);
   }
 };
@@ -66,11 +70,20 @@ const createUserInterest = async ({
   });
 };
 
+const createUserProfile = async (formData: FormData) => {
+  await PrivateAxiosInstance.patch('users/profile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
 export {
   createUserNickname,
   createUserInfo,
   createUserRegion,
   createUserWork,
   createUserInterest,
+  createUserProfile,
   getUserDetail,
 };

@@ -9,14 +9,18 @@ import Leaf from 'public/svgs/emoji/leaf.svg';
 import Fire from 'public/svgs/emoji/fire.svg';
 import Moai from 'public/svgs/emoji/moai.svg';
 import Learning from 'public/svgs/emoji/learning.svg';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import { createUserInterest } from '@/services/users';
 import axios from 'axios';
+import useUserInterestStore from '@/app/stores/userInterestStore';
+import useUserStore from '@/app/stores/loginStore';
 
 export default function ModifyTour() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const { interests, setInterests } = useUserInterestStore();
+  const { socialId } = useUserStore();
   const router = useRouter();
   const options = [
     { text: '액티비티', icon: <Activity /> },
@@ -27,14 +31,12 @@ export default function ModifyTour() {
     { text: '문화재', icon: <Moai /> },
     { text: '배움', icon: <Learning /> },
   ];
-
-  // todo : 전역 변수로 저장되어있는 social_id 가져오기
-  const socialId = '3715601705';
   const backClick = () => {
     router.back();
   };
   const selectButtonClick = async () => {
     try {
+      setInterests(selectedOptions);
       await createUserInterest({
         social_id: socialId,
         interests: selectedOptions,
@@ -56,6 +58,10 @@ export default function ModifyTour() {
         : [...prevState, value],
     );
   };
+
+  useEffect(() => {
+    setSelectedOptions(interests);
+  }, []);
   return (
     <div className="h-screen flex justify-center items-center">
       <Header onLeftClick={backClick} />

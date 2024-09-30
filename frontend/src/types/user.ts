@@ -1,5 +1,6 @@
 export interface UserDetail {
   user: {
+    profile_picture_base64: string;
     id: number;
     social_id: string;
     birth: string;
