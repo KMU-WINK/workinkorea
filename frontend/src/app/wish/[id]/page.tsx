@@ -6,12 +6,11 @@ import Link from 'next/link';
 
 import Card from '@/components/Card';
 
-import { CardType, LocationInfo, ServiceType, WishInfo } from '@/types/type';
+import { WishInfo, WishItem } from '@/types/type';
 
 import Back from 'public/svgs/back.svg';
-import { getWishFeed, getWishFeeds } from '@/services/wishs';
+import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import Image from 'next/image';
-import { it } from 'node:test';
 
 interface WishType {
   id: number;
@@ -20,11 +19,6 @@ interface WishType {
 }
 
 const wishData: WishType[] = [
-  {
-    id: 0,
-    location: '전체',
-    count: 11,
-  },
   {
     id: 1,
     location: '강릉',
@@ -61,6 +55,7 @@ const wishData: WishType[] = [
 export default function WishDetail() {
   const router = useRouter();
   const pathname = usePathname();
+  const [location, setLocation] = useState('location');
   const [locationId, setLocationId] = useState<number>();
   const [feedList, setFeedList] = useState<WishInfo[]>([]);
 
@@ -72,7 +67,7 @@ export default function WishDetail() {
   ) => {
     if (contentTypeId === 'open' || contentTypeId === 'tour') {
       router.push(
-        `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image}`,
+        `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image ? image : ''}`,
       );
     } else {
       router.push(`/spot/${id}?contenttypeid=${contentTypeId}?type=${type}`);
@@ -80,7 +75,37 @@ export default function WishDetail() {
   };
 
   const wishClick = async (item: WishInfo) => {
-    console.log('wishClick', item);
+    const originState = item.inWish;
+    setFeedList(prevList =>
+      prevList.map(feedItem =>
+        feedItem.contentid === item.contentid
+          ? { ...feedItem, inWish: !feedItem.inWish }
+          : feedItem,
+      ),
+    );
+
+    try {
+      const data: WishItem = {
+        type: item.type,
+        contentTypeId: item.contenttypeid || '',
+        contentId: item.contentid || '',
+      };
+
+      if (originState) {
+        await deleteWishItem(data);
+      } else {
+        await postWishItem(data);
+      }
+    } catch (error) {
+      console.error('Error in wishClick:', error);
+      setFeedList(prevList =>
+        prevList.map(feedItem =>
+          feedItem.contentid === item.contentid
+            ? { ...feedItem, inWish: originState }
+            : feedItem,
+        ),
+      );
+    }
   };
 
   const fetchData = async () => {
@@ -88,57 +113,38 @@ export default function WishDetail() {
 
     try {
       const response = await getWishFeeds();
-      console.log('response : ', response);
+      const selectedKey = Object.keys(response)[locationId - 1]; // locationId가 1부터 시작하는 가정
 
-      if (locationId === 0) {
-        // locationId가 0이면 모든 데이터를 feedList에 넣기
-        const allData: WishInfo[] = Object.values(response)
-          .flatMap(location => Object.values(location))
-          .flat();
-        console.log(allData);
-        setFeedList(allData);
-      } else {
-        // 특정 지역의 데이터를 feedList에 넣기
-        // const selectedKey = Object.keys(response)[locationId - 1]; // locationId가 1부터 시작하는 가정
-        // const selectedData = response[selectedKey];
-        // setFeedList(data);
-      }
+      // @ts-ignore
+      const selectedData = response[selectedKey];
+      setFeedList(selectedData);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, [locationId]);
-
-  // useEffect(() => {
-  //   setLocationId(
-  //     pathname ? parseInt(pathname.split('/').pop() || '', 10) : '',
-  //   );
-  //
-  // if (locationId !== null) {
-  //   const item = wishData.find(wish => wish.id === id);
-  //   setWishItem(item);
-  // }
-  // }, [pathname]);
-
-  useEffect(() => {
     const lastSegment = pathname ? pathname.split('/').pop() : '';
     setLocationId(lastSegment ? parseInt(lastSegment, 10) : undefined);
   }, [pathname]);
+
   useEffect(() => {
-    console.log('feedList : ', feedList);
-  }, [feedList]);
+    fetchData();
+    wishData.map(item => {
+      if (item.id === locationId) {
+        setLocation(item.location);
+      }
+    });
+  }, [locationId]);
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
       <div className="max-w-sm w-full h-full flex flex-col items-center relative py-16">
-        <div className="max-w-sm w-full text-center pt-6 pb-2 px-5 flex items-center gap-3 fixed top-0 left-1/2	-translate-x-2/4 bg-white z-10">
+        <div className="max-w-sm w-full text-center pt-6 pb-2 px-5 flex items-center gap-3 fixed top-0 left-1/2	-translate-x-2/4 bg-white z-20">
           <Link href="/wish">
             <Back className="cursor-pointer" />
           </Link>
-          <span>location</span>
+          <span>{location}</span>
         </div>
         <div className="w-full flex flex-col px-6 items-center gap-2">
           {feedList.length > 0 ? (
@@ -147,10 +153,12 @@ export default function WishDetail() {
                 <Card
                   id={item.contentid}
                   key={item.contentid}
-                  cardType={'default'}
-                  serviceType={'default'}
+                  cardType="default"
+                  serviceType="default"
                   title={item.title || item.empmnTtl || ''}
-                  location={`${item.addr1} ${item.addr2}`}
+                  location={
+                    item.wrkpAdres || item.addr1 + ' ' + item.addr2 || ''
+                  }
                   image={
                     item.firstimage ||
                     item.firstimage2 ||

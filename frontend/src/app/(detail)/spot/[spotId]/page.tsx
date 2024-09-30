@@ -22,9 +22,15 @@ import {
   InfoRowType39,
 } from '../../_components/InfoItem';
 import { formatString, extractLinkOrValue } from '../../_utils/stringUtils';
-import { SpotExtraInfo, SpotInfo, WishItem, WishRes } from '@/types/type';
+import {
+  SpotExtraInfo,
+  SpotInfo,
+  WishInfo,
+  WishItem,
+  WishRes,
+} from '@/types/type';
 import { getSpotDetail } from '@/services/spots';
-import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
+import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 
@@ -38,7 +44,7 @@ const ImageWrapper = styled.div`
 
 export default function Tour() {
   const [inWish, setInWish] = useState<boolean>(false);
-  const [wishList, setWishList] = useState<WishRes[]>([]);
+  const [wishList, setWishList] = useState<WishInfo[]>([]);
 
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
@@ -178,9 +184,12 @@ export default function Tour() {
   };
 
   const fetchWishList = async () => {
-    const wishListData = await getWishList();
-    setWishList(wishListData);
-    setIsLoading(false);
+    const wishListData = await getWishFeeds();
+    const allData: WishInfo[] = Object.values(wishListData)
+      .flatMap(location => Object.values(location))
+      .flat();
+    setWishList(allData);
+    await setIsLoading(false);
   };
 
   const wishClick = async () => {
@@ -235,7 +244,7 @@ export default function Tour() {
     if (isInWishList) {
       setInWish(true);
     }
-  }, [spotInfo]);
+  }, [spotInfo, wishList]);
 
   return (
     <div className="flex flex-col justify-start items-center h-full w-screen bg-white text-black">
