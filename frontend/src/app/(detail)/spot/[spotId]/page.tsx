@@ -75,8 +75,10 @@ export default function Tour() {
   const [contentId, setContentId] = useState<number>(0);
   const [contentTypeId, setContentTypeId] = useState<number>(0);
   const [type, setType] = useState<string>('');
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
+    fetchWishList();
+
     const pathParts = window.location.pathname.split('/');
 
     const id = pathParts.pop() || pathParts.pop() || '';
@@ -93,7 +95,6 @@ export default function Tour() {
     if (typeMatch) {
       setType(typeMatch[1]);
     }
-    fetchWishList();
   }, []);
 
   useEffect(() => {
@@ -146,7 +147,7 @@ export default function Tour() {
         outTime: data.checkouttime || '',
         mapx: data.mapx,
         mapy: data.mapy,
-        inWishlist: data.inWishlist,
+        inWishlist: inWish || data.inWishlist,
         location: data.location,
       });
 
@@ -178,6 +179,7 @@ export default function Tour() {
   const fetchWishList = async () => {
     const wishListData = await getWishList();
     setWishList(wishListData);
+    setIsLoading(false);
   };
 
   const wishClick = async () => {
@@ -203,7 +205,6 @@ export default function Tour() {
         setInWish(true);
         res = await postWishItem(data);
       }
-      await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
       if (res.error) {
@@ -257,71 +258,96 @@ export default function Tour() {
           <div className="absolute inset-0 h-1/4 bg-gradient-to-b from-[#00000080] to-transparent"></div>
         </ImageWrapper>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
-          <div className="w-full flex flex-col gap-4 px-4 py-2 bg-white">
-            <div className="w-full flex justify-between items-center">
-              <span
-                className="text-xl font-medium
-              whitespace-pre-wrap break-keep
-              max-w-[92%]"
-              >
-                {spotInfo.title}
-              </span>
-              {inWish ? (
-                <HeartColor className="cursor-pointer" onClick={wishClick} />
-              ) : (
-                <Heart className="cursor-pointer" onClick={wishClick} />
-              )}
+          {isLoading ? (
+            <div className="w-full flex flex-col items-center pt-20 gap-24 bg-white">
+              <span className="text-center">잠시만 기다려주세요.</span>
+              <div className="w-full flex flex-col gap-2.5 items-center">
+                <Image
+                  src="/svgs/no-feed-bubble.svg"
+                  alt="no-feed-bubble"
+                  width={50}
+                  height={0}
+                />
+                <Image
+                  src="/svgs/no-feed-logo.svg"
+                  alt="no-feed-logo"
+                  width={100}
+                  height={0}
+                />
+              </div>
             </div>
-            <div
-              className="w-fit flex items-center cursor-pointer"
-              onClick={addressClick}
-            >
-              <Location />
-              <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                {spotInfo.address}
-              </span>
-              <GoSmall />
-            </div>
-            <div className="w-full flex flex-col gap-2 text-xs">
-              <InfoRow>
-                <span>주소</span>
-                <pre>{spotInfo.address}</pre>
-              </InfoRow>
-              <InfoRow>
-                <span>
-                  {contentTypeId === 32 ? '체크인/아웃 시간' : '운영 시간'}
+          ) : (
+            <>
+              <div className="w-full flex flex-col gap-4 px-4 py-2 bg-white">
+                <div className="w-full flex justify-between items-center">
+                  <span
+                    className="text-xl font-medium
+                              whitespace-pre-wrap break-keep
+                              max-w-[92%]"
+                  >
+                    {spotInfo.title}
+                  </span>
+                  {inWish ? (
+                    <HeartColor
+                      className="cursor-pointer"
+                      onClick={wishClick}
+                    />
+                  ) : (
+                    <Heart className="cursor-pointer" onClick={wishClick} />
+                  )}
+                </div>
+                <div
+                  className="w-fit flex items-center cursor-pointer"
+                  onClick={addressClick}
+                >
+                  <Location />
+                  <span className="max-w-[80%] text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                    {spotInfo.address}
+                  </span>
+                  <GoSmall />
+                </div>
+                <div className="w-full flex flex-col gap-2 text-xs">
+                  <InfoRow>
+                    <span>주소</span>
+                    <pre>{spotInfo.address}</pre>
+                  </InfoRow>
+                  <InfoRow>
+                    <span>
+                      {contentTypeId === 32 ? '체크인/아웃 시간' : '운영 시간'}
+                    </span>
+                    <pre>
+                      {contentTypeId === 32
+                        ? `${spotInfo.inTime} ~ ${spotInfo.outTime}`
+                        : formatString(spotInfo.time || '')}
+                    </pre>
+                  </InfoRow>
+                  <InfoRow>
+                    <span>휴무</span>
+                    <pre>{spotInfo.restDate}</pre>
+                  </InfoRow>
+                  <InfoRow>
+                    <span>문의</span>
+                    <pre>
+                      {spotInfo.number}
+                      {spotInfo.telName ? `(${spotInfo.telName})` : null}
+                    </pre>
+                  </InfoRow>
+                </div>
+              </div>
+              {contentTypeId == 12 && <InfoRowType12 extraInfo={extraInfo} />}
+              {contentTypeId == 14 && <InfoRowType14 extraInfo={extraInfo} />}
+              {contentTypeId == 28 && <InfoRowType28 extraInfo={extraInfo} />}
+              {contentTypeId == 32 && <InfoRowType32 extraInfo={extraInfo} />}
+              {contentTypeId == 38 && <InfoRowType38 extraInfo={extraInfo} />}
+              {contentTypeId == 39 && <InfoRowType39 extraInfo={extraInfo} />}
+              <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
+                <span className="font-bold">소개</span>
+                <span className="whitespace-pre-wrap break-words">
+                  {spotInfo.overview}
                 </span>
-                <pre>
-                  {contentTypeId === 32
-                    ? `${spotInfo.inTime} ~ ${spotInfo.outTime}`
-                    : formatString(spotInfo.time || '')}
-                </pre>
-              </InfoRow>
-              <InfoRow>
-                <span>휴무</span>
-                <pre>{spotInfo.restDate}</pre>
-              </InfoRow>
-              <InfoRow>
-                <span>문의</span>
-                <pre>
-                  {spotInfo.number}
-                  {spotInfo.telName ? `(${spotInfo.telName})` : null}
-                </pre>
-              </InfoRow>
-            </div>
-          </div>
-          {contentTypeId == 12 && <InfoRowType12 extraInfo={extraInfo} />}
-          {contentTypeId == 14 && <InfoRowType14 extraInfo={extraInfo} />}
-          {contentTypeId == 28 && <InfoRowType28 extraInfo={extraInfo} />}
-          {contentTypeId == 32 && <InfoRowType32 extraInfo={extraInfo} />}
-          {contentTypeId == 38 && <InfoRowType38 extraInfo={extraInfo} />}
-          {contentTypeId == 39 && <InfoRowType39 extraInfo={extraInfo} />}
-          <div className="w-full flex flex-col gap-2 px-4 py-2 bg-white text-xs">
-            <span className="font-bold">소개</span>
-            <span className="whitespace-pre-wrap break-words">
-              {spotInfo.overview}
-            </span>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <div className="w-full fixed bottom-0 flex justify-center items-center sm:max-w-sm">

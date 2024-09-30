@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Back from 'public/svgs/back.svg';
 import Go from 'public/svgs/go.svg';
+import { useRouter } from 'next/navigation';
+import { getWishFeeds } from '@/services/wishs';
+import { LocationInfo } from '@/types/type';
 
 interface WishType {
   id: number;
@@ -11,62 +14,119 @@ interface WishType {
   count: number;
 }
 
+type LocCountType = {
+  [key: string]: {
+    id: number;
+    count: number;
+    items: LocCountType[];
+    length: number;
+  };
+};
+
 export default function Wish() {
-  const [wishList, setWishList] = useState<WishType[]>([]);
+  const router = useRouter();
+  const [locCount, setLocCount] = useState<LocCountType>({
+    전체: {
+      id: 0,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    강릉: {
+      id: 1,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    경주: {
+      id: 2,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    부산: {
+      id: 3,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    여수: {
+      id: 4,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    전주: {
+      id: 5,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    제주: {
+      id: 6,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+    춘천: {
+      id: 7,
+      count: 0,
+      items: [],
+      length: 0,
+    },
+  });
+
+  const fetchData = async () => {
+    try {
+      const response: LocationInfo[] = await getWishFeeds(); // 배열로 처리
+      let totalCount = 0;
+
+      const updatedLocCount = { ...locCount };
+      Object.entries(response).forEach(([key, value]) => {
+        // @ts-ignore
+        updatedLocCount[key].count = response[key].length;
+        // @ts-ignore
+        totalCount += response[key].length;
+      });
+      console.log('updatedLocCount', updatedLocCount);
+      updatedLocCount['전체'].count = totalCount;
+
+      setLocCount(updatedLocCount);
+    } catch (error) {
+      console.log('error : ', error);
+    }
+  };
 
   useEffect(() => {
-    setWishList([
-      {
-        id: 0,
-        location: '전체',
-        count: 11,
-      },
-      {
-        id: 1,
-        location: '강릉',
-        count: 0,
-      },
-      {
-        id: 2,
-        location: '경주',
-        count: 0,
-      },
-      {
-        id: 3,
-        location: '부산',
-        count: 0,
-      },
-      { id: 4, location: '여수', count: 0 },
-      {
-        id: 5,
-        location: '전주',
-        count: 0,
-      },
-      {
-        id: 6,
-        location: '제주',
-        count: 0,
-      },
-      {
-        id: 7,
-        location: '춘천',
-        count: 0,
-      },
-    ]);
+    fetchData();
   }, []);
+
+  const backClick = () => {
+    router.push('/main');
+  };
+
+  useEffect(() => {
+    console.log('locCount : ', locCount);
+    Object.keys(locCount).map(item => {
+      console.log('location[item]: ', locCount[item]);
+    });
+  }, [locCount]);
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
       <div className="max-w-sm w-full h-full flex flex-col items-center gap-2 py-4">
         <div className="w-full relative text-center py-3">
-          <Back className="absolute top-3 left-6 cursor-pointer" />
+          <Back
+            className="absolute top-3 left-6 cursor-pointer"
+            onClick={backClick}
+          />
           <span>위시리스트</span>
         </div>
         <div className="w-full flex flex-col px-6 items-center">
-          {wishList.map(item => (
+          {(Object.keys(locCount) as (keyof LocationInfo)[]).map(item => (
             <Link
-              href={`/wish/${item.id}`}
-              key={item.id}
+              href={`/wish/${locCount[item].id}`}
+              key={locCount[item].id}
               passHref
               className="w-full"
             >
@@ -76,7 +136,7 @@ export default function Wish() {
                 tabIndex={0}
               >
                 <span>
-                  {item.location}({item.count})
+                  {item}({locCount[item].count})
                 </span>
                 <Go />
               </div>

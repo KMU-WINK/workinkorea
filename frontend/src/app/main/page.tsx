@@ -101,6 +101,10 @@ export default function MainPage() {
     router.push(`/${type}?location=${location}&keyword=`);
   };
 
+  const wishClick = () => {
+    router.push('/wish');
+  };
+
   console.log(isLoggedIn);
 
   return (
@@ -128,7 +132,7 @@ export default function MainPage() {
             </div>
             {isLoggedIn ? (
               <div className="flex gap-2">
-                <HeartColor className="cursor-pointer" />
+                <HeartColor className="cursor-pointer" onClick={wishClick} />
                 <SettingColor className="cursor-pointer" />
               </div>
             ) : (
