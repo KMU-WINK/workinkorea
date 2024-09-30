@@ -35,9 +35,7 @@ export default function Input({
       role="button"
       tabIndex={0}
     >
-      <div onClick={onClick} className="z-10">
-        {leftIcon}
-      </div>
+      <div className="z-10">{leftIcon}</div>
       <input
         type="text"
         placeholder={placeholder}
