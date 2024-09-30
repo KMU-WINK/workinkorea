@@ -20,11 +20,16 @@ export default function DatePicker({
 }: InputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 오늘 날짜를 가져와서 maxDate 설정
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <div
       className={`flex gap-2.5 w-full border border-gray-2 rounded-[10px] px-3.5 py-[18px] ${disabled ? 'bg-[#F5F5F5] cursor-pointer' : 'bg-white cursor-default'}`}
       onClick={() => {
-        inputRef.current?.showPicker();
+        if (!disabled && !readOnly) {
+          inputRef.current?.showPicker(); // 달력 선택기 표시
+        }
       }}
     >
       <input
@@ -32,6 +37,7 @@ export default function DatePicker({
         placeholder={placeholder}
         ref={inputRef}
         value={state}
+        max={today} // 오늘 날짜 이후 선택 불가
         className={`hide-calendar text-black bg-transparent outline-none flex-1 placeholder-gray-4 ${disabled && 'cursor-pointer'}`}
         readOnly={disabled || readOnly}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +51,16 @@ export default function DatePicker({
           }
         }}
       />
-      <CalendarIcon />
+      <div
+        className="cursor-pointer"
+        onClick={() => {
+          if (!disabled && !readOnly) {
+            inputRef.current?.showPicker(); // 달력 선택기 표시
+          }
+        }}
+      >
+        <CalendarIcon />
+      </div>
     </div>
   );
 }

@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import Badge from '@/app/onboarding/_components/Badge';
 import Button from '@/components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { createUserNickname } from '@/services/users';
 import axios from 'axios';
 
@@ -15,53 +14,70 @@ export default function Step1() {
     null,
   );
   const [errorMessage, setErrorMessage] = useState('');
-  const [messageColor, setMessageColor] = useState('red'); // 메시지 색상 상태 추가
+  const [messageColor, setMessageColor] = useState('red');
   const router = useRouter();
 
-  // 서버에서 클라이언트로 전달하는 search param을 로컬 변수에 저장
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
   const provider = searchParam.get('provider');
 
   const handleDuplicateCheck = async () => {
-  try {
-    await createUserNickname({
-      social_id: socialId,
-      nickname,
-    });
-    setIsNicknameUnique(true);
-    setErrorMessage('사용 가능한 닉네임입니다.');
-    setMessageColor('blue');
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      if (e.response?.status === 400) {
-        setIsNicknameUnique(false);
-        setErrorMessage('중복된 닉네임입니다.');
-        setMessageColor('red');
-      } else {
-        console.error(e);
-        setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
-        setMessageColor('red');
+    if (nickname.length === 1) {
+      setErrorMessage('닉네임은 최소 두 글자여야 합니다.');
+      setMessageColor('red');
+      return;
+    }
+
+    try {
+      await createUserNickname({
+        social_id: socialId,
+        nickname,
+      });
+      setIsNicknameUnique(true);
+      setErrorMessage('사용 가능한 닉네임입니다.');
+      setMessageColor('blue');
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 400) {
+          setIsNicknameUnique(false);
+          setErrorMessage('중복된 닉네임입니다.');
+          setMessageColor('red');
+        } else {
+          console.error(e);
+          setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
+          setMessageColor('red');
+        }
       }
     }
-  }
-};
-
-  const handleNextClick = async () => {
-    router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);
   };
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
 
-    if (newNickname.length > 6) {
+    const koreanRegex = /^[ㄱ-ㅎ|가-힣]+$/;
+
+    if (newNickname.length === 0) {
+      setErrorMessage('');
+      setMessageColor('');
+      setNickname(newNickname);
+      return;
+    }
+
+    if (!koreanRegex.test(newNickname)) {
+      setErrorMessage('닉네임은 한글만 입력할 수 있습니다.');
+      setMessageColor('red');
+    } else if (newNickname.length > 6) {
       setErrorMessage('닉네임은 6글자를 넘을 수 없습니다.');
-      setMessageColor('red'); // 에러 메시지는 빨간색
+      setMessageColor('red');
     } else {
       setErrorMessage('');
-      setMessageColor(''); // 오류 메시지 초기화
+      setMessageColor('');
       setNickname(newNickname);
     }
+  };
+
+  const handleNextClick = async () => {
+    router.push(`/onboarding/step2?social_id=${socialId}&provider=${provider}`);
   };
 
   return (

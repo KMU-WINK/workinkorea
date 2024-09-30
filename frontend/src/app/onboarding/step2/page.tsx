@@ -40,7 +40,6 @@ export default function Step2() {
     }
   };
 
-  // 성별 선택
   const handleGenderSelect = (selectedGender: string) => {
     setGender(selectedGender);
   };
