@@ -13,7 +13,7 @@ export default function Header({
   onRightClick,
 }: HeaderProps) {
   return (
-    <div className="flex justify-between px-6 py-[18px] items-center fixed top-0 sm:max-w-sm w-full z-20 bg-white">
+    <div className="flex justify-between px-6 py-[18px] items-center fixed top-0 sm:max-w-sm w-full z-20 bg-white max-w-[393px]">
       <div
         onClick={onLeftClick}
         className={`${onLeftClick ? 'cursor-pointer' : 'opacity-0'}`}
