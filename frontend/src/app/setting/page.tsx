@@ -9,13 +9,14 @@ import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/services/users';
 import { UserDetail } from '@/types/user';
 import { formatDateWithDots } from '@/utils/dateUtils';
+import { AxiosError } from 'axios';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const router = useRouter();
 
   const backButtonClick = () => {
-    router.back();
+    router.push('/main');
   };
   const modifyClick = () => {
     router.push('/setting/modify');
@@ -24,7 +25,11 @@ export default function Setting() {
 
   const fetchUserInfo = async () => {
     const result = await getUserDetail();
-    setUserDetail(result);
+    if (result instanceof AxiosError) {
+      throw result;
+    } else {
+      setUserDetail(result);
+    }
   };
 
   useEffect(() => {
