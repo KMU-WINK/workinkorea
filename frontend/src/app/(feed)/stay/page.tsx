@@ -1,3 +1,4 @@
+// (feed)/stay.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -5,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { parseUrl } from '../_utils/stringUtils';
 import Card from '@/components/Card';
+import Spinner from '@/components/Spinner';
 
 import { FeedProps, WishInfo, WishItem, WishRes } from '@/types/type';
 
@@ -245,7 +247,7 @@ export default function Stay() {
       ) : (
         <div className="w-full flex flex-col items-center pt-20 gap-24">
           {isFirst ? (
-            <span className="text-center">잠시만 기다려주세요.</span>
+            <Spinner />
           ) : (
             <span className="text-center">
               검색 결과가 없습니다.
@@ -253,20 +255,6 @@ export default function Stay() {
               다른 검색어를 입력해주세요.
             </span>
           )}
-          <div className="w-full flex flex-col gap-2.5 items-center">
-            <Image
-              src="/svgs/no-feed-bubble.svg"
-              alt="no-feed-bubble"
-              width={50}
-              height={0}
-            />
-            <Image
-              src="/svgs/no-feed-logo.svg"
-              alt="no-feed-logo"
-              width={100}
-              height={0}
-            />
-          </div>
         </div>
       )}
     </div>

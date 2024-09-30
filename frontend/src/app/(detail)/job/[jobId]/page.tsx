@@ -9,6 +9,7 @@ import HeartColor from '../../../../../public/svgs/heart-color.svg';
 import BackWhite from '../../../../../public/svgs/back-white.svg';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
+import Spinner from '@/components/Spinner';
 import { InfoRow } from '../../_components/InfoItem';
 import {
   formatDateString,
@@ -197,22 +198,8 @@ export default function Job() {
         </ImageWrapper>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
           {isLoading ? (
-            <div className="w-full flex flex-col items-center pt-20 gap-24 bg-white">
-              <span className="text-center">잠시만 기다려주세요.</span>
-              <div className="w-full flex flex-col gap-2.5 items-center">
-                <Image
-                  src="/svgs/no-feed-bubble.svg"
-                  alt="no-feed-bubble"
-                  width={50}
-                  height={0}
-                />
-                <Image
-                  src="/svgs/no-feed-logo.svg"
-                  alt="no-feed-logo"
-                  width={100}
-                  height={0}
-                />
-              </div>
+            <div className="w-full flex flex-col items-center gap-24 bg-white">
+              <Spinner />
             </div>
           ) : (
             <>
