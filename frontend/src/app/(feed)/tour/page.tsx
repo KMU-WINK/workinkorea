@@ -1,10 +1,10 @@
+// (feed)/tour.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
-import Spinner from '@/components/Spinner';
 
 import { FeedProps, JobProps, WishInfo, WishItem, WishRes } from '@/types/type';
 
@@ -251,7 +251,7 @@ export default function Tour() {
       ) : (
         <div className="w-full flex flex-col items-center pt-20 gap-24">
           {isFirst ? (
-            <Spinner />
+            <span className="text-center">잠시만 기다려주세요.</span>
           ) : (
             <span className="text-center">
               검색 결과가 없습니다.

@@ -1,4 +1,3 @@
-// (feed)/stay.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -248,7 +247,8 @@ export default function Stay() {
         <div className="w-full flex flex-col items-center pt-20 gap-24">
           {isFirst ? (
             <Spinner />
-          ) : (
+
+            ) : (
             <span className="text-center">
               검색 결과가 없습니다.
               <br />

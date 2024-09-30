@@ -44,9 +44,7 @@ export default function FeedLayout({ children }: Props) {
       </div>
 
       {/* Suspense 적용하여 children 로딩 중 스피너 보여줌 */}
-      <div className="w-full max-w-sm px-6 mt-[86px]">
-        <Suspense fallback={<Spinner />}>{children}</Suspense>
-      </div>
+      <div className="w-full max-w-sm px-6 mt-[86px]">{children}</div>
     </div>
   );
 }
