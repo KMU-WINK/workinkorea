@@ -1,9 +1,9 @@
 import requests, os, jwt, httpx
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from ..models.User import User
 from ..db.session import get_db
 from ..schemas.user import UserCreate
@@ -332,3 +332,15 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
         )
 
     return user
+
+
+@router.delete("/token")
+async def delete_access_token(response: Response):
+    # 쿠키 만료 시간을 과거로 설정
+    expired_time = datetime.now(timezone.utc) - timedelta(days=1)
+
+    # 쿠키 삭제
+    response.set_cookie(key="accessToken", value="", expires=expired_time)
+    response.set_cookie(key="social_id", value="", expires=expired_time)
+
+    return {"message": "로그아웃이 완료되었습니다."}
