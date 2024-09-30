@@ -17,9 +17,10 @@ export const getStayLocations = async ({
   numOfRows = 50,
 }: GetLocationProps) => {
   try {
+    // keyword가 있을 경우 radius 20000으로 고정
     const response = await PublicAxiosInstance.get(
       keyword
-        ? `/stays/location?mapX=${mapX}&mapY=${mapY}&keyword=${keyword}&radius=${radius}&numOfRows=${numOfRows}`
+        ? `/stays/location?mapX=${mapX}&mapY=${mapY}&keyword=${keyword}&radius=20000&numOfRows=${numOfRows}`
         : `/stays/location?mapX=${mapX}&mapY=${mapY}&radius=${radius}&numOfRows=${numOfRows}`,
     );
     return response.data;
