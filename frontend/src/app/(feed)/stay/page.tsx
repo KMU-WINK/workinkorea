@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation';
 import { parseUrl } from '../_utils/stringUtils';
 import Card from '@/components/Card';
 
-import { FeedProps, WishItem, WishRes } from '@/types/type';
+import { FeedProps, WishInfo, WishItem, WishRes } from '@/types/type';
 
 import { getStays } from '@/services/stays';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 
-import { getWishList, postWishItem, deleteWishItem } from '@/services/wishs';
+import { postWishItem, deleteWishItem, getWishFeeds } from '@/services/wishs';
 
 export default function Stay() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -23,7 +23,7 @@ export default function Stay() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
-  const [wishList, setWishList] = useState<WishRes[]>([]);
+  const [wishList, setWishList] = useState<WishInfo[]>([]);
   const [firstInfo, setFirstInfo] = useState({
     mapx: 0,
     mapy: 0,
@@ -61,7 +61,9 @@ export default function Stay() {
         addr1: item.addr1,
         addr2: item.addr2,
         image: item.firstimage || item.firstimage2 || '/svgs/job-default.svg',
-        inWishlist: false,
+        inWishlist: wishList.some(
+          wishItem => wishItem.contentid === item.contentid,
+        ),
         contenttypeid: item.contenttypeid,
       }));
 
@@ -103,11 +105,14 @@ export default function Stay() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, []);
+  }, [feedList]);
 
   const fetchWishList = async () => {
-    const wishListData = await getWishList();
-    setWishList(wishListData);
+    const wishListData = await getWishFeeds();
+    const allData: WishInfo[] = Object.values(wishListData)
+      .flatMap(location => Object.values(location))
+      .flat();
+    setWishList(allData);
     await setIsFirst(false);
   };
 
@@ -185,7 +190,6 @@ export default function Stay() {
       } else {
         await postWishItem(data);
       }
-
     } catch (error) {
       console.error('Error in wishClick:', error);
 

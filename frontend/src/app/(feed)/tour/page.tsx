@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
 
-import { FeedProps, JobProps, WishItem, WishRes } from '@/types/type';
+import { FeedProps, JobProps, WishInfo, WishItem, WishRes } from '@/types/type';
 
 import { getSpots } from '@/services/spots';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
-import { deleteWishItem, getWishList, postWishItem } from '@/services/wishs';
+import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 
 export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -22,7 +22,7 @@ export default function Tour() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
-  const [wishList, setWishList] = useState<WishRes[]>([]);
+  const [wishList, setWishList] = useState<WishInfo[]>([]);
   const [firstInfo, setFirstInfo] = useState({
     mapx: 0,
     mapy: 0,
@@ -59,7 +59,9 @@ export default function Tour() {
         addr1: item.addr1,
         addr2: item.addr2,
         image: item.firstimage || item.firstimage2 || '/svgs/job-default.svg',
-        inWishlist: false,
+        inWishlist: wishList.some(
+          wishItem => wishItem.contentid === item.contentid,
+        ),
         contenttypeid: item.contenttypeid,
       }));
 
@@ -102,11 +104,14 @@ export default function Tour() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, []);
+  }, [feedList]);
 
   const fetchWishList = async () => {
-    const wishListData = await getWishList();
-    setWishList(wishListData);
+    const wishListData = await getWishFeeds();
+    const allData: WishInfo[] = Object.values(wishListData)
+      .flatMap(location => Object.values(location))
+      .flat();
+    setWishList(allData);
     await setIsFirst(false);
   };
 
@@ -132,7 +137,6 @@ export default function Tour() {
   }, [page, loading]);
 
   useEffect(() => {
-    console.log('wishList : ', wishList);
     if (wishList.length > 0 && feedList.length > 0) {
       const updatedFeedList = feedList.map(feedItem => {
         const isInWishlist = wishList.some(
