@@ -123,6 +123,9 @@ export default function MainPage() {
       name: result.user.nickname,
       profile: profileFile ? URL.createObjectURL(profileFile) : '',
     });
+
+    if (result.regions && result.regions.length > 0)
+      setLocation(result.regions[0]);
   };
 
   useEffect(() => {

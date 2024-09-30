@@ -23,8 +23,8 @@ import {
 import axios from 'axios';
 import { UserDetail } from '@/types/user';
 import useUserStore from '@/app/stores/loginStore';
-import useUserInterestStore from '@/app/stores/userInterestStore';
 import { base64ToFile } from '@/utils/imageUtil';
+import useUserInfoStore from '@/app/stores/userInfoStore';
 
 interface UserInfo {
   profileImg?: File;
@@ -44,7 +44,7 @@ export default function SettingModify() {
   const [birth, setBirth] = useState<string>('');
 
   // interest 카테고리는 별도의 페이지에서 보여줘야 하므로 전역 변수로 관리
-  const { interests, setInterests } = useUserInterestStore();
+  const { interests, setInterests } = useUserInfoStore();
 
   const imageRef = useRef<HTMLInputElement>(null);
   const [nicknameCheckMessage, setNicknameCheckMessage] = useState('');

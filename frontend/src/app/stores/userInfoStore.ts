@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 
-interface UserInterestState {
+interface UserInfoState {
   interests: string[];
   setInterests: (interests: string[]) => void;
 }
-const useUserInterestStore = create<UserInterestState>(set => ({
+const useUserInfoStore = create<UserInfoState>(set => ({
   interests: [],
   setInterests: (interests: string[]) => set({ interests }),
 }));
 
-export default useUserInterestStore;
+export default useUserInfoStore;
