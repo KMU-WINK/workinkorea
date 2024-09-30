@@ -8,6 +8,7 @@ import TrendList from '@/app/search/_components/TrendList';
 import Button from '@/components/Button';
 import Character from 'public/svgs/character.svg';
 import Map from 'public/svgs/map.svg';
+import Header from '@/components/Header';
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,16 +49,14 @@ export default function Search() {
 
   return (
     <div className="flex justify-center min-h-screen">
-      <div className=" w-full max-w-[393px] mx-auto flex flex-col items-center min-h-screen">
-        <div className="px-4 py-4 w-full flex-1">
+      <Header
+        text="검색"
+        onLeftClick={() => router.back()} // 이전 페이지로 이동하는 로직 추가
+      />
+      <div className="w-full max-w-[393px] mx-auto flex flex-col items-center min-h-screen">
+        <div className="px-6 py-6 w-full flex-1">
           {/* 상단 바 */}
-          <div className="flex items-center mb-4 relative justify-center">
-            <button className="p-2 absolute left-0">
-              <Back />
-            </button>
-            <p className="text-lg py-3">검색</p>
-          </div>
-          <div>
+          <div className="pt-14">
             <div className="border border-gray-3 border-b-0 rounded-t-md">
               <div className="flex items-center border-b border-b-gray-2 h-12">
                 <SearchIcon className="ml-4" />
