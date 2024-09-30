@@ -88,7 +88,6 @@ export default function Wish() {
         // @ts-ignore
         totalCount += response[key].length;
       });
-      console.log('updatedLocCount', updatedLocCount);
       updatedLocCount['전체'].count = totalCount;
 
       setLocCount(updatedLocCount);
@@ -104,13 +103,6 @@ export default function Wish() {
   const backClick = () => {
     router.push('/main');
   };
-
-  useEffect(() => {
-    console.log('locCount : ', locCount);
-    Object.keys(locCount).map(item => {
-      console.log('location[item]: ', locCount[item]);
-    });
-  }, [locCount]);
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">

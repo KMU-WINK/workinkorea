@@ -154,6 +154,8 @@ export interface WishInfo {
   empmnTtl?: string;
   wrkpAdres?: string;
   corpoLogoFileUrl?: string;
+  salStle?: string;
+  wageAmt?: string;
 }
 
 export interface LocationDetails {
