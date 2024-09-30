@@ -80,12 +80,6 @@ export default function MainPage() {
         description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요', // 여기에 콤마 추가
         backgroundImage: '/images/banner-test.jpg',
       },
-      {
-        type: 'white-filter-on',
-        title: '완전한 휴식이 필요할 때',
-        description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요', // 여기에 콤마 추가
-        backgroundImage: '/images/banner-test.jpg',
-      },
     ]);
     setUserInfo({
       name: '여섯글자이름',
@@ -111,6 +105,10 @@ export default function MainPage() {
 
   const settingClick = () => {
     router.push('/setting');
+  };
+
+  const bannerClick = () => {
+    router.push('/recommend');
   };
 
   const fetchUserInfo = async () => {
@@ -238,6 +236,7 @@ export default function MainPage() {
               type={info.type}
               title={info.title}
               description={info.description}
+              onClick={bannerClick}
               backgroundImage={
                 <Image
                   src={info.backgroundImage}

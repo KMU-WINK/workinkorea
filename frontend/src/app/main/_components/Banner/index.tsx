@@ -5,6 +5,7 @@ export default function Banner({
   title,
   description,
   backgroundImage,
+  onClick,
 }: BannerProps) {
   const commonStyle =
     'flex flex-col gap-5 rounded-xl px-6 py-8 min-h-[360px] relative overflow-hidden cursor-pointer';
@@ -29,7 +30,7 @@ export default function Banner({
   }
 
   return (
-    <div className={`${commonStyle} ${typeStyle}`}>
+    <div className={`${commonStyle} ${typeStyle}`} onClick={onClick}>
       {/* Background Image */}
       <div className="absolute inset-0 z-0">{backgroundImage}</div>
 
