@@ -123,10 +123,15 @@ export default function MainPage() {
       name: result.user.nickname,
       profile: profileFile ? URL.createObjectURL(profileFile) : '',
     });
+
+    if (result.regions && result.regions.length > 0)
+      setLocation(result.regions[0]);
   };
 
   useEffect(() => {
-    fetchUserInfo();
+    if (isLoggedIn) {
+      fetchUserInfo();
+    }
   }, []);
 
   return (
@@ -139,16 +144,22 @@ export default function MainPage() {
         <div className="flex flex-col gap-3.5 w-full">
           <div className="flex justify-between">
             <div className="flex gap-1 items-center cursor-pointer">
-              <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
-                <Image
-                  src={userInfo.profile ? userInfo.profile : ProfileDefault}
-                  alt="Profile"
-                  fill
-                />
-              </div>
-              <span className="text-sm font-medium">
-                {userInfo.name ? userInfo.name : '사용자'}
-              </span>
+              {isLoggedIn ? (
+                <>
+                  <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
+                    <Image
+                      src={userInfo.profile ? userInfo.profile : ProfileDefault}
+                      alt="Profile"
+                      fill
+                    />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {userInfo.name ? userInfo.name : '사용자'}
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm font-medium ml-6">워크인코리아</span>
+              )}
             </div>
             {isLoggedIn ? (
               <div className="flex gap-2">

@@ -14,12 +14,12 @@ import Button from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import { createUserInterest } from '@/services/users';
 import axios from 'axios';
-import useUserInterestStore from '@/app/stores/userInterestStore';
+import useUserInfoStore from '@/app/stores/userInfoStore';
 import useUserStore from '@/app/stores/loginStore';
 
 export default function ModifyTour() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const { interests, setInterests } = useUserInterestStore();
+  const { interests, setInterests } = useUserInfoStore();
   const { socialId } = useUserStore();
   const router = useRouter();
   const options = [
