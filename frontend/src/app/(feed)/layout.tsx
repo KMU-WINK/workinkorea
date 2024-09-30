@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 import { parseUrl } from './_utils/stringUtils';
 import Input from '@/components/Input';
 import Spinner from '@/components/Spinner'; // 로딩 스피너 컴포넌트 추가
@@ -42,8 +43,6 @@ export default function FeedLayout({ children }: Props) {
           />
         </div>
       </div>
-
-      {/* Suspense 적용하여 children 로딩 중 스피너 보여줌 */}
       <div className="w-full max-w-sm px-6 mt-[86px]">{children}</div>
     </div>
   );

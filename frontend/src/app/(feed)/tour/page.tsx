@@ -1,4 +1,3 @@
-// (feed)/tour.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -6,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
 import Spinner from '@/components/Spinner';
+
 import { FeedProps, JobProps, WishInfo, WishItem, WishRes } from '@/types/type';
 
 import { getSpots } from '@/services/spots';
