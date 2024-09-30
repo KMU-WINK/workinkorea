@@ -14,12 +14,7 @@ import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 
-import {
-  getWishList,
-  postWishItem,
-  deleteWishItem,
-  getWishFeeds,
-} from '@/services/wishs';
+import { postWishItem, deleteWishItem, getWishFeeds } from '@/services/wishs';
 
 export default function Job() {
   const [feedList, setFeedList] = useState<JobProps[]>([]);

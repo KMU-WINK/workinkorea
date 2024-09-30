@@ -6,21 +6,10 @@ import Link from 'next/link';
 
 import Card from '@/components/Card';
 
-import {
-  CardType,
-  LocationInfo,
-  ServiceType,
-  WishInfo,
-  WishItem,
-} from '@/types/type';
+import { WishInfo, WishItem } from '@/types/type';
 
 import Back from 'public/svgs/back.svg';
-import {
-  deleteWishItem,
-  getWishFeed,
-  getWishFeeds,
-  postWishItem,
-} from '@/services/wishs';
+import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import Image from 'next/image';
 import { it } from 'node:test';
 

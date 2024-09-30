@@ -12,12 +12,7 @@ import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
 import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
-import {
-  deleteWishItem,
-  getWishFeeds,
-  getWishList,
-  postWishItem,
-} from '@/services/wishs';
+import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 
 export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);

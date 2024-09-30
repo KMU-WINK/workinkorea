@@ -29,12 +29,7 @@ import {
   WishRes,
 } from '@/types/type';
 import { getSpotDetail } from '@/services/spots';
-import {
-  deleteWishItem,
-  getWishFeeds,
-  getWishList,
-  postWishItem,
-} from '@/services/wishs';
+import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 
