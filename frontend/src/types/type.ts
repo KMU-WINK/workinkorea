@@ -33,6 +33,7 @@ export interface FeedProps extends CardProps {
   firstimage2: string;
   addr1: string;
   addr2: string;
+  inWish?: boolean;
 }
 
 export interface UserDetail {
@@ -89,6 +90,7 @@ export interface JobProps extends CardProps {
   wrkpAdres?: string;
   wageAmt?: string;
   salStle?: string;
+  inWish?: boolean;
 }
 
 export interface JobInfo {

@@ -23,7 +23,6 @@ export default function Tour() {
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [type, setType] = useState<string>('');
-  const [wishList, setWishList] = useState<WishInfo[]>([]);
   const [firstInfo, setFirstInfo] = useState({
     mapx: 0,
     mapy: 0,
@@ -52,6 +51,8 @@ export default function Tour() {
         setPageCount(Math.floor(response.data.totalCount / 10) + 1);
       }
 
+      console.log(response);
+
       const data = response.data.items.item.map((item: FeedProps) => ({
         contentid: item.contentid,
         cardType: 'default',
@@ -60,9 +61,7 @@ export default function Tour() {
         addr1: item.addr1,
         addr2: item.addr2,
         image: item.firstimage || item.firstimage2 || '/svgs/job-default.svg',
-        inWishlist: wishList.some(
-          wishItem => wishItem.contentid === item.contentid,
-        ),
+        inWishlist: item.inWish,
         contenttypeid: item.contenttypeid,
       }));
 
@@ -98,7 +97,6 @@ export default function Tour() {
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
-    fetchWishList();
 
     if (feedInfo.location) {
       setType(feedInfo.type);
@@ -106,15 +104,6 @@ export default function Tour() {
       setKeyword(feedInfo.keyword || '');
     }
   }, [feedList]);
-
-  const fetchWishList = async () => {
-    const wishListData = await getWishFeeds();
-    const allData: WishInfo[] = Object.values(wishListData)
-      .flatMap(location => Object.values(location))
-      .flat();
-    setWishList(allData);
-    await setIsFirst(false);
-  };
 
   useEffect(() => {
     if (area) fetchData();
@@ -137,30 +126,6 @@ export default function Tour() {
     };
   }, [page, loading]);
 
-  useEffect(() => {
-    if (wishList.length > 0 && feedList.length > 0) {
-      const updatedFeedList = feedList.map(feedItem => {
-        const isInWishlist = wishList.some(
-          wishItem => wishItem.contentid === feedItem.contentid,
-        );
-
-        // 상태가 변경된 경우에만 업데이트
-        if (feedItem.inWishlist !== isInWishlist) {
-          return {
-            ...feedItem,
-            inWishlist: isInWishlist, // wishList에 있으면 true로 설정
-          };
-        }
-        return feedItem; // 상태가 변경되지 않았으면 기존 상태 유지
-      });
-
-      // 변경 사항이 있을 때만 feedList 업데이트
-      if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
-        setFeedList(updatedFeedList);
-      }
-    }
-  }, [wishList]);
-
   const cardClick = (id: string, contenttypeid?: string) => {
     router.push(`/spot/${id}?contenttypeid=${contenttypeid}?type=spot`);
   };
@@ -170,8 +135,6 @@ export default function Tour() {
       openModal();
       return;
     }
-
-    const originState = item.inWishlist;
     setFeedList(prevList =>
       prevList.map(feedItem =>
         feedItem.contentid === item.contentid
@@ -186,25 +149,13 @@ export default function Tour() {
         contentId: item.contentid,
       };
 
-      if (originState) {
+      if (item.inWishlist) {
         await deleteWishItem(data);
       } else {
         await postWishItem(data);
       }
-
-      // 위 작업이 성공적으로 이루어졌다면, WishList를 다시 불러옴
-      await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
-
-      // 에러가 발생한 경우 원래 상태로 되돌림
-      setFeedList(prevList =>
-        prevList.map(feedItem =>
-          feedItem.contentid === item.contentid
-            ? { ...feedItem, inWishlist: originState }
-            : feedItem,
-        ),
-      );
     }
   };
 
