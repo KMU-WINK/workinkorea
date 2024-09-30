@@ -61,7 +61,9 @@ export default function Stay() {
         addr1: item.addr1,
         addr2: item.addr2,
         image: item.firstimage || item.firstimage2 || '/svgs/job-default.svg',
-        inWishlist: false,
+        inWishlist: wishList.some(
+          wishItem => wishItem.contentid === item.contentid,
+        ),
         contenttypeid: item.contenttypeid,
       }));
 
@@ -103,7 +105,7 @@ export default function Stay() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, []);
+  }, [feedList]);
 
   const fetchWishList = async () => {
     const wishListData = await getWishFeeds();

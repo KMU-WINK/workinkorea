@@ -49,7 +49,7 @@ export default function MainPage() {
     link: '/',
   });
   // user 정보에 따라 location 적용
-  const [location, setLocation] = useState<string>('제주');
+  const [location, setLocation] = useState<string>('강릉');
   const { openModal } = useModalStore();
   const { isLoggedIn, login, logout } = useUserStore();
 

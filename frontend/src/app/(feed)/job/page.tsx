@@ -51,7 +51,9 @@ export default function Job() {
         price: item.wageAmt,
         location: item.wrkpAdres,
         image: item.corpoLogoFileUrl || '/svgs/job-default.svg',
-        inWishlist: false,
+        inWishlist: wishList.some(
+          wishItem => wishItem.contentid === item.contentid,
+        ),
         contenttypeid: item.contenttypeid,
         workType: item.salStle,
       }));
@@ -87,7 +89,7 @@ export default function Job() {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
-  }, []);
+  }, [feedList]);
 
   const fetchWishList = async () => {
     const wishListData = await getWishFeeds();
