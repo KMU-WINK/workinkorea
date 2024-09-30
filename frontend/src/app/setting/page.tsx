@@ -10,9 +10,11 @@ import { getUserDetail } from '@/services/users';
 import { UserDetail } from '@/types/user';
 import { formatDateWithDots } from '@/utils/dateUtils';
 import { AxiosError } from 'axios';
+import { base64ToFile } from '@/utils/imageUtil';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
+  const [profileFile, setProfileFile] = useState<File | undefined>();
   const router = useRouter();
 
   const backButtonClick = () => {
@@ -29,6 +31,12 @@ export default function Setting() {
       throw result;
     } else {
       setUserDetail(result);
+      setProfileFile(
+        base64ToFile({
+          base64String: result?.user.profile_picture_base64,
+          fileName: 'image',
+        }),
+      );
     }
   };
 
@@ -46,7 +54,13 @@ export default function Setting() {
       <div className="pt-[84px] max-w-sm h-full overflow-hidden relative w-full">
         <div className="mb-[18px] mx-auto rounded-full overflow-hidden w-[50px] h-[50px] relative">
           {/*유저 이미지 받아오기*/}
-          <Image src={ProfileDefault} alt="profile-image" fill />
+          <Image
+            src={
+              profileFile ? URL.createObjectURL(profileFile) : ProfileDefault
+            }
+            alt="profile-image"
+            fill
+          />
         </div>
         <div className="px-6">
           <div className="flex justify-between py-4">

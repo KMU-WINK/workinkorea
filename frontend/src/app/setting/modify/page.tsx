@@ -24,9 +24,10 @@ import axios from 'axios';
 import { UserDetail } from '@/types/user';
 import useUserStore from '@/app/stores/loginStore';
 import useUserInterestStore from '@/app/stores/userInterestStore';
+import { base64ToFile } from '@/utils/imageUtil';
 
 interface UserInfo {
-  profileImg: File | null;
+  profileImg?: File;
   nickname: string;
   gender: string;
   work: string;
@@ -35,7 +36,6 @@ interface UserInfo {
 export default function SettingModify() {
   // birth 를 제외한 유저 정보 (birth는 DatePicker 컴포넌트 특성상 따로 뻈습니다.)
   const [userInfo, setUserInfo] = useState<UserInfo>({
-    profileImg: null,
     nickname: '',
     gender: '',
     work: '',
@@ -48,8 +48,10 @@ export default function SettingModify() {
 
   const imageRef = useRef<HTMLInputElement>(null);
   const [nicknameCheckMessage, setNicknameCheckMessage] = useState('');
-  // 수정된 닉네임만 중복확인할 수 있도록 하는 변수
+  // 수정된 닉네임만 중복확인할 수 있도록 하는 ref
   const nicknameRef = useRef('');
+  // profile이 수정되었는지 확인하는 ref
+  const isProfileChangeRef = useRef(false);
 
   const router = useRouter();
 
@@ -82,7 +84,11 @@ export default function SettingModify() {
 
   const profileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target?.files) {
-      setUserInfo({ ...userInfo, profileImg: e.target?.files[0] });
+      setUserInfo({
+        ...userInfo,
+        profileImg: e.target?.files[0],
+      });
+      isProfileChangeRef.current = true;
     }
   };
 
@@ -118,7 +124,7 @@ export default function SettingModify() {
 
   const submitClick = async () => {
     try {
-      if (userInfo.profileImg) {
+      if (isProfileChangeRef.current && userInfo.profileImg) {
         formdata.append('profile', userInfo.profileImg);
         await createUserProfile(formdata);
       }
@@ -148,11 +154,13 @@ export default function SettingModify() {
 
   const fetchUserInfo = async () => {
     const result: UserDetail = await getUserDetail();
-    // const image = Buffer.from(result.user.profile_picture_base64, 'base64');
-    // console.log(image);
+    console.log(result);
     // todo: profileImg api 연결
     setUserInfo({
-      profileImg: null,
+      profileImg: base64ToFile({
+        base64String: result.user.profile_picture_base64,
+        fileName: 'profile',
+      }),
       nickname: result.user.nickname,
       gender: result.user.gender,
       region: (result.regions && result.regions[0]) || '부산',
