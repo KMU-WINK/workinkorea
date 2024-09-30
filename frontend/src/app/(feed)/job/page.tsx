@@ -23,7 +23,6 @@ export default function Job() {
   const [loading, setLoading] = useState(false);
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
-  const [wishList, setWishList] = useState<WishInfo[]>([]);
   const [isFirst, setIsFirst] = useState(true);
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
@@ -46,9 +45,7 @@ export default function Job() {
         price: item.wageAmt,
         location: item.wrkpAdres,
         image: item.corpoLogoFileUrl || '/svgs/job-default.svg',
-        inWishlist: wishList.some(
-          wishItem => wishItem.contentid === item.contentid,
-        ),
+        inWishlist: item.inWish,
         contenttypeid: item.contenttypeid,
         workType: item.salStle,
       }));
@@ -79,21 +76,11 @@ export default function Job() {
   useEffect(() => {
     const fullUrl = window.location.href;
     const feedInfo = parseUrl(fullUrl);
-    fetchWishList();
     if (feedInfo.location) {
       setArea(feedInfo.location);
       setKeyword(feedInfo.keyword || '');
     }
   }, [feedList]);
-
-  const fetchWishList = async () => {
-    const wishListData = await getWishFeeds();
-    const allData: WishInfo[] = Object.values(wishListData)
-      .flatMap(location => Object.values(location))
-      .flat();
-    setWishList(allData);
-    await setIsFirst(false);
-  };
 
   useEffect(() => {
     if (area) {
@@ -118,46 +105,17 @@ export default function Job() {
     };
   }, [page, loading]);
 
-  useEffect(() => {
-    if (wishList.length > 0 && feedList.length > 0) {
-      const updatedFeedList = feedList.map(feedItem => {
-        const isInWishlist = wishList.some(
-          wishItem => wishItem.contentid === feedItem.contentid,
-        );
-
-        // 상태가 변경된 경우에만 업데이트
-        if (feedItem.inWishlist !== isInWishlist) {
-          return {
-            ...feedItem,
-            inWishlist: isInWishlist, // wishList에 있으면 true로 설정
-          };
-        }
-        return feedItem; // 상태가 변경되지 않았으면 기존 상태 유지
-      });
-
-      // 변경 사항이 있을 때만 feedList 업데이트
-      if (JSON.stringify(updatedFeedList) !== JSON.stringify(feedList)) {
-        setFeedList(updatedFeedList);
-      }
-    }
-  }, [wishList]);
-
   const cardClick = (id: string, contentTypeId?: string, image?: string) => {
     const pushImage = image === '/svgs/job-default.svg' ? '' : image;
     router.push(
       `/job/${id}?contenttypeid=${contentTypeId}?thumbnail=${pushImage}`,
     );
   };
-
-  // fetchDataAndWishList 함수를 통해서만 wish icon 업데이트를 하면 클라이언트 측에서 조금 느리게 반영되어 보임
-  // 따라서 우선 상태를 바꾸고 에러가 발생했을 경우, 원래 상태로 되돌리는 방향으로 진행
   const wishClick = async (item: JobProps) => {
     if (!isLoggedIn) {
       openModal();
       return;
     }
-
-    const originState = item.inWishlist;
     setFeedList(prevList =>
       prevList.map(feedItem =>
         feedItem.contentid === item.contentid
@@ -172,22 +130,13 @@ export default function Job() {
         contentId: item.contentid || '',
       };
 
-      if (originState) {
+      if (item.inWishlist) {
         await deleteWishItem(data);
       } else {
         await postWishItem(data);
       }
     } catch (error) {
       console.error('Error in wishClick:', error);
-
-      // 에러가 발생한 경우 원래 상태로 되돌림
-      setFeedList(prevList =>
-        prevList.map(feedItem =>
-          feedItem.contentid === item.contentid
-            ? { ...feedItem, inWishlist: originState }
-            : feedItem,
-        ),
-      );
     }
   };
 
