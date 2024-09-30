@@ -9,6 +9,16 @@ API_KEY = os.getenv("API_KEY")
 
 ENDPOINT = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1"
 
+AREA_CODE = {
+    "강릉": [32, 1],
+    "부산": [6],
+    "제주": [39],
+    "경주": [35, 2],
+    "여수": [38, 13],
+    "전주": [37, 12],
+    "춘천": [32, 13],
+}
+
 
 # 관광지 리스트를 가져오는 함수 (랜덤 순서로 섞음)
 def get_content(areaCode):
@@ -22,11 +32,13 @@ def get_content(areaCode):
             ["O", "Q", "R"]
         ),  # 정렬 기준 (A: 제목 순, 나중에 섞을 예정)
         "contentTypeId": "12",  # 12는 관광지
-        "areaCode": str(
-            areaCode
-        ),  # 지역 코드 (1: 서울특별시) -> 사용자 온보딩에서 받아서 넣기
+        "areaCode": AREA_CODE[
+            areaCode[0]
+        ],  # 지역 코드 (1: 서울특별시) -> 사용자 온보딩에서 받아서 넣기
         "_type": "json",
     }
+    if len(AREA_CODE[areaCode]) > 1:
+        params["sigunguCode"] = AREA_CODE[areaCode[1]]
     response = requests.get(ENDPOINT, params=params)
 
     # 응답 상태 코드 확인
@@ -85,7 +97,6 @@ def recommend_tourist_spots(user_preferences, areaCode):
     contents = get_content(areaCode)
     # 3. contentId로부터 개요와 제목 가져오기
     overviews = []
-    titles = []
 
     for content in contents:
         # titles.append(content["title"])
