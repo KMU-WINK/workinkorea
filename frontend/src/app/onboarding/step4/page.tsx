@@ -24,6 +24,7 @@ export default function Step4() {
   const provider = searchParam.get('provider');
 
   const handleNextClick = async () => {
+    if (!selectedOption) return;
     try {
       await createUserWork({
         social_id: socialId,
