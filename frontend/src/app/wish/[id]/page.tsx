@@ -167,7 +167,7 @@ export default function WishDetail() {
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
       <div className="max-w-sm w-full h-full flex flex-col items-center relative py-16">
-        <div className="max-w-sm w-full text-center pt-6 pb-2 px-5 flex items-center gap-3 fixed top-0 left-1/2	-translate-x-2/4 bg-white z-10">
+        <div className="max-w-sm w-full text-center pt-6 pb-2 px-5 flex items-center gap-3 fixed top-0 left-1/2	-translate-x-2/4 bg-white z-20">
           <Link href="/wish">
             <Back className="cursor-pointer" />
           </Link>
