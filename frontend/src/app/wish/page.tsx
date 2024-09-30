@@ -26,12 +26,6 @@ type LocCountType = {
 export default function Wish() {
   const router = useRouter();
   const [locCount, setLocCount] = useState<LocCountType>({
-    전체: {
-      id: 0,
-      count: 0,
-      items: [],
-      length: 0,
-    },
     강릉: {
       id: 1,
       count: 0,
@@ -79,16 +73,12 @@ export default function Wish() {
   const fetchData = async () => {
     try {
       const response: LocationInfo[] = await getWishFeeds(); // 배열로 처리
-      let totalCount = 0;
 
       const updatedLocCount = { ...locCount };
       Object.entries(response).forEach(([key, value]) => {
         // @ts-ignore
         updatedLocCount[key].count = response[key].length;
-        // @ts-ignore
-        totalCount += response[key].length;
       });
-      updatedLocCount['전체'].count = totalCount;
 
       setLocCount(updatedLocCount);
     } catch (error) {

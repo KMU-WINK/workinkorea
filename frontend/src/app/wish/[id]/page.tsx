@@ -11,7 +11,6 @@ import { WishInfo, WishItem } from '@/types/type';
 import Back from 'public/svgs/back.svg';
 import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import Image from 'next/image';
-import { it } from 'node:test';
 
 interface WishType {
   id: number;
@@ -20,11 +19,6 @@ interface WishType {
 }
 
 const wishData: WishType[] = [
-  {
-    id: 0,
-    location: '전체',
-    count: 11,
-  },
   {
     id: 1,
     location: '강릉',
@@ -73,7 +67,7 @@ export default function WishDetail() {
   ) => {
     if (contentTypeId === 'open' || contentTypeId === 'tour') {
       router.push(
-        `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image}`,
+        `/${type}/${id}?contenttypeid=${contentTypeId}?thumbnail=${image ? image : ''}`,
       );
     } else {
       router.push(`/spot/${id}?contenttypeid=${contentTypeId}?type=${type}`);
@@ -119,21 +113,11 @@ export default function WishDetail() {
 
     try {
       const response = await getWishFeeds();
+      const selectedKey = Object.keys(response)[locationId - 1]; // locationId가 1부터 시작하는 가정
 
-      if (locationId === 0) {
-        // locationId가 0이면 모든 데이터를 feedList에 넣기
-        const allData: WishInfo[] = Object.values(response)
-          .flatMap(location => Object.values(location))
-          .flat();
-        setFeedList(allData);
-      } else {
-        // 특정 지역의 데이터를 feedList에 넣기
-        const selectedKey = Object.keys(response)[locationId - 1]; // locationId가 1부터 시작하는 가정
-
-        // @ts-ignore
-        const selectedData = response[selectedKey];
-        setFeedList(selectedData);
-      }
+      // @ts-ignore
+      const selectedData = response[selectedKey];
+      setFeedList(selectedData);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
