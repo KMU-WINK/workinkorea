@@ -115,8 +115,8 @@ async def spot_stay_location(
         data = get_location_based_list(mapX, mapY, radius, numOfRows)
 
         wishs = False
-        if request.headers.get("Authorization"):
-            current_user = get_current_user(request, db)
+        current_user = get_current_user(request, db)
+        if current_user:
             stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
             spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
             wishs = [wish.content_id for wish in stay_wish + spot_wish]

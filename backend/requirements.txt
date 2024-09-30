@@ -9,6 +9,7 @@ fastapi==0.112.0
 fasttext==0.9.3
 filelock==3.16.1
 fsspec==2024.9.0
+googlemaps==4.10.0
 h11==0.14.0
 httpcore==1.0.5
 httptools==0.6.1
