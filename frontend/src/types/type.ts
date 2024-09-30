@@ -143,11 +143,29 @@ export interface WishInfo {
   contentid: string;
   cardType: CardType;
   serviceType: ServiceType;
-  title: string;
-  addr1: string;
-  addr2: string;
-  firstimage: string;
-  firstimage2: string;
+  title?: string;
+  addr1?: string;
+  addr2?: string;
+  firstimage?: string;
+  firstimage2?: string;
   type: string;
   inWish: boolean;
+  empmnTtl?: string;
+  wrkpAdres?: string;
+  corpoLogoFileUrl?: string;
+}
+
+export interface LocationDetails {
+  id: number;
+  count: number;
+  items: (JobInfo | SpotInfo)[];
+  length: number; // 추가적인 설명을 위해 length 필드를 포함
+}
+
+export interface LocationInfo {
+  [key: string]: WishInfo[];
+}
+
+export interface WishInfoFeed extends WishInfo {
+  count?: number;
 }
