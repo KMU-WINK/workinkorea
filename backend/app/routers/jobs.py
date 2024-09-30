@@ -33,8 +33,8 @@ async def read_jobs(
 
     try:
         wishs = False
-        if request.headers.get("Authorization"):
-            current_user = get_current_user(request, db)
+        current_user = get_current_user(request, db)
+        if current_user:
             job_wish = db.query(Job).filter(Job.user_id == current_user.id).all()
             wishs = [wish.content_id for wish in job_wish]
         data = get_jobs(area, keyword, pageNo, wishs)
