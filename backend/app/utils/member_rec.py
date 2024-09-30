@@ -1,6 +1,4 @@
 import requests, os, random
-import torch
-import xml.etree.ElementTree as ET
 from transformers import BertTokenizer, BertModel
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv

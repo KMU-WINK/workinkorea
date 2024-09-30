@@ -1,8 +1,5 @@
 import fasttext
-import requests
-import xml.etree.ElementTree as ET
 from konlpy.tag import Okt
-from collections import OrderedDict
 
 # KoNLPy 형태소 분석기
 okt = Okt()
