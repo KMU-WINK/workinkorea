@@ -22,7 +22,7 @@ def create_jwt_token(user_social_id: str):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"social_id": user_social_id, "exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt if isinstance(encoded_jwt, str) else encoded_jwt.decode('utf-8')
+    return encoded_jwt if isinstance(encoded_jwt, str) else encoded_jwt.decode("utf-8")
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -93,7 +93,7 @@ async def naverAuth(
     _result = _res.json()
 
     access_token = _result.get("access_token")
-    
+
     print(_result)
     if not access_token:
         raise ValueError("Access token not found in response")
@@ -281,6 +281,7 @@ async def get_access_token(
 
     return response
 
+
 def pad_base64_token(token: str) -> str:
     # Base64 패딩을 추가해 4의 배수로 만듦
     return token + "=" * (4 - len(token) % 4)
@@ -294,22 +295,22 @@ def verify_jwt_token(token: str):
         # 디코드
         payload = jwt.decode(padded_token, SECRET_KEY, algorithms=[ALGORITHM])
         social_id = payload.get("social_id")
-            
+
         if social_id is None:
-            raise ValueError("social_id not found in token")        
+            raise ValueError("social_id not found in token")
         return social_id
-    
+
     except jwt.ExpiredSignatureError:
         raise ValueError("Token has expired")
     # except jwt.InvalidTokenError:
     #     raise ValueError("Invalid token")
 
 
-
 def get_current_user(request: Request, db: Session = Depends(get_db)):
     # 쿠키에서 accessToken 가져오기
+    print(request.cookies)
     token = request.cookies.get("accessToken")
-
+    print(token)
     # 요청에서 Access token이 넘어오지 않았을 때
     if token is None:
         raise HTTPException(
@@ -317,7 +318,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
             detail="Access token is missing",
             headers={"WWW-Authenticate": "Bearer"},
         )
-            
+
     social_id: str = verify_jwt_token(token)
 
     # 사용자 조회 로직

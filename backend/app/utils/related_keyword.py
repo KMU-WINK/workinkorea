@@ -22,12 +22,12 @@ def find_similar_words(word, topn=10, similarity_threshold=0.5):
     try:
         similar_words = model.get_nearest_neighbors(word, k=topn)
         # 연관 단어 중 유사도와 명사 필터링
-        filtered_words = []
+        filtered_words = set()
         for similarity, similar_word in similar_words:
             if similarity >= similarity_threshold:  # 유사도 임계값 적용
                 nouns = filter_nouns(similar_word)
                 if nouns:  # 명사만 남김
-                    filtered_words.append(nouns[0])  # 첫 번째 명사만 사용
+                    filtered_words.add(nouns[0])  # 첫 번째 명사만 사용
         return filtered_words
     except KeyError:
         return [f"'{word}'에 대한 유사 단어를 찾을 수 없습니다."]
