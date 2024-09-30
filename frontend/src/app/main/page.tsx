@@ -51,7 +51,7 @@ export default function MainPage() {
   // user 정보에 따라 location 적용
   const [location, setLocation] = useState<string>('제주');
   const { openModal } = useModalStore();
-  const { isLoggedIn, login } = useUserStore();
+  const { isLoggedIn, login, logout } = useUserStore();
 
   useEffect(() => {
     const checkIsLoggedIn = () => {
@@ -63,6 +63,8 @@ export default function MainPage() {
       if (socialIdCookie) {
         const socialId = socialIdCookie.split('=')[1];
         login(socialId);
+      } else {
+        logout();
       }
     };
 

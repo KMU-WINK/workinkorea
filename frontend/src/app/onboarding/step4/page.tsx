@@ -12,13 +12,12 @@ import Egg from 'public/svgs/emoji/egg.svg';
 import Hotel from 'public/svgs/emoji/hotel.svg';
 import Dice from 'public/svgs/emoji/dice.svg';
 import Sport from 'public/svgs/emoji/weight.svg';
-import PublicAxiosInstance from '@/services/publicAxiosInstance';
 import { createUserWork } from '@/services/users';
 import axios from 'axios';
 
 export default function Step4() {
   const router = useRouter();
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const searchParam = useSearchParams();
   const socialId = searchParam.get('social_id');
@@ -28,7 +27,7 @@ export default function Step4() {
     try {
       await createUserWork({
         social_id: socialId,
-        works: selectedOptions,
+        works: [selectedOption],
       });
       router.push(
         `/onboarding/step5?social_id=${socialId}&provider=${provider}`,
@@ -44,11 +43,7 @@ export default function Step4() {
   };
 
   const handleInputChange = (value: string) => {
-    setSelectedOptions(prevState =>
-      prevState.includes(value)
-        ? prevState.filter(option => option !== value)
-        : [...prevState, value],
-    );
+    setSelectedOption(prevState => (prevState === value ? null : value)); // 같은 값 클릭 시 선택 해제
   };
 
   const options = [
@@ -60,11 +55,6 @@ export default function Step4() {
     { text: '오락', icon: <Dice /> },
     { text: '스포츠', icon: <Sport /> },
   ];
-
-  // 상태 확인
-  useEffect(() => {
-    console.log(selectedOptions);
-  }, [selectedOptions]);
 
   return (
     <div className="flex justify-center min-h-screen">
@@ -88,7 +78,7 @@ export default function Step4() {
                 <SelectButton
                   key={option.text}
                   text={option.text}
-                  isSelect={selectedOptions.includes(option.text)}
+                  isSelect={selectedOption === option.text}
                   onClick={() => handleInputChange(option.text)}
                   leftIcon={option.icon}
                 />
@@ -100,7 +90,7 @@ export default function Step4() {
       <div className="max-w-[393px] w-full fixed bottom-0 bg-white">
         <Button
           text="다음으로"
-          isAllowed={selectedOptions.length > 0}
+          isAllowed={selectedOption !== null}
           onClick={handleNextClick} // 구문 수정: 함수 호출을 올바르게 처리
         />
       </div>

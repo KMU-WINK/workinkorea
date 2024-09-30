@@ -5,13 +5,13 @@ import Slider, { Settings } from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Card from '@/components/Card';
-import { FeedProps, GetSpotListsProps, MapListInfo } from '@/types/type';
+import { GetLocationProps, MapListInfo } from '@/types/type';
 import styled from 'styled-components';
 import Input from '@/components/Input';
 import Back from '../../../public/svgs/back.svg';
-import Filter from '../../../public/svgs/filter.svg';
-import { useSearchParams } from 'next/navigation';
-import { getSpotLists } from '@/services/location';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getSpotDetail, getSpotLocations } from '@/services/spots';
+import { getStayLocations } from '@/services/stays';
 
 // kakao 라는 객체가 window에 존재하고 있다고 인식시켜주기 위함
 declare global {
@@ -57,6 +57,10 @@ export default function Map() {
     latitude: 0,
     longitude: 0,
   });
+  const [detailLng, setDetailLng] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
   const levelRef = useRef(3);
   const isMarkerClickRef = useRef(false);
 
@@ -64,21 +68,26 @@ export default function Map() {
 
   const sliderRef = useRef<Slider | null>(null);
 
+  const router = useRouter();
+
   const searchParams = useSearchParams();
 
+  // todo: type, mapx, mapy 가 없을 경우 exception page 이동
+
   const type = searchParams.get('type');
+  const location = searchParams.get('location');
   const keyword = searchParams.get('keyword');
+  const mapx = searchParams.get('mapx');
+  const mapy = searchParams.get('mapy');
   const contentId = searchParams.get('contentId');
   const contentTypeId = searchParams.get('contentTypeId');
 
   // 카드 슬라이드시 이벤트 함수
   const onSlideChange = (index: number) => {
-    console.log(isMarkerClickRef);
     // 카드를 직접 슬라이드 할 경우에만 마커 이미지를 변경
     // 마커를 클릭했을 때는 마커 클릭 이벤트 함수에서 해당 기능을 수행하기 때문
     if (!isMarkerClickRef.current) {
       const currentMarker = markers[Math.round(index)];
-      console.log(currentMarker);
       // 마커 이미지
       const markerImage = new window.kakao.maps.MarkerImage(
         markerImageSrc,
@@ -117,7 +126,7 @@ export default function Map() {
     },
   };
 
-  const onWishClick = (id: string) => {
+  const wishClick = (id: string) => {
     console.log(id);
     // api 연동 예정
   };
@@ -128,136 +137,195 @@ export default function Map() {
     keyword,
     radius,
     numOfRows,
-  }: GetSpotListsProps) => {
-    if (true) {
-      // feed에서 지도로 이동했을 경우
-      const result = await getSpotLists({
-        mapX,
-        mapY,
-        keyword,
-        radius,
-        numOfRows,
-      });
-      if (result === 'no data') {
-        setMapList([]);
-      } else {
-        setMapList(result.items.item);
+  }: GetLocationProps) => {
+    if (type && mapx && mapy) {
+      if (type === 'tour') {
+        // 관광 피드에서 지도로 이동했을 경우
+        const result = await getSpotLocations({
+          mapX,
+          mapY,
+          keyword,
+          radius,
+          numOfRows,
+        });
+        if (result === 'no data') {
+          setMapList([]);
+        } else {
+          setMapList(result.items.item);
+        }
+      } else if (type === 'stay') {
+        // 숙소 피드에서 지도로 이동했을 경우
+        const result = await getStayLocations({
+          mapX,
+          mapY,
+          keyword,
+          radius,
+          numOfRows,
+        });
+        if (result === 'no data') {
+          setMapList([]);
+        } else {
+          setMapList(result.items.item);
+        }
       }
-    } else if (contentId) {
-      // detail에서 지도로 이동했을 경우
-      // 얘는 근데 따로 빼도 될듯
+    } else if (contentId && contentTypeId) {
+      // 상세페이지에서 지도로 이동했을 경우
+      try {
+        const result = await getSpotDetail(
+          Number(contentId),
+          Number(contentTypeId),
+        );
+
+        // map 정보 저장
+        setMapList([
+          ...mapList,
+          {
+            contentid: result.data.contentid,
+            contenttypeid: result.data.contenttypeid,
+            title: result.data.title,
+            addr1: result.data.addr1,
+            firstimage: result.data.firstimage,
+            mapx: result.data.mapx,
+            mapy: result.data.mapy,
+          },
+        ]);
+      } catch (e) {
+        console.log(e);
+        // todo: 에러 페이지로 이동
+      }
     } else {
-      // 정상적인 루트가 아닐 경우
+      // 유효하지 않은 경로일경우
     }
   };
 
   const getMapRadius = (level: number) => {
     if (level > 4) {
-      console.log(level * 100 * Math.floor(level / 3) + 200);
       return level * 100 * Math.floor(level / 3) + 200;
     } else {
-      console.log(100 * Math.floor(level / 3) + 200);
       return 100 * Math.floor(level / 3) + 200;
     }
   };
 
   useEffect(() => {
-    // 중심좌표 저장하기
-    centerLngRef.current = {
-      latitude: 35.165731905600005,
-      longitude: 129.15838566290198,
-    };
+    // 처음 api 호출할 때는 radius 1400으로 고정
     fetchLocationLists({
-      mapX: '129.15838566290198',
-      mapY: '35.165731905600005',
-      radius: getMapRadius(levelRef.current),
+      mapX: mapx,
+      mapY: mapy,
+      radius: 1400,
       keyword,
       numOfRows: 50,
     });
+
+    // 피드에서 지도로 이동한 경우에만 적용
     window.kakao.maps.load(() => {
-      const options = {
-        // 지도 중심 좌표
-        center: new window.kakao.maps.LatLng(
-          35.165731905600005,
-          129.15838566290198,
-        ),
-        level: 4,
-      };
+      if (type && mapx && mapy) {
+        const options = {
+          // 지도 중심 좌표 (default level은 4로 고정)
+          center: new window.kakao.maps.LatLng(mapy, mapx),
+          level: 4,
+        };
 
-      const map = new window.kakao.maps.Map(mapRef.current, options);
-      mapObjectRef.current = map;
+        // 지도 생성
+        const map = new window.kakao.maps.Map(mapRef.current, options);
+        mapObjectRef.current = map;
+        // 중심좌표 저장하기
+        centerLngRef.current = {
+          latitude: Number(mapy),
+          longitude: Number(mapx),
+        };
 
-      // 지도 줌 아웃 리스너
-      window.kakao.maps.event.addListener(map, 'zoom_changed', function () {
-        const newLevel = map.getLevel();
-        const newCenter = map.getCenter();
-        if (newLevel > levelRef.current) {
-          // 새로운 레벨과 현재 중심좌표를 기준으로 api 호출
-          fetchLocationLists({
-            mapX: newCenter.La,
-            mapY: newCenter.Ma,
-            radius: getMapRadius(newLevel),
-            numOfRows: newLevel === 3 || newLevel === 4 ? 50 : 30, // level이 3 또는 4일 경우에만 최대 item 50개 설정
-            keyword,
-          });
-        }
-        // 레벨 업데이트
-        levelRef.current = newLevel;
-      });
-
-      // 지도 드래그 리스너
-      window.kakao.maps.event.addListener(map, 'dragend', async function () {
-        const newBounds: BoundsType = map.getBounds();
-
-        // 양 옆으로 드래그 할 때
-        // [이전 중심좌표의 경도 > 우측좌표 OR 이전 중심좌표의 경도 < 좌측좌표] 일때만 api 호출
-        if (
-          centerLngRef.current.longitude > newBounds.oa ||
-          centerLngRef.current.longitude < newBounds.ha
-        ) {
+        // 지도 줌 아웃 리스너
+        window.kakao.maps.event.addListener(map, 'zoom_changed', function () {
+          const newLevel = map.getLevel();
           const newCenter = map.getCenter();
-          console.log(newCenter);
-          // 새로운 중심좌표를 기준으로 하여 api 호출
-          await fetchLocationLists({
-            mapX: newCenter.La,
-            mapY: newCenter.Ma,
-            keyword,
-            radius: getMapRadius(levelRef.current),
-          });
-          // 중심좌표 업데이트
-          centerLngRef.current = {
-            latitude: newCenter.Ma,
-            longitude: newCenter.La,
-          };
-        }
+          if (newLevel > levelRef.current) {
+            // 새로운 레벨과 현재 중심좌표를 기준으로 api 호출
+            fetchLocationLists({
+              mapX: newCenter.La,
+              mapY: newCenter.Ma,
+              radius: getMapRadius(newLevel),
+              numOfRows: newLevel === 3 || newLevel === 4 ? 50 : 30, // level이 3 또는 4일 경우에만 최대 item 50개 설정
+              keyword,
+            });
+          }
+          // 레벨 업데이트
+          levelRef.current = newLevel;
+        });
 
-        // 위 아래로 드래그 할 때
-        // [이전 중심좌표의 위도 > 위쪽 좌표 OR 이전 중심좌표 위도 < 아래 좌표] 일때만 api 호출
-        if (
-          centerLngRef.current.latitude > newBounds.pa ||
-          centerLngRef.current.latitude < newBounds.qa
-        ) {
-          const newCenter = map.getCenter();
-          // 새로운 중심좌표를 기준으로 하여 api 호출
-          await fetchLocationLists({
-            mapX: newCenter.La,
-            mapY: newCenter.Ma,
-            keyword,
-            radius: getMapRadius(levelRef.current),
-          });
-          // 중심좌표 업데이트
-          centerLngRef.current = {
-            latitude: map.getCenter().Ma,
-            longitude: map.getCenter().La,
-          };
-        }
-      });
+        // 지도 드래그 리스너
+        window.kakao.maps.event.addListener(map, 'dragend', async function () {
+          const newBounds: BoundsType = map.getBounds();
+
+          // 양 옆으로 드래그 할 때
+          // [이전 중심좌표의 경도 > 우측좌표 OR 이전 중심좌표의 경도 < 좌측좌표] 일때만 api 호출
+          if (
+            centerLngRef.current.longitude > newBounds.oa ||
+            centerLngRef.current.longitude < newBounds.ha
+          ) {
+            const newCenter = map.getCenter();
+            // 새로운 중심좌표를 기준으로 하여 api 호출
+            await fetchLocationLists({
+              mapX: newCenter.La,
+              mapY: newCenter.Ma,
+              keyword,
+              radius: getMapRadius(levelRef.current),
+            });
+            // 중심좌표 업데이트
+            centerLngRef.current = {
+              latitude: newCenter.Ma,
+              longitude: newCenter.La,
+            };
+          }
+
+          // 위 아래로 드래그 할 때
+          // [이전 중심좌표의 위도 > 위쪽 좌표 OR 이전 중심좌표 위도 < 아래 좌표] 일때만 api 호출
+          if (
+            centerLngRef.current.latitude > newBounds.pa ||
+            centerLngRef.current.latitude < newBounds.qa
+          ) {
+            const newCenter = map.getCenter();
+            // 새로운 중심좌표를 기준으로 하여 api 호출
+            await fetchLocationLists({
+              mapX: newCenter.La,
+              mapY: newCenter.Ma,
+              keyword,
+              radius: getMapRadius(levelRef.current),
+            });
+            // 중심좌표 업데이트
+            centerLngRef.current = {
+              latitude: map.getCenter().Ma,
+              longitude: map.getCenter().La,
+            };
+          }
+        });
+      }
     });
   }, []);
 
   // 마커 생성
   useEffect(() => {
     window.kakao.maps.load(() => {
+      if (contentId && contentTypeId && mapList.length > 0) {
+        console.log(mapList[0].mapx);
+        const options = {
+          // 지도 중심 좌표 (default level은 4로 고정)
+          center: new window.kakao.maps.LatLng(
+            mapList[0].mapy,
+            mapList[0].mapx,
+          ),
+          level: 4,
+        };
+
+        // 지도 생성
+        const map = new window.kakao.maps.Map(mapRef.current, options);
+        mapObjectRef.current = map;
+        // 중심좌표 저장하기
+        centerLngRef.current = {
+          latitude: Number(mapList[0].mapy),
+          longitude: Number(mapList[0].mapx),
+        };
+        console.log(map.getCenter());
+      }
       if (markers) {
         markers.forEach(marker => {
           marker.setMap(null);
@@ -280,9 +348,13 @@ export default function Map() {
           position: new window.kakao.maps.LatLng(list.mapy, list.mapx),
           id: list.contentid,
           title: list.title,
-          image: markerImage,
+          image: index !== 0 ? markerImage : activeMarkerImage,
           clickable: true,
         });
+
+        if (index === 0) {
+          activeMarkerRef.current = marker;
+        }
 
         marker.setMap(mapObjectRef.current);
 
@@ -309,12 +381,16 @@ export default function Map() {
 
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="max-w-sm h-full overflow-hidden relative w-full">
+      <div className="sm:max-w-sm h-full overflow-hidden relative w-full">
         <div className="z-10 absolute top-[54px] w-full px-6">
           <Input
             leftIcon={<Back />}
-            rightIcon={<Filter />}
-            placeholder="검색어"
+            onClick={() => {
+              router.back();
+            }}
+            value={''}
+            placeholder={(keyword ? keyword : location) || ''}
+            readOnly
           />
         </div>
         <div ref={mapRef} className="h-screen w-full" />
@@ -334,9 +410,13 @@ export default function Map() {
                 serviceType="default"
                 title={list.title}
                 location={list.addr1}
-                image={list.firstImage || '/svgs/job-default.svg'}
-                onCardClick={() => {}}
-                onWishListClick={onWishClick}
+                image={list.firstimage || '/svgs/job-default.svg'}
+                onCardClick={() => {
+                  router.push(
+                    `/spot/${contentId}?contenttypeid=${contentTypeId}&type=${type}`,
+                  );
+                }}
+                onWishListClick={wishClick}
               />
             ))}
           </Slider>

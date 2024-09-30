@@ -225,12 +225,13 @@ def get_job(contentId: str, contentTypeId: str, wishs=False):
         # API 호출
         response = requests.get(ENDPOINT_tour_datail, params=params)
         data = response.json()
-
         if data["response"]["body"]["items"]:
             data_row = data["response"]["body"]["items"]["item"][0]
+
             result["contenttypeid"] = contentTypeId
             result["contentid"] = contentId
             for key, value in data_row.items():
+
                 if key in [
                     "corpoNm",
                     "corpoLogoFileUrl",
@@ -259,6 +260,7 @@ def get_job(contentId: str, contentTypeId: str, wishs=False):
             # Wish 여부 추가
             if wishs:
                 result["inWish"] = True if result["contentid"] in wishs else False
+            print(result)
             return result
         else:
             raise ValueError("No data found")
