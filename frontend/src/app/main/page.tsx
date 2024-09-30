@@ -17,6 +17,10 @@ import SettingColor from '../../../public/svgs/setting-color.svg';
 import useUserStore from '../stores/loginStore';
 import useModalStore from '../stores/modalStore';
 import { useRouter } from 'next/navigation';
+import { getUserDetail } from '@/services/users';
+import { base64ToFile } from '@/utils/imageUtil';
+import { UserDetail } from '@/types/user';
+import ProfileDefault from '../../../public/images/profile-default.jpg';
 
 interface BannerInfo {
   type:
@@ -30,7 +34,7 @@ interface BannerInfo {
 }
 interface UserInfo {
   name: string;
-  profile: string;
+  profile?: string;
 }
 interface AdInfo {
   title: string;
@@ -89,7 +93,7 @@ export default function MainPage() {
     });
     setAdInfo({
       title: '워크인코리아 공식 노션 바로가기',
-      link: '/',
+      link: 'https://possible-rowboat-b63.notion.site/111170be5ff980418c37e6aea0d0f1c8',
     });
   }, []);
 
@@ -105,7 +109,25 @@ export default function MainPage() {
     router.push('/wish');
   };
 
-  console.log(isLoggedIn);
+  const settingClick = () => {
+    router.push('/setting');
+  };
+
+  const fetchUserInfo = async () => {
+    const result: UserDetail = await getUserDetail();
+    const profileFile = base64ToFile({
+      base64String: result.user.profile_picture_base64,
+      fileName: 'profile',
+    });
+    setUserInfo({
+      name: result.user.nickname,
+      profile: profileFile ? URL.createObjectURL(profileFile) : '',
+    });
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
 
   return (
     <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
@@ -117,15 +139,13 @@ export default function MainPage() {
         <div className="flex flex-col gap-3.5 w-full">
           <div className="flex justify-between">
             <div className="flex gap-1 items-center cursor-pointer">
-              <Image
-                src={
-                  userInfo.profile ? userInfo.profile : '/pngs/profile-test.png'
-                }
-                alt="Profile"
-                width={20}
-                height={20}
-                className="rounded-3xl "
-              />
+              <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
+                <Image
+                  src={userInfo.profile ? userInfo.profile : ProfileDefault}
+                  alt="Profile"
+                  fill
+                />
+              </div>
               <span className="text-sm font-medium">
                 {userInfo.name ? userInfo.name : '사용자'}
               </span>
@@ -133,7 +153,10 @@ export default function MainPage() {
             {isLoggedIn ? (
               <div className="flex gap-2">
                 <HeartColor className="cursor-pointer" onClick={wishClick} />
-                <SettingColor className="cursor-pointer" />
+                <SettingColor
+                  className="cursor-pointer"
+                  onClick={settingClick}
+                />
               </div>
             ) : (
               <button
