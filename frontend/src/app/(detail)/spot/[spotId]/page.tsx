@@ -269,7 +269,7 @@ export default function Tour() {
         </ImageWrapper>
         <div className="w-full flex flex-col items-center gap-2 bg-gray-1 ">
           {isLoading ? (
-            <div className="w-full flex flex-col items-center pt-20 gap-24 bg-white">
+            <div className="w-full flex flex-col items-center gap-24 bg-white">
               <Spinner />
             </div>
           ) : (
