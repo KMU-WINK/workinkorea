@@ -10,6 +10,8 @@ from ..models.User import User_Region, User_Interest
 from ..models.Interest import Interest
 from ..models.Region import Region
 from ..db.session import get_db
+from ..models.Spot import Spot
+from ..models.Stay import Stay
 
 
 # utility function
@@ -150,6 +152,11 @@ async def recommend_tourist_spots(request: Request, db: Session = Depends(get_db
             status_code=400,
             detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}",
         )
+
+    stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
+    spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
+    wishs = [wish.content_id for wish in stay_wish + spot_wish]
+
     regions = get_regions_by_id(current_user.id, db)
     interests = get_interests_by_id(current_user.id, db)
     ts = time.time()
@@ -168,6 +175,9 @@ async def recommend_tourist_spots(request: Request, db: Session = Depends(get_db
     )
     top_20_indices = sorted_indices[:20]
     result = [contents[idx] for idx in top_20_indices]
+    if wishs:
+        for item in result:
+            item["inWish"] = item["contentid"] in wishs
     # for r in result:
     #     print(r)
     print(f"Total time: {int((time.time() - ts) * 1000)}ms")
