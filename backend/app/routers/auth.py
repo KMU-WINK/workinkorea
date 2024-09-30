@@ -259,7 +259,7 @@ async def get_access_token(
         secure = False
     else:
         httponly = True
-        samesite = "none"
+        samesite = "None"
         secure = True
         domain = ".workinkorea.info"
 
@@ -302,8 +302,6 @@ def verify_jwt_token(token: str):
 
     except jwt.ExpiredSignatureError:
         raise ValueError("Token has expired")
-    # except jwt.InvalidTokenError:
-    #     raise ValueError("Invalid token")
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
@@ -335,12 +333,41 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
 
 
 @router.delete("/token")
-async def delete_access_token(response: Response):
+async def delete_access_token(response: Response, request: Request):
+    # is_dev_mode 체크
+    is_dev_mode = request.url.hostname != OPERATION_HOST_URL
+
     # 쿠키 만료 시간을 과거로 설정
     expired_time = datetime.now(timezone.utc) - timedelta(days=1)
 
+    if is_dev_mode:
+        httponly = False
+        samesite = "Lax"
+        secure = False
+    else:
+        httponly = True
+        samesite = "None"
+        secure = True
+        domain = ".workinkorea.info"
+
     # 쿠키 삭제
-    response.set_cookie(key="accessToken", value="", expires=expired_time)
-    response.set_cookie(key="social_id", value="", expires=expired_time)
+    response.set_cookie(
+        key="accessToken",
+        value="",
+        httponly=httponly,
+        samesite=samesite,
+        secure=secure,
+        expires=expired_time,
+        domain=domain if not is_dev_mode else None,
+    )
+    response.set_cookie(
+        key="social_id",
+        value="",
+        httponly=httponly,
+        samesite=samesite,
+        secure=secure,
+        expires=expired_time,
+        domain=domain if not is_dev_mode else None,
+    )
 
     return {"message": "로그아웃이 완료되었습니다."}
