@@ -89,7 +89,6 @@ export default function Wish() {
         totalCount += response[key].length;
       });
       console.log('updatedLocCount', updatedLocCount);
-      // @ts-ignore
       updatedLocCount['전체'].count = totalCount;
 
       setLocCount(updatedLocCount);
