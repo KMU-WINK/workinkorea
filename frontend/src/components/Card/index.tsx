@@ -24,7 +24,7 @@ const ImageSection = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
-  width: ${props => (props.$cardType === 'map' ? '9rem' : '100%')};
+  min-width: ${props => (props.$cardType === 'map' ? '9rem' : '100%')};
   border-color: #d9d9d9;
   border-width: ${props =>
     props.$cardType === 'map' ? '0 1px 0 0' : '0 0 1px 0'};
@@ -133,7 +133,7 @@ export default function Card({
           style={
             serviceType === 'default'
               ? { objectFit: 'cover' }
-              : { width: 80, height: 80 }
+              : { width: 80, height: 80, objectFit: 'cover' }
           }
           width={serviceType === 'default' ? 0 : 80}
           height={serviceType === 'default' ? 0 : 80}

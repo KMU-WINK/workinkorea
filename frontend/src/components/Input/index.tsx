@@ -28,14 +28,14 @@ export default function Input({
   return (
     <div
       className={`flex gap-2.5 w-full border border-gray-2 rounded-[10px] px-3.5 py-[18px] ${disabled ? 'bg-[#F5F5F5] cursor-pointer' : 'bg-white cursor-default'}`}
-      onClick={
-        onClick !== undefined ? onClick : () => inputRef.current?.focus()
-      }
+      onClick={() => inputRef.current?.focus()}
       onKeyDown={disabled ? onClick : undefined}
       role="button"
       tabIndex={0}
     >
-      {leftIcon}
+      <div onClick={onClick} className="z-10">
+        {leftIcon}
+      </div>
       <input
         type="text"
         placeholder={placeholder}

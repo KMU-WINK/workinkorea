@@ -15,6 +15,7 @@ import DropDown from '@/components/DropDown';
 import {
   createUserInfo,
   createUserNickname,
+  createUserProfile,
   createUserRegion,
   createUserWork,
   getUserDetail,
@@ -22,31 +23,39 @@ import {
 import axios from 'axios';
 import { UserDetail } from '@/types/user';
 import useUserStore from '@/app/stores/loginStore';
+import useUserInterestStore from '@/app/stores/userInterestStore';
+import { base64ToFile } from '@/utils/imageUtil';
 
 interface UserInfo {
-  profileImg: File | null;
+  profileImg?: File;
   nickname: string;
   gender: string;
   work: string;
   region: string;
-  interests: string[];
 }
 export default function SettingModify() {
   // birth 를 제외한 유저 정보 (birth는 DatePicker 컴포넌트 특성상 따로 뻈습니다.)
   const [userInfo, setUserInfo] = useState<UserInfo>({
-    profileImg: null,
     nickname: '',
     gender: '',
     work: '',
     region: '부산',
-    interests: [],
   });
   const [birth, setBirth] = useState<string>('');
+
+  // interest 카테고리는 별도의 페이지에서 보여줘야 하므로 전역 변수로 관리
+  const { interests, setInterests } = useUserInterestStore();
+
   const imageRef = useRef<HTMLInputElement>(null);
-  // 수정된 닉네임만 중복확인할 수 있도록 하는 변수
+  const [nicknameCheckMessage, setNicknameCheckMessage] = useState('');
+  // 수정된 닉네임만 중복확인할 수 있도록 하는 ref
   const nicknameRef = useRef('');
+  // profile이 수정되었는지 확인하는 ref
+  const isProfileChangeRef = useRef(false);
 
   const router = useRouter();
+
+  const formdata = new FormData();
 
   const { socialId } = useUserStore();
 
@@ -75,7 +84,11 @@ export default function SettingModify() {
 
   const profileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target?.files) {
-      setUserInfo({ ...userInfo, profileImg: e.target?.files[0] });
+      setUserInfo({
+        ...userInfo,
+        profileImg: e.target?.files[0],
+      });
+      isProfileChangeRef.current = true;
     }
   };
 
@@ -90,7 +103,7 @@ export default function SettingModify() {
         social_id: socialId,
         nickname: userInfo.nickname,
       });
-      alert('사용 가능한 닉네임 입니다.');
+      setNicknameCheckMessage('사용 가능한 닉네임 입니다.');
     } catch (e) {
       if (axios.isAxiosError(e)) {
         if (e.response?.status === 400) {
@@ -111,6 +124,10 @@ export default function SettingModify() {
 
   const submitClick = async () => {
     try {
+      if (isProfileChangeRef.current && userInfo.profileImg) {
+        formdata.append('profile', userInfo.profileImg);
+        await createUserProfile(formdata);
+      }
       await createUserInfo({
         social_id: socialId,
         birth,
@@ -137,15 +154,19 @@ export default function SettingModify() {
 
   const fetchUserInfo = async () => {
     const result: UserDetail = await getUserDetail();
+    console.log(result);
     // todo: profileImg api 연결
     setUserInfo({
-      profileImg: null,
+      profileImg: base64ToFile({
+        base64String: result.user.profile_picture_base64,
+        fileName: 'profile',
+      }),
       nickname: result.user.nickname,
       gender: result.user.gender,
       region: (result.regions && result.regions[0]) || '부산',
       work: (result.works && result.works[0]) || '마케팅',
-      interests: result.interests || [],
     });
+    setInterests(result.interests || []);
     setBirth(result.user.birth);
     nicknameRef.current = result.user.nickname;
   };
@@ -193,17 +214,20 @@ export default function SettingModify() {
         <div className="px-6 flex flex-col gap-4">
           <div>
             <p className="pb-4">닉네임</p>
-            <div className="flex gap-1">
-              <Input
-                placeholder="닉네임"
-                value={userInfo.nickname}
-                onChange={nickNameChange}
-              />
-              <SmallButton
-                text="중복확인"
-                onClick={duplicateCheck}
-                isAllowed={userInfo.nickname !== nicknameRef.current}
-              />
+            <div>
+              <div className="flex gap-1">
+                <Input
+                  placeholder="닉네임"
+                  value={userInfo.nickname}
+                  onChange={nickNameChange}
+                />
+                <SmallButton
+                  text="중복확인"
+                  onClick={duplicateCheck}
+                  isAllowed={userInfo.nickname !== nicknameRef.current}
+                />
+              </div>
+              <p className="text-[#0000FF] text-sm">{nicknameCheckMessage}</p>
             </div>
           </div>
           <div>
@@ -245,7 +269,7 @@ export default function SettingModify() {
           >
             <p className="whitespace-nowrap">관심있는 관광</p>
             <div className="flex gap-2.5 items-center pl-4">
-              <p>{userInfo.interests.join(', ')}</p>
+              <p>{interests.join(', ')}</p>
               <div className="-rotate-90 flex h-3">
                 <Arrow />
               </div>
