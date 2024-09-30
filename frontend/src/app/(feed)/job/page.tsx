@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import Card from '@/components/Card';
 
-import { JobProps, WishItem, WishRes } from '@/types/type';
+import { JobProps, WishInfo, WishItem, WishRes } from '@/types/type';
 
 import { getJobs } from '@/services/jobs';
 import { formatSalary } from '../../utils/stringUtils';
@@ -14,7 +14,12 @@ import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 
-import { getWishList, postWishItem, deleteWishItem } from '@/services/wishs';
+import {
+  getWishList,
+  postWishItem,
+  deleteWishItem,
+  getWishFeeds,
+} from '@/services/wishs';
 
 export default function Job() {
   const [feedList, setFeedList] = useState<JobProps[]>([]);
@@ -23,7 +28,7 @@ export default function Job() {
   const [loading, setLoading] = useState(false);
   const [area, setArea] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
-  const [wishList, setWishList] = useState<WishRes[]>([]);
+  const [wishList, setWishList] = useState<WishInfo[]>([]);
   const [isFirst, setIsFirst] = useState(true);
   const { isLoggedIn } = useUserStore();
   const { openModal } = useModalStore();
@@ -85,8 +90,11 @@ export default function Job() {
   }, []);
 
   const fetchWishList = async () => {
-    const wishListData = await getWishList();
-    setWishList(wishListData);
+    const wishListData = await getWishFeeds();
+    const allData: WishInfo[] = Object.values(wishListData)
+      .flatMap(location => Object.values(location))
+      .flat();
+    setWishList(allData);
     await setIsFirst(false);
   };
 
@@ -172,9 +180,6 @@ export default function Job() {
       } else {
         await postWishItem(data);
       }
-
-      // 위 작업이 성공적으로 이루어졌다면, WishList를 다시 불러옴
-      // await fetchWishList();
     } catch (error) {
       console.error('Error in wishClick:', error);
 
