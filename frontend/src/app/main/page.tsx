@@ -130,7 +130,7 @@ export default function MainPage() {
     if (isLoggedIn) {
       fetchUserInfo();
     }
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
