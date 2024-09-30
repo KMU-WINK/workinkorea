@@ -9,10 +9,13 @@ import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/services/users';
 import { UserDetail } from '@/types/user';
 import { formatDateWithDots } from '@/utils/dateUtils';
+import PrivateAxiosInstance from '@/services/privateAxiosInstance';
+import useUserStore from '../stores/loginStore';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const router = useRouter();
+  const { logout } = useUserStore();
 
   const backButtonClick = () => {
     router.back();
@@ -20,7 +23,15 @@ export default function Setting() {
   const modifyClick = () => {
     router.push('/setting/modify');
   };
-  const logoutClick = () => {};
+  const logoutClick = async () => {
+    try {
+      await PrivateAxiosInstance.delete('/auth/token');
+      logout();
+      router.replace('/main');
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const fetchUserInfo = async () => {
     const result = await getUserDetail();
