@@ -10,6 +10,11 @@ class Stay(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     content_type_id = Column(String)
     content_id = Column(String)
+    title = Column(String)
+    addr1 = Column(String)
+    addr2 = Column(String)
+    firstimage = Column(String)
+    firstimage2 = Column(String)
 
     # User와의 일대일 관계 설정
     user = relationship("User", back_populates="stays")

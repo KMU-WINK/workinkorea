@@ -26,6 +26,14 @@ AREA_SCALE_UP = {
 }
 
 
+def object_to_dict(obj, fields):
+    """Convert SQLAlchemy object to dictionary."""
+    result = {}
+    for field in fields:
+        result[field] = getattr(obj, field)
+    return result
+
+
 @router.get("")
 async def get_wish(
     request: Request,
@@ -46,98 +54,93 @@ async def get_wish(
         "제주": [],
         "춘천": [],
     }
+    try:
+        # id 필드를 제거
+        for item in spot_wish:
+            tmp = object_to_dict(
+                item,
+                [
+                    "content_type_id",
+                    "content_id",
+                    "title",
+                    "addr1",
+                    "addr2",
+                    "firstimage",
+                    "firstimage2",
+                ],
+            )
+            tmp["type"] = "spot"
+            tmp["contenttypeid"] = tmp.pop("content_type_id")
+            tmp["contentid"] = tmp.pop("content_id")
+            tmp["inWish"] = True
 
-    # id 필드를 제거
-    for item in spot_wish:
-        tmp = {}
-        tmp["contenttypeid"] = item.content_type_id
-        tmp["contentid"] = item.content_id
-        tmp["type"] = "spot"
-        data = await spot_stay_detail(
-            request=request,
-            contentId=item.content_id,
-            contentTypeId=item.content_type_id,
-            db=db,
-        )
-
-        field_list = ["title", "addr1", "addr2", "firstimage", "firstimage2", "inWish"]
-        # 필드 선별
-        for field in field_list:
-            if field in data.keys():
-                tmp[field] = data[field]
-        # 지역 분류
-        for key in result.keys():
-            if key in tmp["addr1"]:
-                result[key].append(tmp)
-                continue
-
-    for item in stay_wish:
-        tmp = {}
-        tmp["contenttypeid"] = item.content_type_id
-        tmp["contentid"] = item.content_id
-        tmp["type"] = "stay"
-
-        data = await spot_stay_detail(
-            request=request,
-            contentId=item.content_id,
-            contentTypeId=item.content_type_id,
-            db=db,
-        )
-
-        field_list = ["title", "addr1", "addr2", "firstimage", "firstimage2", "inWish"]
-
-        # 필드 선별
-        for field in field_list:
-            if field in data.keys():
-                tmp[field] = data[field]
-
-        # 지역 분류
-        for key in result.keys():
-            if key in tmp["addr1"]:
-                result[key].append(tmp)
-                continue
-
-    for item in job_wish:
-        tmp = {}
-        tmp["contenttypeid"] = item.content_type_id
-        tmp["contentid"] = item.content_id
-        tmp["type"] = "job"
-        data = await read_job(
-            request=request,
-            contentId=item.content_id,
-            contentTypeId=item.content_type_id,
-            db=db,
-        )
-        field_list = [
-            "corpoNm",
-            "empmnTtl",
-            "wageAmt",
-            "wrkpAdres",
-            "corpoLogoFileUrl",
-            "inWish",
-            "salStle",
-        ]
-        # 필드 선별
-        for field in field_list:
-            if field in data.keys():
-                tmp[field] = data[field]
-
-        # 지역 분류
-        if tmp["contenttypeid"] == "open":
-            for key in AREA_SCALE_UP.keys():
-                if key in tmp["wrkpAdres"]:
-                    if len(AREA_SCALE_UP[key]) > 1:
-                        for area in AREA_SCALE_UP[key]:
-                            result[area].append(tmp)
-                    else:
-                        result[AREA_SCALE_UP[key][0]].append(tmp)
-        else:  # is tour
+            # 지역 분류
             for key in result.keys():
-                if key in tmp["wrkpAdres"]:
+                if key in tmp["addr1"]:
                     result[key].append(tmp)
                     continue
 
-    return result
+        for item in stay_wish:
+            tmp = object_to_dict(
+                item,
+                [
+                    "content_type_id",
+                    "content_id",
+                    "title",
+                    "addr1",
+                    "addr2",
+                    "firstimage",
+                    "firstimage2",
+                ],
+            )
+            tmp["type"] = "stay"
+            tmp["contenttypeid"] = tmp.pop("content_type_id")
+            tmp["contentid"] = tmp.pop("content_id")
+            tmp["inWish"] = True
+
+            # 지역 분류
+            for key in result.keys():
+                if key in tmp["addr1"]:
+                    result[key].append(tmp)
+                    continue
+
+        for item in job_wish:
+            tmp = object_to_dict(
+                item,
+                [
+                    "content_type_id",
+                    "content_id",
+                    "corpoNm",
+                    "empmnTtl",
+                    "wageAmt",
+                    "wrkpAdres",
+                    "corpoLogoFileUrl",
+                    "salStle",
+                ],
+            )
+            tmp["type"] = "job"
+            tmp["contenttypeid"] = tmp.pop("content_type_id")
+            tmp["contentid"] = tmp.pop("content_id")
+            tmp["inWish"] = True
+
+            # 지역 분류
+            if tmp["contenttypeid"] == "open":
+                for key in AREA_SCALE_UP.keys():
+                    if key in tmp["wrkpAdres"]:
+                        if len(AREA_SCALE_UP[key]) > 1:
+                            for area in AREA_SCALE_UP[key]:
+                                result[area].append(tmp)
+                        else:
+                            result[AREA_SCALE_UP[key][0]].append(tmp)
+            else:  # is tour
+                for key in result.keys():
+                    if key in tmp["wrkpAdres"]:
+                        result[key].append(tmp)
+                        continue
+
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("")
@@ -182,12 +185,35 @@ async def add_wish(
     current_user = get_current_user(request, db)
 
     if contentTypeId == "32":
+        tmp = {}
+        tmp["contenttypeid"] = contentTypeId
+        tmp["contentid"] = contentId
+        tmp["type"] = "stay"
+
+        data = await spot_stay_detail(
+            request=request,
+            contentId=contentId,
+            contentTypeId=contentTypeId,
+            db=db,
+        )
+        field_list = [
+            "title",
+            "addr1",
+            "addr2",
+            "firstimage",
+            "firstimage2",
+        ]
+
+        # 필드 선별
+        for field in field_list:
+            if field in data.keys():
+                tmp[field] = data[field]
         chk_wish = (
             db.query(Stay)
             .filter(
                 Stay.user_id == current_user.id,
-                Stay.content_type_id == contentTypeId,
-                Stay.content_id == contentId,
+                Stay.content_type_id == tmp["contenttypeid"],
+                Stay.content_id == tmp["contentid"],
             )
             .first()
         )
@@ -195,17 +221,47 @@ async def add_wish(
             raise HTTPException(status_code=400, detail=f"already exist in wish list.")
         new_wish = Stay(
             user_id=current_user.id,
-            content_type_id=contentTypeId,
-            content_id=contentId,
+            content_type_id=tmp["contenttypeid"],
+            content_id=tmp["contentid"],
+            title=tmp["title"] if "title" in tmp.keys() else None,
+            addr1=tmp["addr1"] if "addr1" in tmp.keys() else None,
+            addr2=tmp["addr2"] if "addr2" in tmp.keys() else None,
+            firstimage=tmp["firstimage"] if "firstimage" in tmp.keys() else None,
+            firstimage2=tmp["firstimage2"] if "firstimage2" in tmp.keys() else None,
         )
 
     elif contentTypeId in ["12", "14", "15", "25", "28", "38", "39"]:
+
+        tmp = {}
+        tmp["contenttypeid"] = contentTypeId
+        tmp["contentid"] = contentId
+        tmp["type"] = "spot"
+        data = await spot_stay_detail(
+            request=request,
+            contentId=contentId,
+            contentTypeId=contentTypeId,
+            db=db,
+        )
+
+        field_list = [
+            "title",
+            "addr1",
+            "addr2",
+            "firstimage",
+            "firstimage2",
+            "inWish",
+        ]
+        # 필드 선별
+        for field in field_list:
+            if field in data.keys():
+                tmp[field] = data[field]
+
         chk_wish = (
             db.query(Spot)
             .filter(
                 Spot.user_id == current_user.id,
-                Spot.content_type_id == contentTypeId,
-                Spot.content_id == contentId,
+                Spot.content_type_id == tmp["contenttypeid"],
+                Spot.content_id == tmp["contentid"],
             )
             .first()
         )
@@ -213,16 +269,45 @@ async def add_wish(
             raise HTTPException(status_code=400, detail=f"already exist in wish list.")
         new_wish = Spot(
             user_id=current_user.id,
-            content_type_id=contentTypeId,
-            content_id=contentId,
+            content_type_id=tmp["contenttypeid"],
+            content_id=tmp["contentid"],
+            title=tmp["title"] if "title" in tmp.keys() else None,
+            addr1=tmp["addr1"] if "addr1" in tmp.keys() else None,
+            addr2=tmp["addr2"] if "addr2" in tmp.keys() else None,
+            firstimage=tmp["firstimage"] if "firstimage" in tmp.keys() else None,
+            firstimage2=tmp["firstimage2"] if "firstimage2" in tmp.keys() else None,
         )
     elif contentTypeId in ["open", "tour"]:
+        tmp = {}
+        tmp["contenttypeid"] = contentTypeId
+        tmp["contentid"] = contentId
+        tmp["type"] = "job"
+        data = await read_job(
+            request=request,
+            contentId=contentId,
+            contentTypeId=contentTypeId,
+            db=db,
+        )
+
+        field_list = [
+            "corpoNm",
+            "empmnTtl",
+            "wageAmt",
+            "wrkpAdres",
+            "corpoLogoFileUrl",
+            "salStle",
+        ]
+        # 필드 선별
+        for field in field_list:
+            if field in data.keys():
+                tmp[field] = data[field]
+
         chk_wish = (
             db.query(Job)
             .filter(
                 Job.user_id == current_user.id,
-                Job.content_type_id == contentTypeId,
-                Job.content_id == contentId,
+                Job.content_type_id == tmp["contenttypeid"],
+                Job.content_id == tmp["contentid"],
             )
             .first()
         )
@@ -230,8 +315,20 @@ async def add_wish(
             raise HTTPException(status_code=400, detail=f"already exist in wish list.")
         new_wish = Job(
             user_id=current_user.id,
-            content_type_id=contentTypeId,
-            content_id=contentId,
+            content_type_id=tmp["contenttypeid"],
+            content_id=tmp["contentid"],
+            corpoNm=(
+                tmp["corpoNm"]
+                if "corpoNm" in tmp.keys()
+                else tmp["empmnTtl"].split(" ")[0]
+            ),
+            empmnTtl=tmp["empmnTtl"] if "empmnTtl" in tmp.keys() else None,
+            wageAmt=tmp["wageAmt"] if "wageAmt" in tmp.keys() else None,
+            wrkpAdres=tmp["wrkpAdres"] if "wrkpAdres" in tmp.keys() else None,
+            corpoLogoFileUrl=(
+                tmp["corpoLogoFileUrl"] if "corpoLogoFileUrl" in tmp.keys() else None
+            ),
+            salStle=tmp["salStle"] if "salStle" in tmp.keys() else None,
         )
     try:
         db.add(new_wish)
