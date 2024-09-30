@@ -247,28 +247,13 @@ export default function Stay() {
         <div className="w-full flex flex-col items-center pt-20 gap-24">
           {isFirst ? (
             <Spinner />
-
-            ) : (
+          ) : (
             <span className="text-center">
               검색 결과가 없습니다.
               <br />
               다른 검색어를 입력해주세요.
             </span>
           )}
-          <div className="w-full flex flex-col gap-2.5 items-center">
-            <Image
-              src="/svgs/no-feed-bubble.svg"
-              alt="no-feed-bubble"
-              width={50}
-              height={0}
-            />
-            <Image
-              src="/svgs/no-feed-logo.svg"
-              alt="no-feed-logo"
-              width={100}
-              height={0}
-            />
-          </div>
         </div>
       )}
     </div>
