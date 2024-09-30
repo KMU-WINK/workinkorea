@@ -14,8 +14,24 @@ from ..models.Work import Work
 from ..models.User import User, User_Region, User_Interest, User_Work
 from ..db.session import get_db
 from .auth import get_current_user
-from ..utils.member_rec import recommend_tourist_spots
-import base64
+import base64, os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+
+ENDPOINT = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1"
+
+AREA_CODE = {
+    "강릉": [32, 1],
+    "부산": [6],
+    "제주": [39],
+    "경주": [35, 2],
+    "여수": [38, 13],
+    "전주": [37, 12],
+    "춘천": [32, 13],
+}
 
 router = APIRouter(
     prefix="/users",
@@ -301,8 +317,8 @@ async def update_user_profile(request: Request, db: Session = Depends(get_db)):
 # user recommendation
 @router.get("/recommend")
 async def recommend_user(request: Request, db: Session = Depends(get_db)):
-    current_user = get_current_user(request, db)
-    # current_user = db.query(User).filter(User.id == 1).first() #for test
+    # current_user = get_current_user(request, db)
+    current_user = db.query(User).filter(User.id == 7).first()  # for test
 
     if current_user is None:
         raise HTTPException(
@@ -313,14 +329,7 @@ async def recommend_user(request: Request, db: Session = Depends(get_db)):
     regions = get_regions_by_id(current_user.id, db)
     interests = get_interests_by_id(current_user.id, db)
     # works = get_works_by_id(current_user.id, db)
-
-    print(regions)
-    print(interests)
-    # 추천 알고리즘
-    result = recommend_tourist_spots(interests, regions[0])
-    print(result)
-    # 추천 알고리즘 결과를 반환
-    return result
+    return "result"
 
 
 @router.delete("")
