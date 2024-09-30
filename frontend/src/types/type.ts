@@ -123,16 +123,17 @@ export interface WishRes extends WishItem {
 
 export interface MapListInfo {
   contentid: string;
+  contenttypeid: string;
   title: string;
   addr1: string;
-  firstImage: string;
+  firstimage: string;
   mapx: string;
   mapy: string;
 }
 
-export interface GetSpotListsProps {
-  mapX: string;
-  mapY: string;
+export interface GetLocationProps {
+  mapX: string | null;
+  mapY: string | null;
   keyword: string | null;
   radius?: number;
   numOfRows?: number;
