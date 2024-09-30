@@ -390,6 +390,7 @@ export default function Map() {
             }}
             value={''}
             placeholder={(keyword ? keyword : location) || ''}
+            disabled
             readOnly
           />
         </div>
