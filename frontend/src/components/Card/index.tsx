@@ -173,17 +173,6 @@ export default function Card({
                 </Price>
               </>
             )}
-            {cardType === 'map' && (
-              <WishButton
-                type="button"
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.stopPropagation(); // 이벤트 버블링 현상을 방지
-                  onWishListClick(id);
-                }}
-              >
-                {inWishlist ? <ColorHeart /> : <Heart />}
-              </WishButton>
-            )}
           </BottomContainer>
           <Location $cardType={cardType}>{location}</Location>
         </InfoContainer>
