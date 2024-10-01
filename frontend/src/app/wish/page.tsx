@@ -7,6 +7,9 @@ import Go from 'public/svgs/go.svg';
 import { useRouter } from 'next/navigation';
 import { getWishFeeds } from '@/services/wishs';
 import { LocationInfo } from '@/types/type';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
+import Spinner from '@/components/Spinner';
 
 interface WishType {
   id: number;
@@ -25,6 +28,7 @@ type LocCountType = {
 
 export default function Wish() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [locCount, setLocCount] = useState<LocCountType>({
     강릉: {
       id: 1,
@@ -69,6 +73,8 @@ export default function Wish() {
       length: 0,
     },
   });
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const fetchData = async () => {
     try {
@@ -83,16 +89,31 @@ export default function Wish() {
       setLocCount(updatedLocCount);
     } catch (error) {
       console.log('error : ', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isLoggedIn) {
+      fetchData();
+    } else {
+      setLoading(false);
+      openModal();
+    }
+  }, [isLoggedIn]);
 
   const backClick = () => {
     router.push('/main');
   };
+
+  if (loading) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">

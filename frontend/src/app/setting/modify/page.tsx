@@ -26,6 +26,7 @@ import useUserStore from '@/app/stores/loginStore';
 import { base64ToFile } from '@/utils/imageUtil';
 import useUserInfoStore from '@/app/stores/userInfoStore';
 import Spinner from '@/components/Spinner';
+import useModalStore from '@/app/stores/modalStore';
 
 interface UserInfo {
   profileImg?: File;
@@ -52,6 +53,8 @@ export default function SettingModify() {
   const router = useRouter();
   const formdata = new FormData();
   const { socialId } = useUserStore();
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const additionalItems = [
     {
@@ -115,6 +118,7 @@ export default function SettingModify() {
 
   const submitClick = async () => {
     try {
+      setLoading(true);
       if (isProfileChangeRef.current && userInfo.profileImg) {
         formdata.append('profile', userInfo.profileImg);
         await createUserProfile(formdata);
@@ -138,6 +142,8 @@ export default function SettingModify() {
         // 예외 처리 로직 추가 가능
       }
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,8 +171,13 @@ export default function SettingModify() {
   };
 
   useEffect(() => {
-    fetchUserInfo();
-  }, []);
+    if (isLoggedIn) {
+      fetchUserInfo();
+    } else {
+      setLoading(false);
+      openModal();
+    }
+  }, [isLoggedIn]);
 
   if (loading) {
     return <Spinner />;

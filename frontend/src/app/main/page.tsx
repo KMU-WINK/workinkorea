@@ -54,6 +54,7 @@ export default function MainPage() {
     title: '',
     link: '/',
   });
+  const [loading, setLoading] = useState(true);
 
   const [location, setLocation] = useState<keyof typeof bannerList>('부산');
   const { openModal } = useModalStore();
@@ -69,17 +70,14 @@ export default function MainPage() {
       if (socialIdCookie) {
         const socialId = socialIdCookie.split('=')[1];
         login(socialId);
+        fetchUserInfo();
       } else {
+        setLoading(false);
         logout();
       }
     };
 
     checkIsLoggedIn();
-
-    setUserInfo({
-      name: '여섯글자이름',
-      profile: '/images/profile-test.png',
-    });
     setAdInfo({
       title: '워크인코리아 공식 노션 바로가기',
       link: 'https://possible-rowboat-b63.notion.site/111170be5ff980418c37e6aea0d0f1c8',
@@ -108,6 +106,7 @@ export default function MainPage() {
 
   const fetchUserInfo = async () => {
     const result: UserDetail = await getUserDetail();
+    setLoading(false);
     const profileFile = base64ToFile({
       base64String: result.user.profile_picture_base64,
       fileName: 'profile',
@@ -125,12 +124,6 @@ export default function MainPage() {
       setLocation(result.regions[0] as keyof typeof bannerList);
     }
   };
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchUserInfo();
-    }
-  }, [isLoggedIn]);
 
   useEffect(() => {
     if (location) {
@@ -151,42 +144,49 @@ export default function MainPage() {
         bg-white w-full sm:max-w-sm pb-20"
       >
         <div className="flex flex-col gap-3.5 w-full">
-          <div className="flex justify-between">
+          <div className="flex justify-between h-6">
             <div className="flex gap-1 items-center cursor-pointer">
               {isLoggedIn ? (
                 <>
                   <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
-                    <Image
-                      src={userInfo.profile ? userInfo.profile : ProfileDefault}
-                      alt="Profile"
-                      fill
-                    />
+                    {!loading && (
+                      <Image
+                        src={
+                          userInfo.profile ? userInfo.profile : ProfileDefault
+                        }
+                        alt="Profile"
+                        fill
+                      />
+                    )}
                   </div>
                   <span className="text-sm font-medium">
-                    {userInfo.name ? userInfo.name : '사용자'}
+                    {userInfo.name && userInfo.name}
                   </span>
                 </>
               ) : (
-                <span className="text-sm font-medium ml-6">워크인코리아</span>
+                !loading && (
+                  <span className="text-sm font-medium ml-6">워크인코리아</span>
+                )
               )}
             </div>
-            {isLoggedIn ? (
-              <div className="flex gap-2">
-                <HeartColor className="cursor-pointer" onClick={wishClick} />
-                <SettingColor
-                  className="cursor-pointer"
-                  onClick={settingClick}
-                />
-              </div>
-            ) : (
-              <button
-                onClick={openModal}
-                className="text-black underline-offset-1 text-xs font-semibold"
-                type="button"
-              >
-                회원가입/로그인
-              </button>
-            )}
+            {!loading &&
+              (isLoggedIn ? (
+                <div className="flex gap-2">
+                  <HeartColor className="cursor-pointer" onClick={wishClick} />
+                  <SettingColor
+                    className="cursor-pointer"
+                    onClick={settingClick}
+                  />
+                </div>
+              ) : (
+                <button
+                  onClick={openModal}
+                  className="text-black underline-offset-1 text-xs font-semibold"
+                  type="button"
+                >
+                  회원가입/로그인
+                </button>
+              ))}
           </div>
           <div className="border border-gray-2 rounded-lg flex flex-col items-center">
             <div className="p-6 w-full flex flex-col gap-7 justify-center items-center">

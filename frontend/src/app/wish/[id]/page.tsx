@@ -11,6 +11,9 @@ import { WishInfo, WishItem } from '@/types/type';
 import Back from 'public/svgs/back.svg';
 import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import Image from 'next/image';
+import Spinner from '@/components/Spinner';
+import useUserStore from '@/app/stores/loginStore';
+import useModalStore from '@/app/stores/modalStore';
 
 interface WishType {
   id: number;
@@ -58,6 +61,10 @@ export default function WishDetail() {
   const [location, setLocation] = useState('location');
   const [locationId, setLocationId] = useState<number>();
   const [feedList, setFeedList] = useState<WishInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { isLoggedIn } = useUserStore();
+  const { openModal } = useModalStore();
 
   const cardClick = (
     type: string,
@@ -120,6 +127,8 @@ export default function WishDetail() {
       setFeedList(selectedData);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,13 +138,26 @@ export default function WishDetail() {
   }, [pathname]);
 
   useEffect(() => {
-    fetchData();
-    wishData.map(item => {
-      if (item.id === locationId) {
-        setLocation(item.location);
-      }
-    });
-  }, [locationId]);
+    if (isLoggedIn) {
+      fetchData();
+      wishData.map(item => {
+        if (item.id === locationId) {
+          setLocation(item.location);
+        }
+      });
+    } else {
+      setLoading(false);
+      openModal();
+    }
+  }, [locationId, isLoggedIn]);
+
+  if (loading) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
