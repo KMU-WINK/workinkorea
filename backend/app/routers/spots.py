@@ -37,8 +37,8 @@ async def read_stays(
         )
     try:
         wishs = False
-        current_user = get_current_user(request, db)
-        if current_user:
+        if request.cookies.get("accessToken"):
+            current_user = get_current_user(request, db)
             stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
             spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
             wishs = [wish.content_id for wish in stay_wish + spot_wish]
