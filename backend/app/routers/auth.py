@@ -11,7 +11,6 @@ from ..schemas.user import UserCreate
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 OPERATION_HOST_URL = "api.workinkorea.info"
@@ -19,8 +18,7 @@ OPERATION_HOST_URL = "api.workinkorea.info"
 
 def create_jwt_token(user_social_id: str):
     # JWT 토큰 생성
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode = {"social_id": user_social_id, "exp": expire}
+    to_encode = {"social_id": user_social_id}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt if isinstance(encoded_jwt, str) else encoded_jwt.decode("utf-8")
 
