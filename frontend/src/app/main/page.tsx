@@ -22,6 +22,7 @@ import { base64ToFile } from '@/utils/imageUtil';
 import { UserDetail } from '@/types/user';
 import ProfileDefault from '../../../public/images/profile-default.jpg';
 import { bannerList } from '@/constants/bannerInfo';
+import { getGoogleSentence } from '@/services/google';
 
 interface BannerType {
   type:
@@ -56,6 +57,10 @@ export default function MainPage() {
   });
 
   const [location, setLocation] = useState<keyof typeof bannerList>('부산');
+  const [bannerText, setBannerText] = useState<string>();
+  const [googleLocation, setGoogleLocation] =
+    useState<keyof typeof bannerList>('부산');
+  const [googleImage, setGoogleImage] = useState();
   const { openModal } = useModalStore();
   const { isLoggedIn, login, logout } = useUserStore();
 
@@ -73,13 +78,9 @@ export default function MainPage() {
         logout();
       }
     };
+    getGoogleInfo();
 
     checkIsLoggedIn();
-
-    setUserInfo({
-      name: '여섯글자이름',
-      profile: '/images/profile-test.png',
-    });
     setAdInfo({
       title: '워크인코리아 공식 노션 바로가기',
       link: 'https://possible-rowboat-b63.notion.site/111170be5ff980418c37e6aea0d0f1c8',
@@ -103,7 +104,7 @@ export default function MainPage() {
   };
 
   const bannerClick = () => {
-    router.push(`/recommend?location=${location}`);
+    router.push(`/recommend?location=${location}&type=recommend`);
   };
 
   const fetchUserInfo = async () => {
@@ -132,6 +133,21 @@ export default function MainPage() {
     }
   }, [isLoggedIn]);
 
+  const getGoogleInfo = async () => {
+    const gun = await getGoogleSentence();
+    // const gugu = gun.sentence.split(' ')[0];
+    // console.log('gugu : ', gugu);
+    setGoogleLocation(gun.sentence.split(' ')[0]);
+    // console.log('gun : ', gun);
+    setBannerText(gun.sentence);
+    // @ts-ignore
+    setGoogleImage(bannerList[googleLocation].imagePath2);
+  };
+
+  useEffect(() => {
+    console.log('googleLocation : ', googleLocation);
+  }, [googleLocation]);
+
   useEffect(() => {
     if (location) {
       setBannerInfo({
@@ -140,11 +156,15 @@ export default function MainPage() {
         description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요',
         backgroundImage: bannerList[location].imagePath,
       });
+      // console.log(
+      //   'bannerList[location].imagePath : ',
+      //   bannerList[location].imagePath2,
+      // );
     }
   }, [location]);
 
   return (
-    <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
+    <div className="h-full px-6 py-5 bg-white flex justify-center items-start text-black">
       <div
         className="flex flex-col justify-start items-center
         gap-9
@@ -163,7 +183,7 @@ export default function MainPage() {
                     />
                   </div>
                   <span className="text-sm font-medium">
-                    {userInfo.name ? userInfo.name : '사용자'}
+                    {userInfo.name ? userInfo.name : ''}
                   </span>
                 </>
               ) : (
@@ -232,27 +252,25 @@ export default function MainPage() {
               href={adInfo.link ? adInfo.link : '/main'}
               className="p-6 w-full flex gap-7 justify-between items-center"
             >
-              <span>{adInfo.title ? adInfo.title : '광고'}</span>
+              <span>{adInfo.title ? adInfo.title : ''}</span>
               <Go />
             </Link>
           </div>
         </div>
         <div className="flex flex-col gap-5 w-full">
           <span className="text-xl font-medium">
-            {userInfo.name ? userInfo.name : '사용자'}님을 위한 추천
+            {isLoggedIn && userInfo.name
+              ? `${userInfo.name}님을 위한 추천`
+              : '이런 건 어떠세요 ?'}
           </span>
           <Banner
             type={'white-filter-on'}
-            title={bannerInfo?.title || bannerList[location].title}
-            description={
-              bannerInfo?.description || bannerList[location].content
-            }
+            title={'리뷰가 가장 많은 \n' + `${googleLocation} 관광지 추천`}
+            description={bannerText || ''}
             onClick={bannerClick}
             backgroundImage={
               <Image
-                src={
-                  bannerInfo?.backgroundImage || bannerList[location].imagePath
-                }
+                src={googleImage || ''}
                 alt="Background"
                 layout="fill"
                 objectFit="cover"
@@ -260,6 +278,25 @@ export default function MainPage() {
               />
             }
           />
+          {isLoggedIn && (
+            <Banner
+              type={'white-filter-on'}
+              title={bannerInfo?.title || bannerList[location].title}
+              description={
+                bannerInfo?.description || bannerList[location].content
+              }
+              onClick={bannerClick}
+              backgroundImage={
+                <Image
+                  src={bannerList[location].imagePath}
+                  alt="Background"
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                />
+              }
+            />
+          )}
         </div>
       </div>
     </div>

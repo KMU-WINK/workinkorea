@@ -77,7 +77,9 @@ export default function RecommendPage() {
     const location = urlParams.get('location') as
       | keyof typeof bannerList
       | null; // null을 처리
-
+    const recommendType = urlParams.get('type');
+    console.log('recommendType : ', recommendType);
+    console.log('location', location);
     if (location && bannerList[location]) {
       setTitle(bannerList[location].title);
     }
