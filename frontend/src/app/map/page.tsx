@@ -58,10 +58,6 @@ export default function Map() {
     latitude: 0,
     longitude: 0,
   });
-  const [detailLng, setDetailLng] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
   const levelRef = useRef(3);
   const isMarkerClickRef = useRef(false);
 
@@ -127,11 +123,6 @@ export default function Map() {
     afterChange: (index: number) => {
       if (!loading) onSlideChange(index);
     },
-  };
-
-  const wishClick = (id: string) => {
-    console.log(id);
-    // api 연동 예정
   };
 
   const fetchLocationLists = async ({
@@ -429,10 +420,10 @@ export default function Map() {
                     image={list.firstimage || '/svgs/job-default.svg'}
                     onCardClick={() => {
                       router.push(
-                        `/spot/${contentId}?contenttypeid=${contentTypeId}&type=${type}`,
+                        `/spot/${list.contentid}?contenttypeid=${list.contenttypeid}&type=${type}`,
                       );
                     }}
-                    onWishListClick={wishClick}
+                    onWishListClick={() => {}}
                   />
                 ))}
               </Slider>

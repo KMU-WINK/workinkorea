@@ -234,7 +234,9 @@ export default function Tour() {
   };
 
   const addressClick = () => {
-    router.push(`/map?contentId=${contentId}&contentTypeId=${contentTypeId}`);
+    router.push(
+      `/map?contentId=${contentId}&contentTypeId=${contentTypeId}&type=${type}`,
+    );
   };
 
   useEffect(() => {
