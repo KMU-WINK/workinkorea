@@ -52,7 +52,7 @@ async def read_job(
 ):
     try:
         wishs = False
-        if request.headers.get("Authorization"):
+        if request.cookies.get("accessToken"):
             current_user = get_current_user(request, db)
             job_wish = db.query(Job).filter(Job.user_id == current_user.id).all()
             wishs = [wish.content_id for wish in job_wish]

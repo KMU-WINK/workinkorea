@@ -71,7 +71,7 @@ async def spot_stay_detail(
     combined_dict.update(info)
     combined_dict.update(image)
 
-    if request.headers.get("Authorization"):
+    if request.cookies.get("accessToken"):
         current_user = get_current_user(request, db)
         stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
         wishs = [wish.content_id for wish in stay_wish]
@@ -103,7 +103,7 @@ async def spot_stay_location(
         data = get_location_based_list(mapX, mapY, radius, numOfRows, contentTypeId=32)
 
         wishs = False
-        if request.headers.get("Authorization"):
+        if request.cookies.get("accessToken"):
             current_user = get_current_user(request, db)
             stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
             wishs = [wish.content_id for wish in stay_wish]
