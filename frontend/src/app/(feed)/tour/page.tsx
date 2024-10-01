@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Card from '@/components/Card';
 import Spinner from '@/components/Spinner';
 
-import { FeedProps, JobProps, WishInfo, WishItem, WishRes } from '@/types/type';
+import { FeedProps, WishItem } from '@/types/type';
 
 import { getSpots } from '@/services/spots';
 import { parseUrl } from '@/app/(feed)/_utils/stringUtils';
@@ -82,7 +82,6 @@ export default function Tour() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
-      router.push('/not-found');
     } finally {
       setLoading(false);
     }

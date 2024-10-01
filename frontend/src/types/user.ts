@@ -1,3 +1,5 @@
+import { bannerList } from '@/constants/bannerInfo';
+
 export interface UserDetail {
   user: {
     profile_picture_base64: string;
@@ -8,7 +10,7 @@ export interface UserDetail {
     nickname: string;
     gender: string;
   };
-  regions: string[] | null;
+  regions: keyof typeof bannerList | null;
   interests: string[] | null;
   works: string[] | null;
 }
