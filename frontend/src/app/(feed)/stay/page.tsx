@@ -131,7 +131,7 @@ export default function Stay() {
   }, [page, loading]);
 
   const cardClick = (id: string, contenttypeid?: string) => {
-    router.push(`/spot/${id}?contenttypeid=${contenttypeid}?type=spot`);
+    router.push(`/spot/${id}?contenttypeid=32?type=stay`);
   };
 
   const wishClick = async (item: FeedProps) => {
@@ -148,8 +148,8 @@ export default function Stay() {
     );
     try {
       const data: WishItem = {
-        type: item.contenttypeid === '32' ? 'stay' : 'spot',
-        contentTypeId: item.contenttypeid || '39',
+        type: 'stay',
+        contentTypeId: item.contenttypeid || '32',
         contentId: item.contentid,
       };
 
