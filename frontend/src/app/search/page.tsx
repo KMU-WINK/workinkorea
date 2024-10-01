@@ -21,13 +21,13 @@ export default function Search() {
     '강릉',
     '여수',
     '부산',
-    '속초',
-    '가평',
-    '파주',
-    '성북',
-    '서울',
-    '이이',
-    '아야',
+    '제주',
+    '여수',
+    '춘천',
+    '경주',
+    '바다',
+    '공원',
+    '펜션',
   ];
 
   const handleSearch = () => {
@@ -45,6 +45,15 @@ export default function Search() {
     )}`;
 
     router.push(url);
+  };
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}.${month}.${day}`;
   };
 
   return (
@@ -104,7 +113,7 @@ export default function Search() {
           <div className="pt-24">
             <div className="flex items-center">
               <p className="text-md font-semibold pr-3">최신 트렌드</p>
-              <p className="text-xs text-gray-4">2024.07.13 기준</p>
+              <p className="text-xs text-gray-4">{`${getCurrentDate()} 기준`}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-x-4 pt-5">
