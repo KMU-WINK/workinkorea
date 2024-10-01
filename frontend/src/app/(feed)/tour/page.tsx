@@ -51,8 +51,6 @@ export default function Tour() {
         setPageCount(Math.floor(response.data.totalCount / 10) + 1);
       }
 
-      console.log(response);
-
       const data = response.data.items.item.map((item: FeedProps) => ({
         contentid: item.contentid,
         cardType: 'default',

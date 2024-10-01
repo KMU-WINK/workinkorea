@@ -108,7 +108,6 @@ export default function MainPage() {
 
   const fetchUserInfo = async () => {
     const result: UserDetail = await getUserDetail();
-    console.log('result : ', result);
     const profileFile = base64ToFile({
       base64String: result.user.profile_picture_base64,
       fileName: 'profile',
