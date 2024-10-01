@@ -17,6 +17,7 @@ import useModalStore from '@/app/stores/modalStore';
 
 import { postWishItem, deleteWishItem, getWishFeeds } from '@/services/wishs';
 import { getSpots } from '@/services/spots';
+import { showToastMessage } from '@/app/utils/toastMessage';
 
 export default function Stay() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -136,6 +137,7 @@ export default function Stay() {
       openModal();
       return;
     }
+    const originState = item.inWishlist;
     setFeedList(prevList =>
       prevList.map(feedItem =>
         feedItem.contentid === item.contentid
@@ -143,6 +145,9 @@ export default function Stay() {
           : feedItem,
       ),
     );
+    let errorType;
+    let res;
+
     try {
       const data: WishItem = {
         type: 'stay',
@@ -151,9 +156,25 @@ export default function Stay() {
       };
 
       if (item.inWishlist) {
-        await deleteWishItem(data);
+        res = await deleteWishItem(data);
+        errorType = 'delete';
       } else {
-        await postWishItem(data);
+        res = await postWishItem(data);
+        errorType = 'post';
+      }
+      if (res === 'error occurred') {
+        if (errorType === 'delete') {
+          showToastMessage('이미 삭제된 컨텐츠입니다 !', 3000);
+        } else if (errorType === 'post') {
+          showToastMessage('이미 저장된 컨텐츠입니다 !', 3000);
+        }
+        setFeedList(prevList =>
+          prevList.map(feedItem =>
+            feedItem.contentid === item.contentid
+              ? { ...feedItem, inWishlist: originState }
+              : feedItem,
+          ),
+        );
       }
     } catch (error) {
       console.error('Error in wishClick:', error);
