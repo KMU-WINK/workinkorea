@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .db.connection import Base, engine
 from .models import *  # 모든 모델을 import
-from .routers import initial, spots, stays, jobs, users, auth, wishs, ai
+from .routers import initial, spots, stays, jobs, users, auth, wishs, ai, google
 
 
 load_dotenv()
@@ -40,6 +40,7 @@ app.include_router(jobs.router)
 app.include_router(users.router)
 app.include_router(wishs.router)
 app.include_router(ai.router)
+app.include_router(google.router)
 
 
 @app.get("/favicon.ico", response_class=HTMLResponse)
