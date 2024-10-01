@@ -11,7 +11,7 @@ import { WishInfo, WishItem } from '@/types/type';
 import Back from 'public/svgs/back.svg';
 import { deleteWishItem, postWishItem } from '@/services/wishs';
 import { getRecommend } from '@/services/ai';
-import Spinner from '@/components/Spinner'; // 로딩 스피너 컴포넌트 추가
+import AISpinner from '@/components/AISpinner';
 
 export default function RecommendPage() {
   const router = useRouter();
@@ -107,9 +107,9 @@ export default function RecommendPage() {
               ))}
             </>
           ) : (
-            <div className="w-full flex flex-col items-center pt-20 gap-24">
+            <div className="w-full flex flex-col items-center gap-24">
               {isLoading ? (
-                <Spinner />
+                <AISpinner />
               ) : (
                 <span className="text-center">결과가 없습니다.</span>
               )}
