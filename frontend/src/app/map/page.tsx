@@ -12,6 +12,7 @@ import Back from '../../../public/svgs/back.svg';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSpotDetail, getSpotLocations } from '@/services/spots';
 import { getStayLocations } from '@/services/stays';
+import Spinner from '@/components/Spinner';
 
 // kakao 라는 객체가 window에 존재하고 있다고 인식시켜주기 위함
 declare global {
@@ -57,14 +58,12 @@ export default function Map() {
     latitude: 0,
     longitude: 0,
   });
-  const [detailLng, setDetailLng] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
   const levelRef = useRef(3);
   const isMarkerClickRef = useRef(false);
 
   const [mapList, setMapList] = useState<MapListInfo[]>([]);
+
+  const [loading, setLoading] = useState(true);
 
   const sliderRef = useRef<Slider | null>(null);
 
@@ -122,13 +121,8 @@ export default function Map() {
     slidesToScroll: 1,
     arrows: false,
     afterChange: (index: number) => {
-      onSlideChange(index);
+      if (!loading) onSlideChange(index);
     },
-  };
-
-  const wishClick = (id: string) => {
-    console.log(id);
-    // api 연동 예정
   };
 
   const fetchLocationLists = async ({
@@ -218,11 +212,12 @@ export default function Map() {
 
     // 피드에서 지도로 이동한 경우에만 적용
     window.kakao.maps.load(() => {
+      setLoading(false);
       if (type && mapx && mapy) {
         const options = {
-          // 지도 중심 좌표 (default level은 4로 고정)
+          // 지도 중심 좌표 (default level은 6로 고정)
           center: new window.kakao.maps.LatLng(mapy, mapx),
-          level: 4,
+          level: 3,
         };
 
         // 지도 생성
@@ -233,6 +228,8 @@ export default function Map() {
           latitude: Number(mapy),
           longitude: Number(mapx),
         };
+
+        map.setMaxLevel(7);
 
         // 지도 줌 아웃 리스너
         window.kakao.maps.event.addListener(map, 'zoom_changed', function () {
@@ -394,34 +391,45 @@ export default function Map() {
             readOnly
           />
         </div>
-        <div ref={mapRef} className="h-screen w-full" />
-        <SliderContainer>
-          <Slider
-            ref={(slider: Slider | null) => {
-              sliderRef.current = slider;
-            }}
-            /* eslint-disable-next-line react/jsx-props-no-spreading */
-            {...sliderSettings}
-          >
-            {mapList?.map(list => (
-              <Card
-                key={list.contentid}
-                id={list.contentid}
-                cardType="map"
-                serviceType="default"
-                title={list.title}
-                location={list.addr1}
-                image={list.firstimage || '/svgs/job-default.svg'}
-                onCardClick={() => {
-                  router.push(
-                    `/spot/${contentId}?contenttypeid=${contentTypeId}&type=${type}`,
-                  );
+        <div
+          ref={mapRef}
+          className={`w-full h-screen ${loading ? 'opacity-0' : 'opacity-100'}`}
+        />
+        {loading ? (
+          <div className="z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full">
+            <Spinner />
+          </div>
+        ) : (
+          <>
+            <SliderContainer>
+              <Slider
+                ref={(slider: Slider | null) => {
+                  sliderRef.current = slider;
                 }}
-                onWishListClick={wishClick}
-              />
-            ))}
-          </Slider>
-        </SliderContainer>
+                /* eslint-disable-next-line react/jsx-props-no-spreading */
+                {...sliderSettings}
+              >
+                {mapList?.map(list => (
+                  <Card
+                    key={list.contentid}
+                    id={list.contentid}
+                    cardType="map"
+                    serviceType="default"
+                    title={list.title}
+                    location={list.addr1}
+                    image={list.firstimage || '/svgs/job-default.svg'}
+                    onCardClick={() => {
+                      router.push(
+                        `/spot/${list.contentid}?contenttypeid=${list.contenttypeid}&type=${type}`,
+                      );
+                    }}
+                    onWishListClick={() => {}}
+                  />
+                ))}
+              </Slider>
+            </SliderContainer>
+          </>
+        )}
       </div>
     </div>
   );

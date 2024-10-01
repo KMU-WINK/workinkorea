@@ -14,6 +14,7 @@ import Image from 'next/image';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
+import { showToastMessage, ToastMessage } from '@/app/utils/toastMessage';
 
 export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -132,6 +133,7 @@ export default function Tour() {
       openModal();
       return;
     }
+    const originState = item.inWishlist;
     setFeedList(prevList =>
       prevList.map(feedItem =>
         feedItem.contentid === item.contentid
@@ -139,17 +141,35 @@ export default function Tour() {
           : feedItem,
       ),
     );
+    let res;
+    let errorType;
+
     try {
       const data: WishItem = {
         type: item.contenttypeid === '32' ? 'stay' : 'spot',
         contentTypeId: item.contenttypeid || '39',
         contentId: item.contentid,
       };
-
       if (item.inWishlist) {
-        await deleteWishItem(data);
+        res = await deleteWishItem(data);
+        errorType = 'delete';
       } else {
-        await postWishItem(data);
+        res = await postWishItem(data);
+        errorType = 'post';
+      }
+      if (res === 'error occurred') {
+        if (errorType === 'delete') {
+          showToastMessage('이미 삭제된 컨텐츠입니다 !', 3000);
+        } else if (errorType === 'post') {
+          showToastMessage('이미 저장된 컨텐츠입니다 !', 3000);
+        }
+        setFeedList(prevList =>
+          prevList.map(feedItem =>
+            feedItem.contentid === item.contentid
+              ? { ...feedItem, inWishlist: originState }
+              : feedItem,
+          ),
+        );
       }
     } catch (error) {
       console.error('Error in wishClick:', error);
@@ -158,6 +178,7 @@ export default function Tour() {
 
   return (
     <div className="w-full flex flex-col items-center gap-5 text-black relative">
+      <ToastMessage />
       {feedList.length > 0 ? (
         <>
           <div className="w-full pt-4 bg-white fixed z-20 flex items-center justify-center ">
@@ -187,6 +208,7 @@ export default function Tour() {
                 location={`${item.addr1} ${item.addr2}`}
                 image={item.image}
                 inWishlist={item.inWishlist}
+                // inWishlist={false}
                 onCardClick={() =>
                   cardClick(item.contentid, item.contenttypeid)
                 }

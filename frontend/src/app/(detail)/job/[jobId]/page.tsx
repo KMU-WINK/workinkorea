@@ -22,6 +22,7 @@ import { getJobDetail } from '@/services/jobs';
 import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
+import { showToastMessage } from '@/app/utils/toastMessage';
 
 const ImageWrapper = styled.div`
   position: relative;
@@ -132,6 +133,8 @@ export default function Job() {
       return;
     }
     let res;
+    let errorType;
+
     const originState = inWish;
     setInWish(!inWish);
 
@@ -144,9 +147,19 @@ export default function Job() {
       if (originState) {
         setInWish(false);
         res = await deleteWishItem(data);
+        errorType = 'delete';
       } else {
         setInWish(true);
         res = await postWishItem(data);
+        errorType = 'post';
+      }
+      if (res === 'error occurred') {
+        if (errorType === 'delete') {
+          showToastMessage('이미 삭제된 컨텐츠입니다 !', 3000);
+        } else if (errorType === 'post') {
+          showToastMessage('이미 저장된 컨텐츠입니다 !', 3000);
+        }
+        setInWish(!inWish);
       }
     } catch (error) {
       console.error('Error in wishClick:', error);

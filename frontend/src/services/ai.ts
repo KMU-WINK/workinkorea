@@ -5,7 +5,6 @@ export const getRecommend = async () => {
     const response = await PublicAxiosInstance.get('/ai');
     return response.data;
   } catch (error) {
-    console.error('Error:', error);
     return [];
   }
 };

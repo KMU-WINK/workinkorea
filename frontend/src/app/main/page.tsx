@@ -55,6 +55,7 @@ export default function MainPage() {
     title: '',
     link: '/',
   });
+  const [loading, setLoading] = useState(true);
 
   const [location, setLocation] = useState<keyof typeof bannerList>('부산');
   const [bannerText, setBannerText] = useState<string>();
@@ -74,7 +75,9 @@ export default function MainPage() {
       if (socialIdCookie) {
         const socialId = socialIdCookie.split('=')[1];
         login(socialId);
+        fetchUserInfo();
       } else {
+        setLoading(false);
         logout();
       }
     };
@@ -109,6 +112,7 @@ export default function MainPage() {
 
   const fetchUserInfo = async () => {
     const result: UserDetail = await getUserDetail();
+    setLoading(false);
     const profileFile = base64ToFile({
       base64String: result.user.profile_picture_base64,
       fileName: 'profile',
@@ -176,37 +180,44 @@ export default function MainPage() {
               {isLoggedIn ? (
                 <>
                   <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
-                    <Image
-                      src={userInfo.profile ? userInfo.profile : ProfileDefault}
-                      alt="Profile"
-                      fill
-                    />
+                    {!loading && (
+                      <Image
+                        src={
+                          userInfo.profile ? userInfo.profile : ProfileDefault
+                        }
+                        alt="Profile"
+                        fill
+                      />
+                    )}
                   </div>
                   <span className="text-sm font-medium">
                     {userInfo.name ? userInfo.name : ''}
                   </span>
                 </>
               ) : (
-                <span className="text-sm font-medium ml-6">워크인코리아</span>
+                !loading && (
+                  <span className="text-sm font-medium ml-6">워크인코리아</span>
+                )
               )}
             </div>
-            {isLoggedIn ? (
-              <div className="flex gap-2">
-                <HeartColor className="cursor-pointer" onClick={wishClick} />
-                <SettingColor
-                  className="cursor-pointer"
-                  onClick={settingClick}
-                />
-              </div>
-            ) : (
-              <button
-                onClick={openModal}
-                className="text-black underline-offset-1 text-xs font-semibold"
-                type="button"
-              >
-                회원가입/로그인
-              </button>
-            )}
+            {!loading &&
+              (isLoggedIn ? (
+                <div className="flex gap-2">
+                  <HeartColor className="cursor-pointer" onClick={wishClick} />
+                  <SettingColor
+                    className="cursor-pointer"
+                    onClick={settingClick}
+                  />
+                </div>
+              ) : (
+                <button
+                  onClick={openModal}
+                  className="text-black underline-offset-1 text-xs font-semibold"
+                  type="button"
+                >
+                  회원가입/로그인
+                </button>
+              ))}
           </div>
           <div className="border border-gray-2 rounded-lg flex flex-col items-center">
             <div className="p-6 w-full flex flex-col gap-7 justify-center items-center">
