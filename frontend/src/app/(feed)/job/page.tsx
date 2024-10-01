@@ -17,6 +17,7 @@ import useModalStore from '@/app/stores/modalStore';
 
 import { postWishItem, deleteWishItem, getWishFeeds } from '@/services/wishs';
 import { showToastMessage } from '@/app/utils/toastMessage';
+import axios from 'axios';
 
 export default function Job() {
   const [feedList, setFeedList] = useState<JobProps[]>([]);
@@ -69,6 +70,13 @@ export default function Job() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 400) {
+          if (error.response.data.detail == 'No data found') {
+            setIsFirst(false);
+          }
+        }
+      }
     } finally {
       setLoading(false);
     }

@@ -15,6 +15,7 @@ import useUserStore from '@/app/stores/loginStore';
 import useModalStore from '@/app/stores/modalStore';
 import { deleteWishItem, getWishFeeds, postWishItem } from '@/services/wishs';
 import { showToastMessage, ToastMessage } from '@/app/utils/toastMessage';
+import axios from 'axios';
 
 export default function Tour() {
   const [feedList, setFeedList] = useState<FeedProps[]>([]);
@@ -81,6 +82,13 @@ export default function Tour() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 400) {
+          if (error.response.data.detail == 'No data found') {
+            setIsFirst(false);
+          }
+        }
+      }
     } finally {
       setLoading(false);
     }
