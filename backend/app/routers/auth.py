@@ -301,7 +301,7 @@ def verify_jwt_token(token: str):
         return social_id
 
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=400, detail="Token has expired")
+        raise HTTPException(status_code=401, detail="Token has expired")
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
