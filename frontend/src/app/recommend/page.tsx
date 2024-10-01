@@ -13,12 +13,14 @@ import { deleteWishItem, postWishItem } from '@/services/wishs';
 import { getRecommend } from '@/services/ai';
 import AISpinner from '@/components/AISpinner';
 import { bannerList } from '@/constants/bannerInfo';
+import {getGoogleRecommends} from "@/services/google";
 
 export default function RecommendPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [feedList, setFeedList] = useState<WishInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [googleIdx, setGoogleIdx] = useState<{ keyword_idx?: number, region_idx?: number }>({});
   const cardClick = (id: string, contentTypeId?: string) => {
     const type = contentTypeId === '32' ? 'stay' : 'spot';
     router.push(`/spot/${id}?contenttypeid=${contentTypeId}?type=${type}`);
@@ -58,9 +60,9 @@ export default function RecommendPage() {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (type: string, region_idx: string | null, keyword_idx?: string | null) => {
     try {
-      const response = await getRecommend();
+      const response = (type === 'google' && region_idx && keyword_idx) ? await getGoogleRecommends(region_idx, keyword_idx) : await getRecommend();
       setFeedList(response);
       setIsLoading(false);
     } catch (error) {
@@ -69,21 +71,25 @@ export default function RecommendPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const location = urlParams.get('location') as
       | keyof typeof bannerList
       | null; // null을 처리
-    const recommendType = urlParams.get('type');
-    console.log('recommendType : ', recommendType);
-    console.log('location', location);
     if (location && bannerList[location]) {
       setTitle(bannerList[location].title);
     }
+
   }, [window.location.search]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const region_idx = urlParams.get('region_idx');
+    const keyword_idx = urlParams.get('keyword_idx');
+    const recommendType = urlParams.get('type');
+
+    if (recommendType)
+      fetchData(recommendType || 'recommend', region_idx, keyword_idx);
+  }, []);
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">
@@ -92,7 +98,7 @@ export default function RecommendPage() {
           <Link href="/main">
             <Back className="cursor-pointer" />
           </Link>
-          <span>{title}</span>
+          <span className="overflow-hidden whitespace-nowrap text-ellipsis">{title}</span>
         </div>
         <div className="w-full flex flex-col px-6 items-center gap-2">
           {feedList.length > 0 ? (

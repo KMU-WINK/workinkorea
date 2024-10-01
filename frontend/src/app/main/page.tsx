@@ -21,6 +21,7 @@ import { getUserDetail } from '@/services/users';
 import { base64ToFile } from '@/utils/imageUtil';
 import { UserDetail } from '@/types/user';
 import ProfileDefault from '../../../public/images/profile-default.jpg';
+import WorkInKoreaDefault from '../../../public/images/workinkorea_profile.png';
 import { bannerList } from '@/constants/bannerInfo';
 import { getGoogleSentence } from '@/services/google';
 
@@ -60,8 +61,9 @@ export default function MainPage() {
   const [location, setLocation] = useState<keyof typeof bannerList>('부산');
   const [bannerText, setBannerText] = useState<string>();
   const [googleLocation, setGoogleLocation] =
-    useState<keyof typeof bannerList>('부산');
-  const [googleImage, setGoogleImage] = useState();
+    useState<keyof typeof bannerList | string>('');
+  const [googleImage, setGoogleImage] = useState('');
+  const [googleIdx, setGoogleIdx] = useState<{ keyword_idx?: number, region_idx?: number }>({});
   const { openModal } = useModalStore();
   const { isLoggedIn, login, logout } = useUserStore();
 
@@ -81,7 +83,7 @@ export default function MainPage() {
         logout();
       }
     };
-    getGoogleInfo();
+    if(!googleLocation) getGoogleInfo();
 
     checkIsLoggedIn();
     setAdInfo({
@@ -108,6 +110,10 @@ export default function MainPage() {
 
   const bannerClick = () => {
     router.push(`/recommend?location=${location}&type=recommend`);
+  };
+
+  const bannerClickGoogle = () => {
+    router.push(`/recommend?location=${googleLocation}&type=google&region_idx=${googleIdx.region_idx}&keyword_idx=${googleIdx.keyword_idx}`);
   };
 
   const fetchUserInfo = async () => {
@@ -138,19 +144,17 @@ export default function MainPage() {
   }, [isLoggedIn]);
 
   const getGoogleInfo = async () => {
-    const gun = await getGoogleSentence();
-    // const gugu = gun.sentence.split(' ')[0];
-    // console.log('gugu : ', gugu);
-    setGoogleLocation(gun.sentence.split(' ')[0]);
-    // console.log('gun : ', gun);
-    setBannerText(gun.sentence);
+    const { sentence, region_idx, keyword_idx } = await getGoogleSentence();
+    const location = sentence.split(' ')[0];
+    setGoogleIdx({
+      region_idx,
+      keyword_idx
+    });
+    setGoogleLocation(location);
+    setBannerText(sentence);
     // @ts-ignore
-    setGoogleImage(bannerList[googleLocation].imagePath2);
+    setGoogleImage(bannerList[location].imagePath2);
   };
-
-  useEffect(() => {
-    console.log('googleLocation : ', googleLocation);
-  }, [googleLocation]);
 
   useEffect(() => {
     if (location) {
@@ -195,9 +199,14 @@ export default function MainPage() {
                   </span>
                 </>
               ) : (
-                !loading && (
-                  <span className="text-sm font-medium ml-6">워크인코리아</span>
-                )
+                <>
+                  <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
+                    {!loading && (
+                      <Image src={WorkInKoreaDefault} alt="Profile" fill />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium">워크인코리아</span>
+                </>
               )}
             </div>
             {!loading &&
@@ -278,7 +287,7 @@ export default function MainPage() {
             type={'white-filter-on'}
             title={'리뷰가 가장 많은 \n' + `${googleLocation} 관광지 추천`}
             description={bannerText || ''}
-            onClick={bannerClick}
+            onClick={bannerClickGoogle}
             backgroundImage={
               <Image
                 src={googleImage || ''}

@@ -36,7 +36,7 @@ export default function Banner({
 
       {/* Content */}
       <div className="relative z-10">
-        <pre className="text-[24px] font-semibold">{title}</pre>
+        <pre className="text-[24px] font-semibold font-sans">{title}</pre>
         <p>{description}</p>
       </div>
     </div>
