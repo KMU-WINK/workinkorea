@@ -14,13 +14,15 @@ import useUserStore from '../stores/loginStore';
 import { AxiosError } from 'axios';
 import { base64ToFile } from '@/utils/imageUtil';
 import Spinner from '@/components/Spinner';
+import useModalStore from '@/app/stores/modalStore';
 
 export default function Setting() {
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const [profileFile, setProfileFile] = useState<File | undefined>();
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const router = useRouter();
-  const { logout } = useUserStore();
+  const { isLoggedIn, logout } = useUserStore();
+  const { openModal } = useModalStore();
 
   const backButtonClick = () => {
     router.push('/main');
@@ -60,8 +62,13 @@ export default function Setting() {
   };
 
   useEffect(() => {
-    fetchUserInfo();
-  }, []);
+    console.log(isLoggedIn);
+    if (isLoggedIn) {
+      fetchUserInfo();
+    } else {
+      openModal();
+    }
+  }, [isLoggedIn]);
 
   if (loading) {
     return (
