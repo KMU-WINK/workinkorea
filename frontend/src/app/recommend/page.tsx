@@ -12,10 +12,11 @@ import Back from 'public/svgs/back.svg';
 import { deleteWishItem, postWishItem } from '@/services/wishs';
 import { getRecommend } from '@/services/ai';
 import AISpinner from '@/components/AISpinner';
+import { bannerList } from '@/constants/bannerInfo';
 
 export default function RecommendPage() {
   const router = useRouter();
-  const [title, setTitle] = useState('바다를 좋아하는 사람을 위한 추천');
+  const [title, setTitle] = useState('');
   const [feedList, setFeedList] = useState<WishInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const cardClick = (id: string, contentTypeId?: string) => {
@@ -70,6 +71,17 @@ export default function RecommendPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const location = urlParams.get('location') as
+      | keyof typeof bannerList
+      | null; // null을 처리
+
+    if (location && bannerList[location]) {
+      setTitle(bannerList[location].title);
+    }
+  }, [window.location.search]);
 
   return (
     <div className="w-screen h-full flex justify-center text-black bg-white">

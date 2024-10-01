@@ -8,7 +8,7 @@ import { parseUrl } from '../_utils/stringUtils';
 import Card from '@/components/Card';
 import Spinner from '@/components/Spinner';
 
-import { FeedProps, WishInfo, WishItem, WishRes } from '@/types/type';
+import { FeedProps, WishItem } from '@/types/type';
 
 import { getStays } from '@/services/stays';
 import Image from 'next/image';
@@ -55,8 +55,6 @@ export default function Stay() {
         setPageCount(Math.floor(response.data.totalCount / 10) + 1);
       }
 
-      console.log(response);
-
       const data = response.data.items.item.map((item: FeedProps) => ({
         contentid: item.contentid,
         cardType: 'default',
@@ -86,7 +84,6 @@ export default function Stay() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
-      router.push('/not-found');
     } finally {
       setLoading(false);
     }
@@ -131,7 +128,7 @@ export default function Stay() {
   }, [page, loading]);
 
   const cardClick = (id: string, contenttypeid?: string) => {
-    router.push(`/spot/${id}?contenttypeid=${contenttypeid}?type=spot`);
+    router.push(`/spot/${id}?contenttypeid=32?type=stay`);
   };
 
   const wishClick = async (item: FeedProps) => {
@@ -148,8 +145,8 @@ export default function Stay() {
     );
     try {
       const data: WishItem = {
-        type: item.contenttypeid === '32' ? 'stay' : 'spot',
-        contentTypeId: item.contenttypeid || '39',
+        type: 'stay',
+        contentTypeId: item.contenttypeid || '32',
         contentId: item.contentid,
       };
 

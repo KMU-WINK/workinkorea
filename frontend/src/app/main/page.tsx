@@ -21,8 +21,9 @@ import { getUserDetail } from '@/services/users';
 import { base64ToFile } from '@/utils/imageUtil';
 import { UserDetail } from '@/types/user';
 import ProfileDefault from '../../../public/images/profile-default.jpg';
+import { bannerList } from '@/constants/bannerInfo';
 
-interface BannerInfo {
+interface BannerType {
   type:
     | 'white-filter-on'
     | 'white-filter-off'
@@ -32,6 +33,7 @@ interface BannerInfo {
   description: string;
   backgroundImage: string;
 }
+
 interface UserInfo {
   name: string;
   profile?: string;
@@ -43,7 +45,7 @@ interface AdInfo {
 
 export default function MainPage() {
   const router = useRouter();
-  const [bannerInfo, setBannerInfo] = useState<BannerInfo[]>([]);
+  const [bannerInfo, setBannerInfo] = useState<BannerType>();
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: '',
     profile: '',
@@ -52,8 +54,8 @@ export default function MainPage() {
     title: '',
     link: '/',
   });
-  // user 정보에 따라 location 적용
-  const [location, setLocation] = useState<string>('강릉');
+
+  const [location, setLocation] = useState<keyof typeof bannerList>('부산');
   const { openModal } = useModalStore();
   const { isLoggedIn, login, logout } = useUserStore();
 
@@ -73,14 +75,7 @@ export default function MainPage() {
     };
 
     checkIsLoggedIn();
-    setBannerInfo([
-      {
-        type: 'white-filter-on',
-        title: '완전한 휴식이 필요할 때',
-        description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요', // 여기에 콤마 추가
-        backgroundImage: '/images/banner-test.jpg',
-      },
-    ]);
+
     setUserInfo({
       name: '여섯글자이름',
       profile: '/images/profile-test.png',
@@ -108,7 +103,7 @@ export default function MainPage() {
   };
 
   const bannerClick = () => {
-    router.push('/recommend');
+    router.push(`/recommend?location=${location}`);
   };
 
   const fetchUserInfo = async () => {
@@ -122,15 +117,31 @@ export default function MainPage() {
       profile: profileFile ? URL.createObjectURL(profileFile) : '',
     });
 
-    if (result.regions && result.regions.length > 0)
-      setLocation(result.regions[0]);
+    if (
+      result.regions &&
+      result.regions.length > 0 &&
+      result.regions[0] in bannerList
+    ) {
+      setLocation(result.regions[0] as keyof typeof bannerList);
+    }
   };
 
   useEffect(() => {
     if (isLoggedIn) {
       fetchUserInfo();
     }
-  }, []);
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (location) {
+      setBannerInfo({
+        type: 'white-filter-on',
+        title: bannerList[location].title,
+        description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요',
+        backgroundImage: bannerList[location].imagePath,
+      });
+    }
+  }, [location]);
 
   return (
     <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
@@ -230,24 +241,25 @@ export default function MainPage() {
           <span className="text-xl font-medium">
             {userInfo.name ? userInfo.name : '사용자'}님을 위한 추천
           </span>
-          {bannerInfo.map((info, index) => (
-            <Banner
-              key={`info-${index}`}
-              type={info.type}
-              title={info.title}
-              description={info.description}
-              onClick={bannerClick}
-              backgroundImage={
-                <Image
-                  src={info.backgroundImage}
-                  alt="Background"
-                  layout="fill"
-                  objectFit="cover"
-                  quality={100}
-                />
-              }
-            />
-          ))}
+          <Banner
+            type={'white-filter-on'}
+            title={bannerInfo?.title || bannerList[location].title}
+            description={
+              bannerInfo?.description || bannerList[location].content
+            }
+            onClick={bannerClick}
+            backgroundImage={
+              <Image
+                src={
+                  bannerInfo?.backgroundImage || bannerList[location].imagePath
+                }
+                alt="Background"
+                layout="fill"
+                objectFit="cover"
+                quality={100}
+              />
+            }
+          />
         </div>
       </div>
     </div>
