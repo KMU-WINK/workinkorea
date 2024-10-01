@@ -21,7 +21,9 @@ import { getUserDetail } from '@/services/users';
 import { base64ToFile } from '@/utils/imageUtil';
 import { UserDetail } from '@/types/user';
 import ProfileDefault from '../../../public/images/profile-default.jpg';
+import WorkInKoreaDefault from '../../../public/images/workinkorea_profile.png';
 import { bannerList } from '@/constants/bannerInfo';
+import { getGoogleSentence } from '@/services/google';
 
 interface BannerType {
   type:
@@ -57,6 +59,11 @@ export default function MainPage() {
   const [loading, setLoading] = useState(true);
 
   const [location, setLocation] = useState<keyof typeof bannerList>('부산');
+  const [bannerText, setBannerText] = useState<string>();
+  const [googleLocation, setGoogleLocation] =
+    useState<keyof typeof bannerList | string>('');
+  const [googleImage, setGoogleImage] = useState('');
+  const [googleIdx, setGoogleIdx] = useState<{ keyword_idx?: number, region_idx?: number }>({});
   const { openModal } = useModalStore();
   const { isLoggedIn, login, logout } = useUserStore();
 
@@ -76,6 +83,7 @@ export default function MainPage() {
         logout();
       }
     };
+    if(!googleLocation) getGoogleInfo();
 
     checkIsLoggedIn();
     setAdInfo({
@@ -101,7 +109,11 @@ export default function MainPage() {
   };
 
   const bannerClick = () => {
-    router.push(`/recommend?location=${location}`);
+    router.push(`/recommend?location=${location}&type=recommend`);
+  };
+
+  const bannerClickGoogle = () => {
+    router.push(`/recommend?location=${googleLocation}&type=google&region_idx=${googleIdx.region_idx}&keyword_idx=${googleIdx.keyword_idx}`);
   };
 
   const fetchUserInfo = async () => {
@@ -126,6 +138,25 @@ export default function MainPage() {
   };
 
   useEffect(() => {
+    if (isLoggedIn) {
+      fetchUserInfo();
+    }
+  }, [isLoggedIn]);
+
+  const getGoogleInfo = async () => {
+    const { sentence, region_idx, keyword_idx } = await getGoogleSentence();
+    const location = sentence.split(' ')[0];
+    setGoogleIdx({
+      region_idx,
+      keyword_idx
+    });
+    setGoogleLocation(location);
+    setBannerText(sentence);
+    // @ts-ignore
+    setGoogleImage(bannerList[location].imagePath2);
+  };
+
+  useEffect(() => {
     if (location) {
       setBannerInfo({
         type: 'white-filter-on',
@@ -133,18 +164,22 @@ export default function MainPage() {
         description: '일에 지친 몸과 마음을 쉬어갈 만한 장소를 확인해보세요',
         backgroundImage: bannerList[location].imagePath,
       });
+      // console.log(
+      //   'bannerList[location].imagePath : ',
+      //   bannerList[location].imagePath2,
+      // );
     }
   }, [location]);
 
   return (
-    <div className="h-full px-6 py-5 border-2 bg-white flex justify-center items-start text-black">
+    <div className="h-full px-6 py-5 bg-white flex justify-center items-start text-black">
       <div
         className="flex flex-col justify-start items-center
         gap-9
         bg-white w-full sm:max-w-sm pb-20"
       >
         <div className="flex flex-col gap-3.5 w-full">
-          <div className="flex justify-between h-6">
+          <div className="flex justify-between">
             <div className="flex gap-1 items-center cursor-pointer">
               {isLoggedIn ? (
                 <>
@@ -160,13 +195,18 @@ export default function MainPage() {
                     )}
                   </div>
                   <span className="text-sm font-medium">
-                    {userInfo.name && userInfo.name}
+                    {userInfo.name ? userInfo.name : ''}
                   </span>
                 </>
               ) : (
-                !loading && (
-                  <span className="text-sm font-medium ml-6">워크인코리아</span>
-                )
+                <>
+                  <div className="rounded-full overflow-hidden w-[20px] h-[20px] relative">
+                    {!loading && (
+                      <Image src={WorkInKoreaDefault} alt="Profile" fill />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium">워크인코리아</span>
+                </>
               )}
             </div>
             {!loading &&
@@ -232,27 +272,25 @@ export default function MainPage() {
               href={adInfo.link ? adInfo.link : '/main'}
               className="p-6 w-full flex gap-7 justify-between items-center"
             >
-              <span>{adInfo.title ? adInfo.title : '광고'}</span>
+              <span>{adInfo.title ? adInfo.title : ''}</span>
               <Go />
             </Link>
           </div>
         </div>
         <div className="flex flex-col gap-5 w-full">
           <span className="text-xl font-medium">
-            {userInfo.name ? userInfo.name : '사용자'}님을 위한 추천
+            {isLoggedIn && userInfo.name
+              ? `${userInfo.name}님을 위한 추천`
+              : '이런 건 어떠세요 ?'}
           </span>
           <Banner
             type={'white-filter-on'}
-            title={bannerInfo?.title || bannerList[location].title}
-            description={
-              bannerInfo?.description || bannerList[location].content
-            }
-            onClick={bannerClick}
+            title={'리뷰가 가장 많은 \n' + `${googleLocation} 관광지 추천`}
+            description={bannerText || ''}
+            onClick={bannerClickGoogle}
             backgroundImage={
               <Image
-                src={
-                  bannerInfo?.backgroundImage || bannerList[location].imagePath
-                }
+                src={googleImage || ''}
                 alt="Background"
                 layout="fill"
                 objectFit="cover"
@@ -260,6 +298,25 @@ export default function MainPage() {
               />
             }
           />
+          {isLoggedIn && (
+            <Banner
+              type={'white-filter-on'}
+              title={bannerInfo?.title || bannerList[location].title}
+              description={
+                bannerInfo?.description || bannerList[location].content
+              }
+              onClick={bannerClick}
+              backgroundImage={
+                <Image
+                  src={bannerList[location].imagePath}
+                  alt="Background"
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                />
+              }
+            />
+          )}
         </div>
       </div>
     </div>
