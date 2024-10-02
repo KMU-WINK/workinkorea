@@ -14,11 +14,15 @@ jobs:
     
     steps:
       - name: Checkout source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.JIWON_GITHUB_KEY }}
+          fetch-depth: 0
+          ref: develop
 
       - name: Configure git
         run: |
-          git remote add forked-repo https://${{ secrets.JIWON_GITHUB_KEY }}@github.com/Choi-Jiwon-38/workinkorea.git
+          git remote add forked-repo https://Choi-Jiwon-38:${{ secrets.JIWON_GITHUB_KEY }}@github.com/Choi-Jiwon-38/workinkorea.git
           git config user.name "Choi-Jiwon-38"
           git config user.email "chlrhwldnjs@naver.com"
 
