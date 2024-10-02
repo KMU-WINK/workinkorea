@@ -26,4 +26,4 @@ jobs:
 
       - name: Push to forked repo
         run: |
-          git push fork develop
+          git push fork develop --force
