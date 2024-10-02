@@ -1,4 +1,4 @@
-name: Sync to Foked Repo
+name: Sync to Forked Repo
 
 on:
   push:
@@ -8,28 +8,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: pandoc/latex
+    
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout source repository
+        uses: actions/checkout@v2
 
-      - name: Install mustache (to update the date)
-        run: apk add ruby && gem install mustache
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
 
-      - name: creates output
-        run: sh ./build.sh
+      - name: Add fork as remote
+        run: |
+          git remote add fork https://${{secrets.JIWON_GITHUB_TOKEN}}@github.com/Choi-Jiwon-38/workinkorea.git
+          git fetch fork
+          git checkout develop
 
-      - name: Pushes to another repository
-        id: push_directory
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.JIWON_GITHUB_TOKEN }}
-        with:
-          source-directory: 'output'
-          destination-github-username: 'Choi-Jiwon-38'
-          destination-repository-name: 'workinkorea'
-          user-email: 'chlrhwldnjs@naver.com'
-          commit-message: ${{ github.event.commits[0].message }}
-          target-branch: develop
-
-      - name: Test get variable exported by push-to-another-repository
-        run: echo $DESTINATION_CLONED_DIRECTORY
+      - name: Push to forked repo
+        run: |
+          git push fork develop
