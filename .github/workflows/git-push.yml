@@ -20,7 +20,7 @@ jobs:
 
       - name: Add fork as remote
         run: |
-          git remote add fork https://${{secrets.JIWON_GITHUB_TOKEN}}@github.com/Choi-Jiwon-38/workinkorea.git
+          git remote add fork https://${{secrets.JIWON_GITHUB_KEY}}@github.com/Choi-Jiwon-38/workinkorea.git
           git fetch fork
           git checkout develop
 
