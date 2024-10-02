@@ -18,15 +18,14 @@ jobs:
 
       - name: Configure git
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git remote add forked-repo https://${{ secrets.JIWON_GITHUB_KEY }}@github.com/Choi-Jiwon-38/workinkorea.git
+          git config user.name "Choi-Jiwon-38"
+          git config user.email "chlrhwldnjs@naver.com"
 
-      - name: Add fork as remote
+      - name: Push changes to forked-repo
         run: |
-          git remote add fork https://${{secrets.JIWON_GITHUB_KEY}}@github.com/Choi-Jiwon-38/workinkorea.git
-          git fetch fork
-          git checkout develop
+          git push -f forked-repo develop
 
-      - name: Push to forked repo
+      - name: Clean up
         run: |
-          git push fork develop --force-with-lease
+          git remote remove forked-repo
