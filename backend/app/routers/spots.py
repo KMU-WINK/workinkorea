@@ -13,10 +13,6 @@ from .auth import get_current_user
 from ..models.Spot import Spot
 from ..models.Stay import Stay
 
-# from datetime import datetime
-
-# formatted_date = datetime.now().strftime("%Y-%m-%d")
-
 router = APIRouter(
     prefix="/spots",
     tags=["spots"],

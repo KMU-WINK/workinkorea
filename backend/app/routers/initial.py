@@ -13,7 +13,6 @@ router = APIRouter(
 
 
 # region을 사전에 만들어놓기 위한 코드입니다.
-# @router.get("/store_region_to_db", include_in_schema=False) -> docs에서 사라집니다.
 @router.get("/store_region_to_db", include_in_schema=False)
 def store_region_to_db(db: Session = Depends(get_db)):
     regions = ["강릉", "부산", "제주", "경주", "여수", "전주", "춘천"]

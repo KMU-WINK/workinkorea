@@ -1,8 +1,11 @@
 from fastapi import Request, APIRouter, Depends, HTTPException
 import requests, os, random
-import xml.etree.ElementTree as ET
-import googlemaps
+from sqlalchemy.orm import Session
+from .auth import get_current_user
+from ..db.session import get_db
 from dotenv import load_dotenv
+from ..models.Spot import Spot
+from ..models.Stay import Stay
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -25,7 +28,6 @@ AREA_CODE = {
 
 
 def get_additional_info(location, query):
-    print("api", location, query)
     url = "http://apis.data.go.kr/B551011/KorService1/searchKeyword1"
     params = {
         "serviceKey": API_KEY,
@@ -64,11 +66,8 @@ def get_places(query, location, radius):
             data = response.json()
             return data["results"]
         except requests.exceptions.JSONDecodeError as e:
-            print(f"JSONDecodeError: {e}")
-            print("Response content:", response.text)
             raise e
     else:
-        print(f"Error: {response.status_code}")
         raise HTTPException(status_code=400, detail="No data found in get_places")
 
 
@@ -78,15 +77,12 @@ def get_lat_lng(location):
     response = requests.get(GOOGLE_URL, params=params)
     if response.status_code == 200:
         data = response.json()
-        # print("Geocoding API response:", data)
         if data["results"]:
             location = data["results"][0]["geometry"]["location"]
             return location["lat"], location["lng"]
         else:
-            print("No results found for the location.")
             raise ValueError("No results found for the location.")
     else:
-        print(f"Error: {response.status_code}")
         raise HTTPException(status_code=400, detail="No data found in get_lat_lng")
 
 
@@ -120,33 +116,34 @@ def sentence(request: Request):
 
 # 1. 문장 먼저 주기
 @router.get("/list")
-async def main(request: Request, region_idx: int, keyword_idx: int):
+async def main(
+    request: Request, region_idx: int, keyword_idx: int, db: Session = Depends(get_db)
+):
+    current_user = get_current_user(request, db)
+    if current_user is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}",
+        )
+    else:
+        stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
+        spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
+        wishs = [wish.content_id for wish in stay_wish + spot_wish]
+
     if region_idx < 0 or region_idx >= len(keys):
         raise HTTPException(status_code=400, detail="Invalid region index")
     if keyword_idx < 0 or keyword_idx >= len(LOCATION_QUERY[keys[region_idx]]):
         raise HTTPException(status_code=400, detail="Invalid keyword index")
     location = keys[region_idx]  # 예: "부산"
     query = LOCATION_QUERY[location][keyword_idx]  # 예: "부산 관광지"
-    # print(location, query)
     radius = 10000  # 반경 10km
-    # 도시 이름으로 위도와 경도 가져오기
-    lat, lng = get_lat_lng(location)
-    # if lat is None or lng is None:
-    #     print("위도와 경도를 가져올 수 없습니다.")
-    #     return
-
-    lat_lng = f"{lat},{lng}"
 
     # 관광지 검색
     places = get_places(location + query, location, radius)
-    # if not places:
-    #     print("관광지 없음")
-    #     return
 
     # 각 관광지의 리뷰 수와 이름 가져오기
     places_with_reviews = []
     for place in places:
-        place_id = place["place_id"]
         place_name = place["name"]
         reviews = place.get("user_ratings_total")  # 리뷰 수
         if reviews is not None:
@@ -154,10 +151,9 @@ async def main(request: Request, region_idx: int, keyword_idx: int):
 
     # 리뷰 수로 정렬 (내림차순: 리뷰가 많은 순)
     places_with_reviews.sort(key=lambda x: x[1], reverse=True)
-    # print(places_with_reviews)
 
     tour_result = get_additional_info(location, query)
-    # print(tour_result)
+
     titles = [item["title"] for item in tour_result]
     result = []
     # # 결과 출력 및 추가 정보 가져오기 (추가 정보가 없는 경우 제외)
@@ -167,6 +163,9 @@ async def main(request: Request, region_idx: int, keyword_idx: int):
                 result.append(tour_result[idx])
 
     if len(result):
+        if wishs:
+            for item in result:
+                item["inWish"] = item["contentid"] in wishs
         return result
     else:
         raise HTTPException(status_code=500, detail="No data found in google reccomend")
