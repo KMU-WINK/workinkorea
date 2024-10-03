@@ -91,9 +91,6 @@ def get_works_by_id(id: str, db: Session = Depends(get_db)):
     return work_names
 
 
-# root path
-
-
 @router.get("")
 async def read_users(db: Session = Depends(get_db)):
     return db.query(User).all()
@@ -294,7 +291,6 @@ async def update_user_work(user: WorkUpdate, db: Session = Depends(get_db)):
 @router.patch("/profile")
 async def update_user_profile(request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
-    # current_user = db.query(User).filter(User.id == 1).first() #for test
     form = await request.form()
     profile: UploadFile = form.get("profile")
     if not profile:
@@ -314,25 +310,7 @@ async def update_user_profile(request: Request, db: Session = Depends(get_db)):
     return "Profile updated successfully"
 
 
-# user recommendation
-@router.get("/recommend")
-async def recommend_user(request: Request, db: Session = Depends(get_db)):
-    # current_user = get_current_user(request, db)
-    current_user = db.query(User).filter(User.id == 7).first()  # for test
+# @router.delete("")
+# async def delete_user(id: int):
 
-    if current_user is None:
-        raise HTTPException(
-            status_code=400,
-            detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}",
-        )
-
-    regions = get_regions_by_id(current_user.id, db)
-    interests = get_interests_by_id(current_user.id, db)
-    # works = get_works_by_id(current_user.id, db)
-    return "result"
-
-
-@router.delete("")
-async def delete_user(id: int):
-
-    return "delete_user"
+#     return "delete_user"

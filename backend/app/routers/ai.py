@@ -75,6 +75,7 @@ model = None
 
 model_name = "distilbert-base-uncased"
 # model_name = "bert-base-multilingual-cased"
+
 # 모델은 프로세스 풀 외부에서 로드
 tokenizer = BertTokenizer.from_pretrained(model_name)
 model = BertModel.from_pretrained(model_name)
@@ -178,7 +179,5 @@ async def recommend_tourist_spots(request: Request, db: Session = Depends(get_db
     if wishs:
         for item in result:
             item["inWish"] = item["contentid"] in wishs
-    # for r in result:
-    #     print(r)
-    print(f"Total time: {int((time.time() - ts) * 1000)}ms")
+
     return result

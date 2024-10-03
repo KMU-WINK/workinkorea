@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from ..db.session import get_db
-from ..models.User import User
 from ..models.Spot import Spot
 from ..models.Stay import Stay
 from ..models.Job import Job

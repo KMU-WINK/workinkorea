@@ -92,7 +92,6 @@ async def naverAuth(
 
     access_token = _result.get("access_token")
 
-    print(_result)
     if not access_token:
         raise ValueError("Access token not found in response")
 
@@ -304,9 +303,7 @@ def verify_jwt_token(token: str):
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
     # 쿠키에서 accessToken 가져오기
-    print(request.cookies)
     token = request.cookies.get("accessToken")
-    print(token)
     # 요청에서 Access token이 넘어오지 않았을 때
     if token is None:
         raise HTTPException(
