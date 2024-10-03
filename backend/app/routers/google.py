@@ -119,13 +119,9 @@ def sentence(request: Request):
 async def main(
     request: Request, region_idx: int, keyword_idx: int, db: Session = Depends(get_db)
 ):
-    current_user = get_current_user(request, db)
-    if current_user is None:
-        raise HTTPException(
-            status_code=400,
-            detail=f"user not found. request.header.Authorization: {request.headers.get('Authorization')}",
-        )
-    else:
+    wishs = []
+    if request.cookies.get("accessToken"):
+        current_user = get_current_user(request, db)
         stay_wish = db.query(Stay).filter(Stay.user_id == current_user.id).all()
         spot_wish = db.query(Spot).filter(Spot.user_id == current_user.id).all()
         wishs = [wish.content_id for wish in stay_wish + spot_wish]
@@ -163,9 +159,8 @@ async def main(
                 result.append(tour_result[idx])
 
     if len(result):
-        if wishs:
-            for item in result:
-                item["inWish"] = item["contentid"] in wishs
+        for item in result:
+            item["inWish"] = item["contentid"] in wishs
         return result
     else:
         raise HTTPException(status_code=500, detail="No data found in google reccomend")
