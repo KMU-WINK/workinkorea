@@ -22,6 +22,8 @@ export default function Step3() {
   const socialId = searchParam.get('social_id');
   const router = useRouter();
 
+  const isDevMode = typeof window !== 'undefined' && window.location.hostname !== 'workinkorea.info';
+
   const handleNextClick = async () => {
     try {
       await createUserInterest({
@@ -29,7 +31,7 @@ export default function Step3() {
         interests: selectedOptions,
       });
       const data = await PublicAxiosInstance.get(
-        `/auth/token?social_id=${socialId}`,
+        `/auth/token?social_id=${socialId}&is_dev_mode=${isDevMode}`,
       );
       const redirectUrl = data.data.redirect_url;
       router.push(redirectUrl);
