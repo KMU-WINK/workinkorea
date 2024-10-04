@@ -5,3 +5,10 @@
 pre {
     font-family: inherit;
 }
+
+/* 다크 모드를 무시하고 항상 라이트 모드 적용 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light;
+  }
+}
