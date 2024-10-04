@@ -3,8 +3,9 @@
   "short_name": "워크인코리아",
   "description": "원하는 곳에서 머무르며 일하다",
   "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#000000",
+  "display": "browser",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
